@@ -20,6 +20,7 @@ public class Users {
 	@Id
     // Tự động sinh giá trị cho khóa chính (ID) khi một bản ghi mới được tạo
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "USER_ID")
 	private Long id;
 	// Tên
 	@Column(name = "USER_NAME")
@@ -28,7 +29,7 @@ public class Users {
 	@Column(name = "USER_PASSWORD")
 	private String pass;
 	// Quyền hạn
-	@Column(name = "ROLE")
+	@Column(name = "USER_ROLE")
 	private String role;
 	// Họ tên
 	@Column(name = "FULL_NAME")
@@ -37,7 +38,7 @@ public class Users {
 	@Column(name = "USER_EMAIL")
 	private String email;
 	// Số điện thoại
-	@Column(name = "PHONE_NUMBER")
+	@Column(name = "USER_PHONE_NUMBER")
 	private String phoneNumber;
 	// Id của tỉnh/thành
 	@Column(name = "PROVINCE_ID")

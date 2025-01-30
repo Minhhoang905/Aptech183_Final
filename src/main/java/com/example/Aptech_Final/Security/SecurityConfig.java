@@ -13,30 +13,28 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
-//import com.example.Aptech_Final.Service.Imp.UserDetailsServiceImpl;
-
-
+import com.example.Aptech_Final.Service.Imp.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     @Autowired
-//    private UserDetailsServiceImpl userDetailsService;
-	
+    private UserDetailsServiceImpl userDetailsService;
+
 //	@Bean này thay thế cho WebSecurityConfigureAdapter
 	@SuppressWarnings("removal")
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(auth -> auth
-					.requestMatchers("/home/search").permitAll() //Không đăng nhập: Chỉ được phép xem home
-					.requestMatchers("/doLogin", "/register", "/doRegister", "/changePass", "/doChangePass").permitAll() 
+					.requestMatchers("/home").permitAll() //Không đăng nhập: Chỉ được phép xem home
+					.requestMatchers("/doLogin").permitAll() 
 					.requestMatchers("/home/doSearch").hasAnyRole("ADMIN", "USER") //Cả user và admin thực hiện search
-					.requestMatchers("/home/insert", "/home/update", "/home/doUpdate", "/home/doDelete").hasRole("ADMIN") //admin: có toàn quyền
+					.requestMatchers("/home/insert").hasRole("ADMIN") //admin: có toàn quyền
 					.anyRequest().authenticated() //Yêu cầu khác phải đăng nhập
 			)
 			.formLogin(login -> login
 					.loginPage("/login") //Trang login
-					.defaultSuccessUrl("/home/search", true) //Chuyển hướng sau khi đăng nhập thành công
+					.defaultSuccessUrl("/home/main", true) //Chuyển hướng sau khi đăng nhập thành công
 					.permitAll() //Ai cũng có thể truy cập
 			)
 			.logout(logout -> logout
@@ -51,10 +49,10 @@ public class SecurityConfig {
 		return http.build();
 	}
 		
-//    @Autowired
-//    protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
-//    }
+    @Autowired
+    protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+    }
     
     @Bean
     public PasswordEncoder passwordEncoder() {

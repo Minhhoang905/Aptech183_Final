@@ -38,7 +38,7 @@ public class LoginController {
 			// Tạo if để kiểm tra xem tên đăng nhập của người dùng có bị rỗng không
 			if (!StringUtils.isEmpty(username)) {
 				// Nếu đã đăng nhập, điều hướng về link sau
-				return "redirect:/home/search";
+				return "redirect:/home/main";
 			}
 		}
 		//Kiểm tra nếu có tham số "error" trong URL (được gửi từ Spring Security)
