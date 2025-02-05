@@ -10,5 +10,5 @@ import com.example.Aptech_Final.Enity.Ward;
 @Repository
 public interface WardRepository extends JpaRepository<Ward, Long>{
 	// Tạo phương thức tùy chỉnh để tìm danh sách xã theo id Quận
-	//List<Ward> findXaByIdQuan(Long districtId);
+	List<Ward> findWardByDistrictId(Long districtId);
 }

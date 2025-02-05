@@ -15,7 +15,7 @@
 	
     <p th:text="${mes}"></p>
     <button class="login-button" th:if="${role == 'Anonymous'}" th:onclick="@{location.href='/login'}">Login</button>    
-    <button class="logout-button" th:if="${role != 'Anonymous'}" th:onclick="@{location.href='/logout'}">Logout</button>
+    <button class="logout-button" th:if="${role != 'Anonymous'}" th:onclick="@{location.href='/login'}">Logout</button>
         <div class="container">
 </body>
 </html>

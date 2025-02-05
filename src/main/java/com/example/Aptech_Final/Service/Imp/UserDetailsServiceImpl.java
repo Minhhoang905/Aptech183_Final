@@ -7,13 +7,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.example.Aptech_Final.Enity.Users;
-import com.example.Aptech_Final.Repository.LoginRepository;
+import com.example.Aptech_Final.Repository.UserRepository;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService{
 	// Inject LoginRepository để lấy truy cập DB
 	@Autowired
-	private LoginRepository loginRepository;
+	private UserRepository loginRepository;
 	
     // Gọi phương thức (ghi đè phương thức có sẵn trong UserDetails) khi người dùng đăng nhập để xác thực thông tin người dùng
     @Override

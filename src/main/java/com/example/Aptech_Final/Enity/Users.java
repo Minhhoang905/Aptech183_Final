@@ -2,6 +2,8 @@ package com.example.Aptech_Final.Enity;
 
 
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,6 +39,9 @@ public class Users {
 	// Email
 	@Column(name = "USER_EMAIL")
 	private String email;
+	// Ngày tháng năm sinh
+	@Column(name = "USER_DOB")
+	private LocalDate dateOfBirth;
 	// Số điện thoại
 	@Column(name = "USER_PHONE_NUMBER")
 	private String phoneNumber;
@@ -85,6 +90,12 @@ public class Users {
 	}
 	public void setFullName(String fullName) {
 		this.fullName = fullName;
+	}
+	public LocalDate getDateOfBirth() {
+		return dateOfBirth;
+	}
+	public void setDateOfBirth(LocalDate dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
 	}
 	public String getEmail() {
 		return email;

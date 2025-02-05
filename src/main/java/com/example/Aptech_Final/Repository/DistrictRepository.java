@@ -10,5 +10,5 @@ import com.example.Aptech_Final.Enity.District;
 @Repository
 public interface DistrictRepository extends JpaRepository<District, Long>{
 	// Tạo phương thức tùy chỉnh để tìm danh sách quận theo id Tỉnh
-	//List<District> findQuanByIdTinh(Long provinceId);
+	List<District> findDistrictByProvinceId(Long provinceId);
 }
