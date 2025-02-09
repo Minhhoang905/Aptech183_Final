@@ -2,13 +2,17 @@ package com.example.Aptech_Final.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -18,6 +22,9 @@ import com.example.Aptech_Final.Enity.Province;
 import com.example.Aptech_Final.Enity.Ward;
 import com.example.Aptech_Final.Form.UserForm;
 import com.example.Aptech_Final.Service.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 
 
@@ -131,5 +138,14 @@ public class UserController {
 			return "changePass";
 		}
 	}	
+	// Phương thức để log out và đưa về page login.html
+	@GetMapping(path = "/logout")
+	public String logout(HttpServletRequest request, HttpServletResponse reponse) {
+		//Tạo đối tượng SecurityContextLogoutHandler để xử lý việc đăng xuất
+		SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+		//Gọi phương thức logout() có sẵn của SecurityContextServerLogoutHandle để thực hiện đăng xuất
+		logoutHandler.logout(request, reponse, null);
+		return "redirect:/ComplexGym/home";
+	}
 
 }
