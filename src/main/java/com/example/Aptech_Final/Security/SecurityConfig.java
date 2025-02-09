@@ -36,14 +36,18 @@ public class SecurityConfig {
 					.loginPage("/login") //Trang login
 					.defaultSuccessUrl("/ComplexGym/home", true) //Chuyển hướng sau khi đăng nhập thành công
 					.permitAll() //Ai cũng có thể truy cập
-			)
+			)			
 			.logout(logout -> logout
 					.logoutUrl("/logout") //Đường dẫn logout
 					.invalidateHttpSession(true) //Xóa session
 					.clearAuthentication(true) // Xóa authen
 					.permitAll()
 			)
-			.anonymous(); //Bật chế độ khách (anonymous) 
+	        .rememberMe(rememberMe -> rememberMe // Kích hoạt Remember-Me
+	                .key("uniqueAndSecret") // Tên khóa bí mật
+	                .tokenValiditySeconds(7 * 24 * 60 * 60) // Thời hạn 7 ngày
+	            )
+	        .anonymous(); //Bật chế độ khách (anonymous) 
 		
 		//Hoàn tất cấu hình bảo mật và trả về SecurityFilterChain
 		return http.build();
@@ -58,6 +62,7 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    
     // Xử lý lỗi đăng nhập
     @Bean
     public AuthenticationFailureHandler authenticationFailureHandler() {

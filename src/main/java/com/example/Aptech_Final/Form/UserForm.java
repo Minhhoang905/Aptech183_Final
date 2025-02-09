@@ -10,6 +10,8 @@ public class UserForm {
 	private String password;
 	// Password mới
 	private String newPassword;
+	// Thuộc tính cho checkbox Remember Me
+	private boolean rememberMe;
 	// Họ tên đầy đủ
 	private String fullName;
 	// Ngày tháng năm sinh
@@ -48,6 +50,13 @@ public class UserForm {
 	public void setNewPassword(String newPassword) {
 		this.newPassword = newPassword;
 	}
+    public boolean isRememberMe() {
+        return rememberMe;
+    }
+
+    public void setRememberMe(boolean rememberMe) {
+        this.rememberMe = rememberMe;
+    }
 	public String getFullName() {
 		return fullName;
 	}

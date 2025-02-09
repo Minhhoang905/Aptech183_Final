@@ -61,10 +61,6 @@
             color: blue;
             text-align: center;
         }
-        .register-link {
-            font-size: 14px;
-            text-align: right;
-        }
         .toggle-password {
             cursor: pointer;
             position: absolute;
@@ -101,9 +97,8 @@
             </div>
             <div class="checkbox-container">
                 <label>
-                    <input type="checkbox" name="remember" checked="checked"> Remember Me
+                    <input type="checkbox" id="rememberMe" name="rememberMe" checked="checked"> Remember Me
                 </label>
-                <a th:href="register" class="register-link">Register</a>
             </div>
             <button type="submit" class="submit-button">Login</button>
              <a href="changePass" class="change-password-link">Change Password</a> 

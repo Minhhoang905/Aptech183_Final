@@ -29,7 +29,9 @@ public class UserController {
 	
     @SuppressWarnings("deprecation") // Loại bỏ cảnh báo deprecation, liên quan đến các phương thức hoặc lớp cũ
 	@GetMapping("/login")  //Dùng getmapping với authentication từ spring security để đăng nhập 
-	public String login(Authentication authentication, ModelMap model, @RequestParam (value ="error", required = false) String error) {
+	public String login(Authentication authentication, ModelMap model,
+						@RequestParam (value ="error", required = false) String error, 
+						@RequestParam(value = "rememberMe", required = false) String rememberMe) {
 		// Kiểm tra xem người dùng đã đăng nhập hay chưa thông qua đối tượng
 		// Athentication
 		if (null != authentication) {
@@ -41,10 +43,15 @@ public class UserController {
 				return "redirect:/ComplexGym/home";
 			}
 		}
-		//Kiểm tra nếu có tham số "error" trong URL (được gửi từ Spring Security)
+		// Kiểm tra nếu có tham số "error" trong URL (được gửi từ Spring Security)
 		if (error != null) {
 			model.addAttribute("errMes", "Wrong name or password");
-		}		
+		}
+		
+		// Kiểm tra xem có tham số rememberMe từ form thì thêm vào model 
+		if (rememberMe != null) {
+			model.addAttribute("remember", true);
+		}
 		// Nếu chưa đăng nhập thì đưa về lại login
 		return "login";
 	}
