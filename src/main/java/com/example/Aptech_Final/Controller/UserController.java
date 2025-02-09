@@ -104,5 +104,32 @@ public class UserController {
             return "redirect:/register";
         }
 	}
+	// Phương thức để hiển thị changePass.html
+	@GetMapping("/changePass")
+	public String changePass(ModelMap model) {
+		return "changePass";
+	}
+	
+	// Phương thức để cập nhập mật khẩu ở changePass.html
+	@PostMapping("/doChangePass")
+	public String doChangePass(@ModelAttribute UserForm userForm, ModelMap model) {
+		
+		// Tạo 1 boolean và gọi phương thức `changePass` từ UserService để kiểm tra và cập nhập mật khẩu
+		boolean isPasswordChanged = userService.changePass(	userForm.getUsername(),
+															userForm.getPassword(),
+															userForm.getNewPassword(), model);
+		// Tạo if-else để điều hướng trang web
+		if (isPasswordChanged) {
+			// Nếu thành công => Thêm thuộc tính "mes" để chuyển hướng tới trang login với thông báo
+			model.addAttribute("okMess", "Password changed successfully!");
+			// Đi đến trang login.html
+			return "login";
+		}else {
+			// Nếu thất bại => Thêm thuộc tính "mes" ở trang đổi mật khẩu với thông báo
+			model.addAttribute("mes", "Invalid username or password");
+			// Quay trở lại trang ChangePass.html
+			return "changePass";
+		}
+	}	
 
 }

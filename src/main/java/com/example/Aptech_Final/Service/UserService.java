@@ -74,7 +74,7 @@ public class UserService{
 			model.addAttribute("mes","Tên người dùng đã tồn tại.");
 			return false; // <= Invalid
 		}
-		//Tạo ifelse check các điều kiện
+		// Tạo ifelse check các điều kiện
 		if (userForm.getUsername().length() < 6) {
 			// Kiểm tra nếu độ dài phải nằm trong khoảng 8 đến 16
 			model.addAttribute("mes", "Username less than 5 characters");
@@ -125,6 +125,38 @@ public class UserService{
 		}				
 	}
 	
+	// Phương thức boolean để cập nhập mật khẩu
+	public boolean changePass(String username,String oldPassword , String newPassword, ModelMap model) {
+		// Kiểm tra tính hợp lệ của user 
+		Users users = userRepository.findByName(username);
+		// Tạo if-else để kiểm tra thông tin và check xem mật khẩu đã nhập có đúng không
+		if (users != null && passwordEncoder.matches(oldPassword, users.getPass())) {	
+			if (newPassword.length() < 9 || newPassword.length() > 21) {
+				// Kiểm tra độ dài phải nằm trong khoảng 8 đến 20
+				model.addAttribute("mes", "Password must be between 8 and 20 characters");
+				return false; // <= Invalid
+			}else if (!Pattern.compile("[A-Z]").matcher(newPassword).find()) {
+				// Kiểm tra kí tự in hoa của password
+				model.addAttribute("mes", "Password must contain at least one uppercase letter");
+				return false; // <= Invalid
+			}else if (!Pattern.compile("[^a-zA-Z0-9]").matcher(newPassword).find()) {
+				// Kiểm tra kí tự đặc biệt của password
+	            model.addAttribute("mes", "Password must contain at least one special character");
+	            return false; // <= Invalid
+			}else {
+				// Cập nhập mật khẩu mới với passwordEncoder
+				users.setPass(passwordEncoder.encode(newPassword));
+				// Cập nhập vào database
+				userRepository.save(users);
+				// Trả về true
+				return true;
+			}
+		}else {
+			model.addAttribute("mes", "Old password is incorrect");
+			// Trả về false nếu không hợp lệ
+			return false;
+		}
+	}
 	
 }
 

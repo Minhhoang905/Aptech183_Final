@@ -27,7 +27,7 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(auth -> auth
 					.requestMatchers("/ComplexGym/home", "/register","/doRegister", "/loginAPI", "/loginAPI/getDistrictDropdown", "/loginAPI/getWardDropdown").permitAll() //Không đăng nhập: Chỉ được phép xem home
-					.requestMatchers("/doLogin").permitAll() 
+					.requestMatchers("/doLogin",  "/doChangePass", "/changePass").permitAll() 
 					.requestMatchers("/home/doSearch").hasAnyRole("ADMIN", "USER") //Cả user và admin thực hiện search
 					.requestMatchers("/home/main").hasRole("ADMIN") //admin: có toàn quyền
 					.anyRequest().authenticated() //Yêu cầu khác phải đăng nhập
