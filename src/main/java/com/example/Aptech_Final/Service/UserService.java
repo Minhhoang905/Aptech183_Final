@@ -1,6 +1,7 @@
 package com.example.Aptech_Final.Service;
 
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -10,7 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 
-import com.example.Aptech_Final.Controller.DTO.DropdownDTO;
+import com.example.Aptech_Final.Controller.DTO.UserManagementDTO;
+import com.example.Aptech_Final.Controller.DTO.UsersDTO;
 import com.example.Aptech_Final.Enity.District;
 import com.example.Aptech_Final.Enity.Users;
 import com.example.Aptech_Final.Enity.Ward;
@@ -50,9 +52,9 @@ public class UserService{
 		return wardRepository.findWardByDistrictId(districtId);
 	}
 	//Method hiển thị các dropdown
-	public DropdownDTO getDropDown() {
+	public UsersDTO getDropDown() {
 		// Tạo DTO chứa các dữ liệu cần thiết cho trang home
-		DropdownDTO dropdownDTO = new DropdownDTO();
+		UsersDTO dropdownDTO = new UsersDTO();
 		
 		// Lấy danh sách Tỉnh từ phương thức ở repository
 		dropdownDTO.setProvinceList(provinceRepository.findAll());
@@ -157,6 +159,100 @@ public class UserService{
 			return false;
 		}
 	}
+
+	// Phương thức để tìm kiếm thông tin user dựa trên các tham số (parameter) truyền vào
+	public List<UserManagementDTO> findUser(Long id, 
+											String username, 
+											String fullName, 
+											LocalDate dateOfBirth, 
+											String email, 
+											String phoneNumber, 
+											Long provinceId, 
+											Long districtId, 
+											Long wardId, 
+											String address, 
+											String role) {
+		List<UserManagementDTO> user = userRepository.selectUsersInfo(id, username, fullName, dateOfBirth, email, phoneNumber, provinceId, districtId, wardId, address, role);
+		return user;
+	}
 	
+	// Phương thức để chuẩn bị dữ liệu, hiển thị ban đầu cho trang userManagement
+	public UsersDTO getUsersDTO(Users users) {
+
+		// Lấy danh sách của UsersDTO theo từ entity của Users
+		// id
+		Long userId = users.getId();
+		// Tên tài khoản
+		String userName = users.getName();
+		// Họ tên đầy đủ
+		String userFullName = users.getFullName();
+		// Ngày tháng năm sinh
+		LocalDate userDOB = users.getDateOfBirth();
+		// Mail
+		String userEmail = users.getEmail();
+		// Số điện thoại
+		String phoneNumber = users.getPhoneNumber();
+		// if-else rút gọn của id tỉnh (Nếu (điều kiện ?) thì lấy giá trị trước (:) ,
+		// còn không thì lấy sau (:)
+		Long provinceId = (users.getProvinceId() != null) ? users.getProvinceId() : null;
+		// if-else rút gọn của id quận (Nếu (điều kiện ?) thì lấy giá trị trước (:) ,
+		// còn không thì lấy sau (:)
+		Long districtId = (users.getDistrictId() != null) ? users.getDistrictId() : null;
+		// if-else rút gọn của id quận (Nếu (điều kiện ?) thì lấy giá trị trước (:) ,
+		// còn không thì lấy sau (:)
+		Long wardId = (users.getWardId() != null) ? users.getWardId() : null;
+		// Số nhà
+		String userAddress = users.getAddress();
+		// Vai trò
+		String userRole = users.getRole();
+		
+		// Gọi phương thức findUser trong `@Service` để hiển thị thông tin theo yêu cầu từ list
+		List<UserManagementDTO> userManagementDTOs = findUser(userId, userName, userFullName, userDOB, userEmail, phoneNumber, provinceId, districtId, wardId, userAddress, userRole);
+		
+		// Tạo đối tượng của UsersDTO
+		UsersDTO usersDTO = new UsersDTO();
+		// Gán danh sách userManagementDTOs vào danh sách UserManagementDTO ở lớp UsersDTO
+		usersDTO.setUserManagementDTO(userManagementDTOs);
+		
+		// Trả về đối tượng của lớp usersDTO
+		return usersDTO;
+	}
+	
+    // Phương thức sử dụng hàm escape ký tự đặc biệt trong chuỗi tìm kiếm
+    private String escapeSpecialChars(String input) {
+        if (input == null) return null;
+        // Thứ tự quan trọng: escape "\" trước, sau đó "%" và "_"
+        return input.replace("\\", "\\\\")
+                    .replace("%", "\\%")
+                    .replace("_", "\\_");
+    }
+
+    // Phương thức tìm kiếm user theo keyword (xử lý cả trường hợp ký tự đặc biệt và chuỗi rỗng)
+    public List<UserManagementDTO> searchUsers(String keyword) {
+    	// Trả về trường hợp là null và chuỗi rồng
+        if (keyword == null || keyword.trim().isEmpty()) {
+        	// Nếu không nhập gì, có thể gọi repository để trả về toàn bộ user
+            return userRepository.searchUsers(keyword);
+        }
+        // Escape ký tự đặc biệt để đảm bảo tìm kiếm chính xác
+        String escapedKeyword = escapeSpecialChars(keyword.trim());
+        return userRepository.searchUsers(escapedKeyword);
+    }
+
+	// Phương thức trả về khi nhấn button `search` ở trang userManagement
+    // (sử dụng kết quả từ phương thức searchUsers đã được xử lý)
+	public UsersDTO getUsersDTOByKeyword(String keyword) {
+		
+	    // Gọi phương thức `searchUsers` để tìm kiếm theo ký tự đặc biệt
+	    List<UserManagementDTO> userManagementDTOs = searchUsers(keyword);
+	    
+	    // Tạo đối tượng UsersDTO
+	    UsersDTO usersDTO = new UsersDTO();
+		// Gán danh sách userManagementDTOs vào danh sách UserManagementDTO ở lớp UsersDTO
+	    usersDTO.setUserManagementDTO(userManagementDTOs);
+	    
+	    return usersDTO;
+	}
+
 }
 

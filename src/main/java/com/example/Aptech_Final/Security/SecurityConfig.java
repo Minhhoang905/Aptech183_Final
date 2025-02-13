@@ -29,7 +29,7 @@ public class SecurityConfig {
 					.requestMatchers("/ComplexGym/home", "/loginAPI", "/loginAPI/getDistrictDropdown", "/loginAPI/getWardDropdown").permitAll() //Không đăng nhập: Chỉ được phép xem home
 					.requestMatchers("/doLogin",  "/doChangePass", "/changePass", "/logout").permitAll() 
 					.requestMatchers("/home/doSearch").hasAnyRole("ADMIN", "USER") // Cả user và admin thực hiện search
-					.requestMatchers("/register","/doRegister").hasRole("ADMIN") // admin: có toàn quyền
+					.requestMatchers("/register","/doRegister", "/userManagement", "/searchUserInformation").hasRole("ADMIN") // admin: có toàn quyền
 					.anyRequest().authenticated() // Yêu cầu khác phải đăng nhập
 			)
 			.formLogin(login -> login

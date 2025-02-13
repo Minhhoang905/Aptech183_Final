@@ -1,5 +1,7 @@
 package com.example.Aptech_Final.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -7,20 +9,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.Aptech_Final.Controller.DTO.DropdownDTO;
+import com.example.Aptech_Final.Controller.DTO.UserManagementDTO;
+import com.example.Aptech_Final.Controller.DTO.UsersDTO;
 import com.example.Aptech_Final.Enity.District;
 import com.example.Aptech_Final.Enity.Province;
+import com.example.Aptech_Final.Enity.Users;
 import com.example.Aptech_Final.Enity.Ward;
 import com.example.Aptech_Final.Form.UserForm;
+import com.example.Aptech_Final.Repository.UserRepository;
+import com.example.Aptech_Final.Service.HomeService;
 import com.example.Aptech_Final.Service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,6 +36,10 @@ import jakarta.servlet.http.HttpServletResponse;
 public class UserController {
 	@Autowired
 	private UserService userService; //Service chứa các phương thức
+	@Autowired
+	private HomeService homeService;
+	@Autowired
+	private UserRepository userRepository;
 	
     @SuppressWarnings("deprecation") // Loại bỏ cảnh báo deprecation, liên quan đến các phương thức hoặc lớp cũ
 	@GetMapping("/login")  //Dùng getmapping với authentication từ spring security để đăng nhập 
@@ -67,7 +74,7 @@ public class UserController {
 	@GetMapping("/register")
 	public String register(ModelMap model) {
 		// Tạo đối tượng ở lớp DropDownDTP
-		DropdownDTO dropdownDTO = userService.getDropDown();
+		UsersDTO dropdownDTO = userService.getDropDown();
 		// Thêm danh sách các tỉnh (lấy từ DropdownDTO) vào model
 		model.addAttribute("provinceList", dropdownDTO.getProvinceList());
 		// Thêm đối tượng "Tỉnh" rỗng để binding với thymleaf
@@ -84,7 +91,7 @@ public class UserController {
 	@PostMapping("/doRegister")
 	public String registerUser(@ModelAttribute("userForm") UserForm userForm, Model model, RedirectAttributes redirectAttributes) {
 		// Tạo đối tượng ở lớp DropDownDTP
-		DropdownDTO dropdownDTO = userService.getDropDown();
+		UsersDTO dropdownDTO = userService.getDropDown();
 		// Thêm danh sách các tỉnh (lấy từ DropdownDTO) vào model
 		model.addAttribute("provinceList", dropdownDTO.getProvinceList());
 		// Thêm đối tượng "Tỉnh" rỗng để binding với thymleaf
@@ -138,6 +145,7 @@ public class UserController {
 			return "changePass";
 		}
 	}	
+	
 	// Phương thức để log out và đưa về page login.html
 	@GetMapping(path = "/logout")
 	public String logout(HttpServletRequest request, HttpServletResponse reponse) {
@@ -147,5 +155,40 @@ public class UserController {
 		logoutHandler.logout(request, reponse, null);
 		return "redirect:/ComplexGym/home";
 	}
-
+	
+	// Phương thức để xử lý yêu cầu GET cho đường dẫn `userManagement`
+	@GetMapping(path = "/userManagement")
+	public String getUserManagement(Model model, @ModelAttribute("userManagementObject") Users users) {
+		// Gọi phương thức `getUsersDTO` ở UserService để lấy dữ liệu cần thiết cho @controller
+		UsersDTO usersDTO = userService.getUsersDTO(users);
+		// Gọi phương thức xác định vai trò của user (là admin) từ @Service
+		String role = homeService.getCurrentUserRole();
+		// Thêm thông tin về role vào form ở html
+		model.addAttribute("role", role);
+		// Thêm đối tượng rỗng để binding với th:object ở form
+		model.addAttribute("userManagementObject", new Users());
+		// Thêm  danh sách kết quả tìm kiếm địa điểm du lịch ở `UsersDTO` vào model
+		model.addAttribute("usersResults", usersDTO.getUserManagementDTO());
+		
+		// Trả về tên file template Thymeleaf trong back-end (userManagement.html)		
+		return "userManagement";
+	}
+	
+	// Phương thức để tìm kiếm thông tin ở đường dẫn `userManagement`
+	@PostMapping(path = "/searchUserInformation")
+	public String postUserManagement (@ModelAttribute("userManagementObject") Users users, @RequestParam(value = "keyword", required = false) String keyword, Model model) {
+		
+        // Gọi service để lấy UsersDTO dựa trên keyword
+        UsersDTO usersDTO = userService.getUsersDTOByKeyword(keyword);
+		// Gọi phương thức xác định vai trò của user (là admin) từ @Service
+		String role = homeService.getCurrentUserRole();
+		// Thêm thông tin về role vào form ở html
+		model.addAttribute("role", role);
+		// Thêm đối tượng rỗng để binding với th:object ở form
+		model.addAttribute("userManagementObject", new Users());
+        // Đưa danh sách kết quả (List<UserManagementDTO>) vào model
+        model.addAttribute("usersResults", usersDTO.getUserManagementDTO());
+		
+	    return "userManagement"; 
+	}
 }
