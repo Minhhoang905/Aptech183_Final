@@ -4,12 +4,14 @@ import java.time.LocalDate;
 
 // Tạo thuộc tính (và tên phải khớp với thuộc tính bên html)
 public class UserForm {
+	// id
+	private Long id;
 	// Username
-	private String username;
+	private String name;
 	// Password hiện tại
-	private String password;
+	private String pass;
 	// Password mới
-	private String newPassword;
+	private String newPass;
 	// Thuộc tính cho checkbox Remember Me
 	private boolean rememberMe;
 	// Họ tên đầy đủ
@@ -32,29 +34,42 @@ public class UserForm {
 	private String address;
 	
 	//Tạo getter và setter
-	public String getUsername() {
-		return username;
+    public Long getId() {
+		return id;
 	}
-	public void setUsername(String username) {
-		this.username = username;
+
+	public void setId(Long id) {
+		this.id = id;
 	}
-	public String getPassword() {
-		return password;
+
+	public String getName() {
+		return name;
 	}
-	public void setPassword(String password) {
-		this.password = password;
+
+	public void setName(String name) {
+		this.name = name;
 	}
-	public String getNewPassword() {
-		return newPassword;
+
+	public String getPass() {
+		return pass;
 	}
-	public void setNewPassword(String newPassword) {
-		this.newPassword = newPassword;
+
+	public void setPass(String pass) {
+		this.pass = pass;
+	}
+
+	public String getNewPass() {
+		return newPass;
 	}
     public boolean isRememberMe() {
         return rememberMe;
     }
 
-    public void setRememberMe(boolean rememberMe) {
+	public void setNewPass(String newPass) {
+		this.newPass = newPass;
+	}
+
+	public void setRememberMe(boolean rememberMe) {
         this.rememberMe = rememberMe;
     }
 	public String getFullName() {

@@ -3,6 +3,7 @@ package com.example.Aptech_Final.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +57,13 @@ public class UserService{
 		// Tạo DTO chứa các dữ liệu cần thiết cho trang home
 		UsersDTO dropdownDTO = new UsersDTO();
 		
-		// Lấy danh sách Tỉnh từ phương thức ở repository
-		dropdownDTO.setProvinceList(provinceRepository.findAll());
+	    // Lấy danh sách Tỉnh
+	    dropdownDTO.setProvinceList(provinceRepository.findAll());
+	    // Lấy danh sách Quận (District)
+	    dropdownDTO.setDistrictList(districtRepository.findAll());
+	    // Lấy danh sách Xã (Ward)
+	    dropdownDTO.setWardList(wardRepository.findAll());
+	    
 		return dropdownDTO;
 	}
 
@@ -72,24 +78,24 @@ public class UserService{
 	// Phương thức boolean để check điều kiện đăng ký
 	public boolean isValid(UserForm userForm, Model model) {
 		// Check xem tên tài khoản đã có chưa, nếu có thì trả về false
-		if (userRepository.findByName(userForm.getUsername()) != null) {
+		if (userRepository.findByName(userForm.getName()) != null) {
 			model.addAttribute("mes","Tên người dùng đã tồn tại.");
 			return false; // <= Invalid
 		}
 		// Tạo ifelse check các điều kiện
-		if (userForm.getUsername().length() < 6) {
+		if (userForm.getName().length() < 6) {
 			// Kiểm tra nếu độ dài phải nằm trong khoảng 8 đến 16
 			model.addAttribute("mes", "Username less than 5 characters");
 			return false; // <= Invalid
-		}else if (userForm.getPassword().length() < 9 || userForm.getPassword().length() > 21) {
+		}else if (userForm.getPass().length() < 9 || userForm.getPass().length() > 21) {
 			// Kiểm tra độ dài phải nằm trong khoảng 8 đến 20
 			model.addAttribute("mes", "Password must be between 8 and 20 characters");
 			return false; // <= Invalid
-		}else if (!Pattern.compile("[A-Z]").matcher(userForm.getPassword()).find()) {
+		}else if (!Pattern.compile("[A-Z]").matcher(userForm.getPass()).find()) {
 			// Kiểm tra kí tự in hoa của password
 			model.addAttribute("mes", "Password must contain at least one uppercase letter");
 			return false; // <= Invalid
-		}else if (!Pattern.compile("[^a-zA-Z0-9]").matcher(userForm.getPassword()).find()) {
+		}else if (!Pattern.compile("[^a-zA-Z0-9]").matcher(userForm.getPass()).find()) {
 			// Kiểm tra kí tự đặc biệt của password
             model.addAttribute("mes", "Password must contain at least one special character");
             return false; // <= Invalid
@@ -98,9 +104,9 @@ public class UserService{
 			Users obj = new Users();
 			// Set các thông tin từ userForm vào đối tượng user
 			// Tên tài khoản
-			obj.setName(userForm.getUsername());
+			obj.setName(userForm.getName());
 			// Mật khẩu (dùng encoder từ SecurityConfig để mã hóa trong database)
-			obj.setPass(passwordEncoder.encode(userForm.getPassword()));
+			obj.setPass(passwordEncoder.encode(userForm.getPass()));
 			// Vai trò
 			obj.setRole(userForm.getRole());
 			// Họ tên đầy đủ
@@ -253,6 +259,52 @@ public class UserService{
 	    
 	    return usersDTO;
 	}
-
+	
+	// Phương thức tìm kiếm thông tin bằng id
+	public Optional<Users> findUserById(Long id) {
+		// Trả về kết quả bằng phương thức có sẵn của spring boot
+		return userRepository.findById(id);
+	}
+	
+	// Phương thức để cập nhập thông tin của user bằng id
+	public boolean isUserInfoUpdateValid (UserForm userForm, Model model) {
+		// Tạo đối tượng theo entity Users
+		Users obj = userRepository.findById(userForm.getId()).orElse(null);
+		// Tạo ifelse check các điều kiện
+		if (userForm.getName().length() < 6) {
+			// Kiểm tra nếu độ dài phải nằm trong khoảng 8 đến 16
+			model.addAttribute("mes", "Username less than 5 characters");
+			return false; // <= Invalid
+		}else { 
+			// Set các thông tin từ userForm vào đối tượng user
+			// id
+			obj.setId(userForm.getId());
+			// Tên tài khoản
+			obj.setName(userForm.getName());
+			// Vai trò
+			obj.setRole(userForm.getRole());
+			// Họ tên đầy đủ
+			obj.setFullName(userForm.getFullName());
+			// Ngày tháng năm sinh
+			obj.setDateOfBirth(userForm.getDateOfBirth());
+			// Email
+			obj.setEmail(userForm.getEmail());
+			// Số điện thoại
+			obj.setPhoneNumber(userForm.getPhoneNumber());
+			// Id của tỉnh
+			obj.setProvinceId(userForm.getProvinceId());
+			// Id của quận
+			obj.setDistrictId(userForm.getDistrictId());
+			// Id của xã
+			obj.setWardId(userForm.getWardId());
+			// Số nhà cụ thể
+			obj.setAddress(userForm.getAddress());
+			// Gọi phương thức có sẵn trong spring để lưu thông tin vào database
+			userRepository.save(obj);
+			// Gửi thông tin vào thuộc tính ở front-end (login)
+			model.addAttribute("okMess", "Register succesfull");
+			return true; // <= Valid
+		}				
+	}
 }
 

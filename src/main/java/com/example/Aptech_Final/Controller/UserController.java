@@ -1,6 +1,7 @@
 package com.example.Aptech_Final.Controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -38,8 +39,6 @@ public class UserController {
 	private UserService userService; //Service chứa các phương thức
 	@Autowired
 	private HomeService homeService;
-	@Autowired
-	private UserRepository userRepository;
 	
     @SuppressWarnings("deprecation") // Loại bỏ cảnh báo deprecation, liên quan đến các phương thức hoặc lớp cũ
 	@GetMapping("/login")  //Dùng getmapping với authentication từ spring security để đăng nhập 
@@ -90,7 +89,7 @@ public class UserController {
 	// Phương thức để thực hiện submit ở register.html
 	@PostMapping("/doRegister")
 	public String registerUser(@ModelAttribute("userForm") UserForm userForm, Model model, RedirectAttributes redirectAttributes) {
-		// Tạo đối tượng ở lớp DropDownDTP
+		// Tạo đối tượng ở lớp DropDownDTO
 		UsersDTO dropdownDTO = userService.getDropDown();
 		// Thêm danh sách các tỉnh (lấy từ DropdownDTO) vào model
 		model.addAttribute("provinceList", dropdownDTO.getProvinceList());
@@ -118,6 +117,7 @@ public class UserController {
             return "redirect:/register";
         }
 	}
+	
 	// Phương thức để hiển thị changePass.html
 	@GetMapping("/changePass")
 	public String changePass(ModelMap model) {
@@ -129,9 +129,9 @@ public class UserController {
 	public String doChangePass(@ModelAttribute UserForm userForm, ModelMap model) {
 		
 		// Tạo 1 boolean và gọi phương thức `changePass` từ UserService để kiểm tra và cập nhập mật khẩu
-		boolean isPasswordChanged = userService.changePass(	userForm.getUsername(),
-															userForm.getPassword(),
-															userForm.getNewPassword(), model);
+		boolean isPasswordChanged = userService.changePass(	userForm.getName(),
+															userForm.getPass(),
+															userForm.getNewPass(), model);
 		// Tạo if-else để điều hướng trang web
 		if (isPasswordChanged) {
 			// Nếu thành công => Thêm thuộc tính "mes" để chuyển hướng tới trang login với thông báo
@@ -190,5 +190,63 @@ public class UserController {
         model.addAttribute("usersResults", usersDTO.getUserManagementDTO());
 		
 	    return "userManagement"; 
+	}
+	
+	// Phương thức xử lý yêu cầu GET cho đường dẫn "/userManagement/update"
+	@GetMapping(path ="/userManagement/updateUser")
+	public String getUpdateUser(Model model, @RequestParam("id") Long id) {
+		// Tạo đối tượng ở lớp DropDownDTP
+		UsersDTO dropdownDTO = userService.getDropDown();
+		// Thêm danh sách các tỉnh (lấy từ DropdownDTO) vào model
+		model.addAttribute("provinceList", dropdownDTO.getProvinceList());
+	    model.addAttribute("districtList", dropdownDTO.getDistrictList());
+	    model.addAttribute("wardList", dropdownDTO.getWardList()); 
+		// Thêm đối tượng "Tỉnh" rỗng để binding với thymleaf
+		model.addAttribute("province", new Province());
+		// Thêm đối tượng "Quận" rỗng để binding với thymleaf
+		model.addAttribute("district", new District());
+		// Thêm đối tượng "Xã" rỗng để binding với thymleaf
+		model.addAttribute("ward", new Ward());
+		
+		// Lấy đối tượng Users để cập nhật (gọi từ service)
+		Users userUpdate = userService.findUserById(id).orElse(new Users());
+		System.out.println("Date of Birth: " + userUpdate.getDateOfBirth());
+	    // Thêm đối tượng userUpdate để binding với th:object ở form update
+		model.addAttribute("userUpdate", userUpdate);
+		// Trả về html "updateInfo"
+		return "updateUserInfo";
+	}
+	
+	// Phương thức thực hiện cập nhập thông tin người dùng theo id
+	@PostMapping(path = "/userManagement/doUpdateUserInfo")
+	public String doUpdateUser(@ModelAttribute("userUpdate") UserForm userForm, Model model, RedirectAttributes redirectAttributes) {
+		// Tạo đối tượng ở lớp DropDownDTP
+		UsersDTO dropdownDTO = userService.getDropDown();
+		// Thêm danh sách các tỉnh (lấy từ DropdownDTO) vào model
+		model.addAttribute("provinceList", dropdownDTO.getProvinceList());
+		// Thêm đối tượng "Tỉnh" rỗng để binding với thymleaf
+		model.addAttribute("province", new Province());
+		// Thêm đối tượng "Quận" rỗng để binding với thymleaf
+		model.addAttribute("district", new District());
+		// Thêm đối tượng "Xã" rỗng để binding với thymleaf
+		model.addAttribute("ward", new Ward());
+		// Đối tượng rỗng để binding với th:object ở form
+		model.addAttribute("userForm", new UserForm());
+				
+		// Tạo boolean và gọi phương thức từ service
+        boolean success = userService.isUserInfoUpdateValid(userForm, model);
+        // Tạo if-else để chuyển về controller
+        if (success) {
+        	// Thêm thông báo thành công vào Flash Attribute để hiển thị sau khi chuyển hướng
+        	redirectAttributes.addFlashAttribute("successMessage", "Cập nhập thành công!");
+        	// Chuyển hướng về lại userManagement sau khi cập nhập thành công (và js ở FE sẽ thực hiện chuyển về login)
+            return "redirect:/userManagement/updateUser?id=" + userForm.getId();
+        } else {
+        	// Thêm thông báo thất bại vào Flash Attribute để hiển thị sau khi chuyển hướng
+        	redirectAttributes.addFlashAttribute("errorMessage", "Cập nhập thất bại. Vui lòng thử lại.");
+        	// Trở về trang đăng ký nếu có lỗi
+            return "redirect:/userManagement/updateUser?id=" + userForm.getId();
+        }
+
 	}
 }

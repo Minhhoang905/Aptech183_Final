@@ -4,6 +4,8 @@ package com.example.Aptech_Final.Enity;
 
 import java.time.LocalDate;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -41,6 +43,7 @@ public class Users {
 	private String email;
 	// Ngày tháng năm sinh
 	@Column(name = "USER_DOB")
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
 	private LocalDate dateOfBirth;
 	// Số điện thoại
 	@Column(name = "USER_PHONE_NUMBER")
