@@ -1,7 +1,5 @@
 package com.example.Aptech_Final.Controller;
 
-import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -16,14 +14,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.Aptech_Final.Controller.DTO.UserManagementDTO;
 import com.example.Aptech_Final.Controller.DTO.UsersDTO;
 import com.example.Aptech_Final.Enity.District;
 import com.example.Aptech_Final.Enity.Province;
 import com.example.Aptech_Final.Enity.Users;
 import com.example.Aptech_Final.Enity.Ward;
 import com.example.Aptech_Final.Form.UserForm;
-import com.example.Aptech_Final.Repository.UserRepository;
 import com.example.Aptech_Final.Service.HomeService;
 import com.example.Aptech_Final.Service.UserService;
 
@@ -247,6 +243,19 @@ public class UserController {
         	// Trở về trang đăng ký nếu có lỗi
             return "redirect:/userManagement/updateUser?id=" + userForm.getId();
         }
-
+	}
+	
+	// Phương thức xóa thông tin người dùng bằng id
+	@GetMapping(path = "/userManagement/doDeleteUser")
+	public String deleteInfoById(@RequestParam(value = "id") Long id, Model model) {
+		// Gọi phương thức xác định vai trò của user (là admin) từ @Service
+		String role = homeService.getCurrentUserRole();
+		// Thêm thông tin về role vào form ở html
+		model.addAttribute("role", role);		
+		// Xóa thông tin cần xóa bằng method ở service 
+		userService.deleteInfoById(id);
+		
+		// Trả về html `userManagement`
+		return "redirect:/userManagement";
 	}
 }

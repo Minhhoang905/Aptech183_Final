@@ -306,5 +306,11 @@ public class UserService{
 			return true; // <= Valid
 		}				
 	}
+	
+	// Phương thức xóa thông tin với id
+	public void deleteInfoById (Long id) {
+		userRepository.deleteById(id);
+	}
+
 }
 

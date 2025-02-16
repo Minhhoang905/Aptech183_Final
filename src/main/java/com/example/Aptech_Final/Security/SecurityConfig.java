@@ -28,8 +28,8 @@ public class SecurityConfig {
 		http.authorizeHttpRequests(auth -> auth
 					.requestMatchers("/ComplexGym/home", "/loginAPI", "/loginAPI/getDistrictDropdown", "/loginAPI/getWardDropdown").permitAll() //Không đăng nhập: Chỉ được phép xem home
 					.requestMatchers("/doLogin",  "/doChangePass", "/changePass", "/logout").permitAll() 
-					.requestMatchers("/home/doSearch").hasAnyRole("ADMIN", "USER") // Cả user và admin thực hiện search
-					.requestMatchers("/register","/doRegister", "/userManagement", "/searchUserInformation", "/userManagement/updateUser", "/userManagement/doUpdateUserInfo").hasRole("ADMIN") // admin: có toàn quyền
+					.requestMatchers("/searchUserInformation").hasAnyRole("ADMIN", "USER") // Cả user và admin thực hiện search
+					.requestMatchers("/register","/doRegister", "/userManagement", "/searchUserInformation", "/userManagement/updateUser", "/userManagement/doUpdateUserInfo", "/userManagement/doDeleteUser").hasRole("ADMIN") // admin: có toàn quyền
 					.anyRequest().authenticated() // Yêu cầu khác phải đăng nhập
 			)
 			.formLogin(login -> login
