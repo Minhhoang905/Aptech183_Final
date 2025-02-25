@@ -22,6 +22,12 @@ public interface UserRepository extends JpaRepository<Users, Long>{
 	@Query(value = "SELECT * FROM dbo.USERS WHERE USER_NAME = ?1" , nativeQuery = true)
 	Users findByName(String name);
 	
+	// Tạo phương thức kiểm tra xem có email của người dùng trong DB không ?
+	boolean existsByEmail(String email);
+	
+	// Tạo phương thức để tìm kiếm theo email
+	Users findByEmail(String email);
+	
 	// Tạo phương thức mới, dùng interface `UserManagement` để hiển thị kết quả theo custom query
 	@Query(value = "SELECT u.USER_ID AS id, u.USER_NAME AS name, u.FULL_NAME AS fullName, " +
             			"u.USER_DOB AS dateOfBirth, u.USER_EMAIL AS email, " +
@@ -48,21 +54,23 @@ public interface UserRepository extends JpaRepository<Users, Long>{
          String phoneNumber, Long provinceId, Long districtId, Long wardId, String address, String role);
 	
 	// Tạo câu query để tìm kiếm theo keyword
-	@Query(value = "SELECT u.USER_ID AS id, u.USER_NAME AS name, u.FULL_NAME AS fullName, " +
-            			"u.USER_DOB AS dateOfBirth, u.USER_EMAIL AS email, " +
-            			"u.USER_PHONE_NUMBER AS phoneNumber, p.PROVINCE_NAME AS provinceName, " +
-            			"d.DISTRICT_NAME AS districtName, w.WARD_NAME AS wardName, " +
-            			"u.CUSTOMER_ADDRESS AS address, u.USER_ROLE AS role " +
-            "FROM dbo.USERS u " +
-            	"LEFT JOIN dbo.PROVINCE p ON u.PROVINCE_ID = p.PROVINCE_ID " +
-            	"LEFT JOIN dbo.DISTRICT d ON u.DISTRICT_ID = d.DISTRICT_ID " +
-            	"LEFT JOIN dbo.WARD w ON u.WARD_ID = w.WARD_ID " +
-            "WHERE (:keyword IS NULL OR u.USER_NAME LIKE CONCAT('%', :keyword, '%') " +
-            	"OR u.USER_EMAIL LIKE CONCAT('%', :keyword, '%') " +
-            	"OR u.USER_PHONE_NUMBER LIKE CONCAT('%', :keyword, '%')) AND " + 
-            	"u.USER_ROLE <> 'admin'",
-    nativeQuery = true)
-		List<UserManagementDTO> searchUsers(@Param("keyword") String keyword);
+	@Query(value = "SELECT u.USER_ID AS id, u.USER_NAME AS name, u.FULL_NAME AS fullName, "
+			+ "u.USER_DOB AS dateOfBirth, u.USER_EMAIL AS email, "
+			+ "u.USER_PHONE_NUMBER AS phoneNumber, p.PROVINCE_NAME AS provinceName, "
+			+ "d.DISTRICT_NAME AS districtName, w.WARD_NAME AS wardName, "
+			+ "u.CUSTOMER_ADDRESS AS address, u.USER_ROLE AS role " + "FROM dbo.USERS u "
+			+ "LEFT JOIN dbo.PROVINCE p ON u.PROVINCE_ID = p.PROVINCE_ID "
+			+ "LEFT JOIN dbo.DISTRICT d ON u.DISTRICT_ID = d.DISTRICT_ID "
+			+ "LEFT JOIN dbo.WARD w ON u.WARD_ID = w.WARD_ID "
+			+ "WHERE (:keyword IS NULL OR u.USER_NAME LIKE CONCAT('%', :keyword, '%') "
+			+ "OR u.USER_EMAIL LIKE CONCAT('%', :keyword, '%') "
+			+ "OR u.USER_PHONE_NUMBER LIKE CONCAT('%', :keyword, '%') "
+			+ "OR u.FULL_NAME LIKE CONCAT('%', :keyword, '%') "
+			+ "OR u.CUSTOMER_ADDRESS LIKE CONCAT('%', :keyword, '%') "
+			+ "OR p.PROVINCE_NAME LIKE CONCAT('%', :keyword, '%') "
+			+ "OR d.DISTRICT_NAME LIKE CONCAT('%', :keyword, '%') "
+			+ "OR w.WARD_NAME LIKE CONCAT('%', :keyword, '%')) AND " + "u.USER_ROLE <> 'admin'", nativeQuery = true)
+	List<UserManagementDTO> searchUsers(@Param("keyword") String keyword);
 }
 
 

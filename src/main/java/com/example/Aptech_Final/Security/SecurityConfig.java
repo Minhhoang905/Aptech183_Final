@@ -25,10 +25,12 @@ public class SecurityConfig {
 	@SuppressWarnings("removal")
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests(auth -> auth
+		http.csrf().disable()
+		.authorizeHttpRequests(auth -> auth
 					.requestMatchers("/ComplexGym/home", "/loginAPI", "/loginAPI/getDistrictDropdown", "/loginAPI/getWardDropdown").permitAll() //Không đăng nhập: Chỉ được phép xem home
+					.requestMatchers("/forgot-password/**","/reset-password/**").permitAll() 
 					.requestMatchers("/doLogin",  "/doChangePass", "/changePass", "/logout").permitAll() 
-					.requestMatchers("/searchUserInformation").hasAnyRole("ADMIN", "USER") // Cả user và admin thực hiện search
+					.requestMatchers("/ComplexGym/home").hasAnyRole("ADMIN", "USER") // Cả user và admin thực hiện search
 					.requestMatchers("/register","/doRegister", "/userManagement", "/searchUserInformation", "/userManagement/updateUser", "/userManagement/doUpdateUserInfo", "/userManagement/doDeleteUser").hasRole("ADMIN") // admin: có toàn quyền
 					.anyRequest().authenticated() // Yêu cầu khác phải đăng nhập
 			)

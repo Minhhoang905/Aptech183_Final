@@ -1,6 +1,8 @@
 package com.example.Aptech_Final.Controller;
 
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -97,20 +99,32 @@ public class UserController {
 		model.addAttribute("ward", new Ward());
 		// Đối tượng rỗng để binding với th:object ở form
 		model.addAttribute("userForm", new UserForm());
-				
+		
 		// Tạo boolean và gọi phương thức từ service
-        boolean success = userService.isValid(userForm, model);
+        String response = userService.isValid(userForm, model);
         // Tạo if-else để chuyển về controller
-        if (success) {
-        	// Thêm thông báo thành công vào Flash Attribute để hiển thị sau khi chuyển hướng
-        	redirectAttributes.addFlashAttribute("successMessage", "Đăng ký thành công!");
+        if (response.startsWith("success:")) {
+        	 // Bỏ "success:"
+        	redirectAttributes.addFlashAttribute("successMessage", response.substring(8));
         	// Chuyển hướng về lại register sau khi đăng ký thành công (và js ở FE sẽ thực hiện chuyển về login)
             return "redirect:/register";
         } else {
-        	// Thêm thông báo thất bại vào Flash Attribute để hiển thị sau khi chuyển hướng
-        	redirectAttributes.addFlashAttribute("errorMessage", "Đăng ký thất bại. Vui lòng thử lại.");
+    	    // Kiểm tra nếu người dùng đã chọn Tỉnh thì load Quận/Huyện tương ứng
+    	    if (userForm.getProvinceId() != null) {
+    	        List<District> districtList = userService.getDistrictByProvinceId(userForm.getProvinceId());
+    	        model.addAttribute("districtList", districtList);
+    	    }
+
+    	    if (userForm.getDistrictId() != null) {
+    	        List<Ward> wardList = userService.getWardByDistrictId(userForm.getDistrictId());
+    	        model.addAttribute("wardList", wardList);
+    	    }
+        	//Giữ nguyên userForm để Thymeleaf có thể hiển thị lại giá trị đã nhập
+            model.addAttribute("userForm", userForm);
+        	// Bỏ "error:"
+        	model.addAttribute("errorMessage", response.substring(6));
         	// Trở về trang đăng ký nếu có lỗi
-            return "redirect:/register";
+            return "register";
         }
 	}
 	
@@ -122,21 +136,25 @@ public class UserController {
 	
 	// Phương thức để cập nhập mật khẩu ở changePass.html
 	@PostMapping("/doChangePass")
-	public String doChangePass(@ModelAttribute UserForm userForm, ModelMap model) {
-		
-		// Tạo 1 boolean và gọi phương thức `changePass` từ UserService để kiểm tra và cập nhập mật khẩu
-		boolean isPasswordChanged = userService.changePass(	userForm.getName(),
+	public String doChangePass(@ModelAttribute("changePasswordForm") UserForm userForm, Model model, RedirectAttributes redirectAttributes) {
+		// Đối tượng rỗng để binding với th:object ở form
+        //model.addAttribute("changePasswordForm", new UserForm());
+
+		// Gọi phương thức `changePass` từ UserService để kiểm tra và cập nhập mật khẩu
+		String isPasswordChanged = userService.changePass(	userForm.getName(),
 															userForm.getPass(),
 															userForm.getNewPass(), model);
 		// Tạo if-else để điều hướng trang web
-		if (isPasswordChanged) {
-			// Nếu thành công => Thêm thuộc tính "mes" để chuyển hướng tới trang login với thông báo
-			model.addAttribute("okMess", "Password changed successfully!");
+		if (isPasswordChanged.startsWith("success:")) {
+			// Nếu thành công => Thêm thuộc tính để chuyển hướng tới trang login với thông báo
+			redirectAttributes.addFlashAttribute("successMessage", isPasswordChanged.substring(8));
 			// Đi đến trang login.html
-			return "login";
+			return "redirect:/login";
 		}else {
+	    	//Giữ nguyên userForm để Thymeleaf có thể hiển thị lại giá trị đã nhập
+	        model.addAttribute("changePasswordForm", userForm);
 			// Nếu thất bại => Thêm thuộc tính "mes" ở trang đổi mật khẩu với thông báo
-			model.addAttribute("mes", "Invalid username or password");
+			model.addAttribute("errorMessage", isPasswordChanged.substring(6));
 			// Quay trở lại trang ChangePass.html
 			return "changePass";
 		}
@@ -216,7 +234,7 @@ public class UserController {
 	// Phương thức thực hiện cập nhập thông tin người dùng theo id
 	@PostMapping(path = "/userManagement/doUpdateUserInfo")
 	public String doUpdateUser(@ModelAttribute("userUpdate") UserForm userForm, Model model, RedirectAttributes redirectAttributes) {
-		// Tạo đối tượng ở lớp DropDownDTP
+		// Tạo đối tượng ở lớp DropDownDTO
 		UsersDTO dropdownDTO = userService.getDropDown();
 		// Thêm danh sách các tỉnh (lấy từ DropdownDTO) vào model
 		model.addAttribute("provinceList", dropdownDTO.getProvinceList());
@@ -230,16 +248,28 @@ public class UserController {
 		model.addAttribute("userForm", new UserForm());
 				
 		// Tạo boolean và gọi phương thức từ service
-        boolean success = userService.isUserInfoUpdateValid(userForm, model);
+        String doUpdate = userService.isUserInfoUpdateValid(userForm, model);
         // Tạo if-else để chuyển về controller
-        if (success) {
+        if (doUpdate.startsWith("success: ")) {
         	// Thêm thông báo thành công vào Flash Attribute để hiển thị sau khi chuyển hướng
-        	redirectAttributes.addFlashAttribute("successMessage", "Cập nhập thành công!");
+        	redirectAttributes.addFlashAttribute("successMessage", doUpdate.substring(8));
         	// Chuyển hướng về lại userManagement sau khi cập nhập thành công (và js ở FE sẽ thực hiện chuyển về login)
             return "redirect:/userManagement/updateUser?id=" + userForm.getId();
         } else {
+    	    // Kiểm tra nếu người dùng đã chọn Tỉnh thì load Quận/Huyện tương ứng
+    	    if (userForm.getProvinceId() != null) {
+    	        List<District> districtList = userService.getDistrictByProvinceId(userForm.getProvinceId());
+    	        model.addAttribute("districtList", districtList);
+    	    }
+
+    	    if (userForm.getDistrictId() != null) {
+    	        List<Ward> wardList = userService.getWardByDistrictId(userForm.getDistrictId());
+    	        model.addAttribute("wardList", wardList);
+    	    }
         	// Thêm thông báo thất bại vào Flash Attribute để hiển thị sau khi chuyển hướng
-        	redirectAttributes.addFlashAttribute("errorMessage", "Cập nhập thất bại. Vui lòng thử lại.");
+        	redirectAttributes.addFlashAttribute("errorMessage", doUpdate.substring(6));
+        	//Giữ nguyên userForm để Thymeleaf có thể hiển thị lại giá trị đã nhập
+            model.addAttribute("userForm", userForm);
         	// Trở về trang đăng ký nếu có lỗi
             return "redirect:/userManagement/updateUser?id=" + userForm.getId();
         }
