@@ -28,10 +28,12 @@ public class SecurityConfig {
 		http.csrf().disable()
 		.authorizeHttpRequests(auth -> auth
 					.requestMatchers("/ComplexGym/home", "/loginAPI", "/loginAPI/getDistrictDropdown", "/loginAPI/getWardDropdown").permitAll() //Không đăng nhập: Chỉ được phép xem home
+					.requestMatchers("/cart/**","/products/**", "/payment").permitAll()
 					.requestMatchers("/forgot-password/**","/reset-password/**").permitAll() 
 					.requestMatchers("/doLogin",  "/doChangePass", "/changePass", "/logout").permitAll() 
 					.requestMatchers("/ComplexGym/home").hasAnyRole("ADMIN", "USER") // Cả user và admin thực hiện search
 					.requestMatchers("/register","/doRegister", "/userManagement", "/searchUserInformation", "/userManagement/updateUser", "/userManagement/doUpdateUserInfo", "/userManagement/doDeleteUser").hasRole("ADMIN") // admin: có toàn quyền
+					.requestMatchers("/products/productManagement").hasRole("ADMIN") // admin: có toàn quyền					
 					.anyRequest().authenticated() // Yêu cầu khác phải đăng nhập
 			)
 			.formLogin(login -> login
