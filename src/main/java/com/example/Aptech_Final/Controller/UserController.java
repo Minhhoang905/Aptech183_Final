@@ -224,7 +224,6 @@ public class UserController {
 		
 		// Lấy đối tượng Users để cập nhật (gọi từ service)
 		Users userUpdate = userService.findUserById(id).orElse(new Users());
-		System.out.println("Date of Birth: " + userUpdate.getDateOfBirth());
 	    // Thêm đối tượng userUpdate để binding với th:object ở form update
 		model.addAttribute("userUpdate", userUpdate);
 		// Trả về html "updateInfo"
@@ -240,7 +239,7 @@ public class UserController {
 		model.addAttribute("provinceList", dropdownDTO.getProvinceList());
 		// Thêm đối tượng "Tỉnh" rỗng để binding với thymleaf
 		model.addAttribute("province", new Province());
-		// Thêm đối tượng "Quận" rỗng để binding với thymleaf
+		// Thêm đối tượng "Quận" rỗng để binding với thymleaf	
 		model.addAttribute("district", new District());
 		// Thêm đối tượng "Xã" rỗng để binding với thymleaf
 		model.addAttribute("ward", new Ward());
