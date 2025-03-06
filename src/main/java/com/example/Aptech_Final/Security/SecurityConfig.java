@@ -27,6 +27,7 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf().disable()
 		.authorizeHttpRequests(auth -> auth
+                	.requestMatchers("/images/**", "/css/**", "/js/**").permitAll() // Cho phép truy cập ảnh, CSS, JS
 					.requestMatchers("/ComplexGym/home", "/loginAPI", "/loginAPI/getDistrictDropdown", "/loginAPI/getWardDropdown").permitAll() //Không đăng nhập: Chỉ được phép xem home
 					.requestMatchers("/cart/**","/products/**", "/payment").permitAll()
 					.requestMatchers("/forgot-password/**","/reset-password/**").permitAll() 
