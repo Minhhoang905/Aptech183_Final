@@ -74,7 +74,7 @@ public class UserService{
 		return user!= null && passwordEncoder.matches(pass, user.getPass());		
 	}
 	
-	// Phương thức boolean để check điều kiện đăng ký
+	// Phương thức để check điều kiện đăng ký
 	public String isValid(UserForm userForm, Model model) {
 		// Check xem tên tài khoản đã có chưa, nếu có thì trả về false
 		if (userRepository.findByName(userForm.getName()) != null) {
