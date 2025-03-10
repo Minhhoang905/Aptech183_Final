@@ -4,11 +4,8 @@
 <meta charset="UTF-8">
 <title>Detail product</title>
 <link rel="stylesheet" href="/styles.css">
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
-	rel="stylesheet">
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
 </head>
@@ -68,60 +65,89 @@
         </div>
     </nav>
 
-	<div class="container mt-4">
-	    <div class="row">
-	        <div class="col-md-6">
-	            <img th:src="${product.imagePath}" class="img-fluid" alt="Product Image">
-	        </div>
-	        <div class="col-md-6">
-	            <h2 th:text="${product.productName}"></h2>
-	            <p>💰 Giá: <span th:text="${product.price}"></span> VND</p>
-	            <p>📦 Số lượng còn lại: <span th:text="${product.quantity}"></span></p>
-	
-	            <label for="quantity">Chọn số lượng:</label>
-	            <input type="number" id="quantity" class="form-control mb-3" value="1" min="1">
-	            
-	            <button class="btn btn-success w-100 mb-2" id="add-to-cart">
-	                🛒 Thêm vào giỏ hàng
-	            </button>
-	            
-	            <button class="btn btn-danger w-100" id="buy-now">
-	                🛍️ Mua ngay
-	            </button>
-	        </div>
-	    </div>
-	</div>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        let productName = "[[${product.productName}]]";
-        let price = "[[${product.price}]]";
+    <!-- Nội dung trang chi tiết sản phẩm -->
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Cột hình ảnh sản phẩm -->
+            <div class="col-md-6">
+                <img th:src="${product.imagePath}" class="img-fluid" alt="Product Image">
+            </div>
+            <!-- Cột thông tin sản phẩm -->
+            <div class="col-md-6">
+                <h2 th:text="${product.productName}"></h2>
+                <p>💰 Giá: <span th:text="${product.price}"></span> VND</p>
+                <p>📦 Số lượng còn lại: <span th:text="${product.quantity}"></span></p>
 
-        document.getElementById("add-to-cart").addEventListener("click", function () {
-            let quantity = parseInt(document.getElementById("quantity").value);
-            if (quantity < 1) {
-                alert("❌ Số lượng không hợp lệ!");
-                return;
-            }
+                <label for="quantity">Chọn số lượng:</label>
+                <input type="number" id="quantity" class="form-control mb-3" value="1" min="1">
 
-            let cart = JSON.parse(localStorage.getItem("cart")) || [];
-            let existingProduct = cart.find(item => item.productName === productName);
+                <button class="btn btn-success w-100 mb-2" id="add-to-cart">
+                    🛒 Thêm vào giỏ hàng
+                </button>
+                <button class="btn btn-danger w-100" id="buy-now">
+                    🛍️ Mua ngay
+                </button>
+            </div>
+        </div>
+        
+        <!-- Phần hiển thị mô tả sản phẩm -->
+        <div class="row mt-4">
+            <div class="col">
+                <h4>Mô tả sản phẩm</h4>
+                <!-- Dùng th:utext để hiển thị nội dung HTML của mô tả -->
+                <div th:utext="${description}"></div>
+            </div>
+        </div>
+        
+        <!-- Form chỉnh sửa mô tả (chỉ hiển thị cho Admin) -->
+        <div class="row mt-4" th:if="${role == 'ROLE_ADMIN'}">
+            <div class="col">
+                <h4>Chỉnh sửa mô tả sản phẩm</h4>
+                <form th:action="@{/products/saveDescription}" method="post">
+                    <input type="hidden" name="id" th:value="${product.id}">
+                    <textarea id="editor" name="description" rows="10" class="form-control" th:text="${description}"></textarea>
+                    <button type="submit" class="btn btn-primary mt-2">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Script của Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- CKEditor để hỗ trợ chỉnh sửa mô tả (chỉ kích hoạt nếu tồn tại textarea) -->
+    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+    <script>
+        // Nếu element có id "editor" tồn tại, khởi tạo CKEditor
+        if (document.getElementById('editor')) {
+            CKEDITOR.replace('editor');
+        }
 
-            if (existingProduct) {
-                existingProduct.quantity += quantity;
-            } else {
-                cart.push({ productName, price, quantity });
-            }
+        // Xử lý thêm sản phẩm vào giỏ hàng
+        document.addEventListener("DOMContentLoaded", function () {
+            let productName = "[[${product.productName}]]";
+            let price = "[[${product.price}]]";
 
-            localStorage.setItem("cart", JSON.stringify(cart));
-            alert(`✅ Đã thêm ${quantity} x ${productName} vào giỏ hàng!`);
+            document.getElementById("add-to-cart").addEventListener("click", function () {
+                let quantity = parseInt(document.getElementById("quantity").value);
+                if (quantity < 1) {
+                    alert("❌ Số lượng không hợp lệ!");
+                    return;
+                }
+                let cart = JSON.parse(localStorage.getItem("cart")) || [];
+                let existingProduct = cart.find(item => item.productName === productName);
+                if (existingProduct) {
+                    existingProduct.quantity += quantity;
+                } else {
+                    cart.push({ productName, price, quantity });
+                }
+                localStorage.setItem("cart", JSON.stringify(cart));
+                alert(`✅ Đã thêm ${quantity} x ${productName} vào giỏ hàng!`);
+            });
+
+            document.getElementById("buy-now").addEventListener("click", function () {
+                alert("🔔 Chuyển đến trang thanh toán...");
+                window.location.href = "/payment";
+            });
         });
-
-        document.getElementById("buy-now").addEventListener("click", function () {
-            alert("🔔 Chuyển đến trang thanh toán...");
-            window.location.href = "/checkout";
-        });
-    });
-</script>
-	
+    </script>
 </body>
 </html>

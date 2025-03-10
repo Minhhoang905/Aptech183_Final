@@ -10,7 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-//Gọi tên của table
+// Gọi tên của table
 @Table(name = "PRODUCT") //Sẽ lấy theo tên của Table này (nếu đặt tên class đúng với tên table thì k cần cũng được)
 
 public class Products {
