@@ -8,17 +8,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.example.Aptech_Final.Service.HomeService;
 
 @Controller
-public class CartController {
+public class PaymentController {
     @Autowired
     private HomeService homeService;
 
-	@GetMapping("/cart")
+	@GetMapping("/payment")
 	public String getCart(Model model) {
     	// Gọi phương thức xác định vai trò của user từ @Service
     	String role = homeService.getCurrentUserRole();
 		// Thêm thông tin về role vào form ở html
 		model.addAttribute("role", role);
 
-		return "cart";
+		return "payment";
 	}
+
 }
