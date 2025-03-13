@@ -12,8 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.Aptech_Final.Controller.DTO.ProductDTO;
 import com.example.Aptech_Final.Controller.DTO.ProductManagementDTO;
+import com.example.Aptech_Final.Enity.ProductDetail;
 import com.example.Aptech_Final.Enity.Products;
 import com.example.Aptech_Final.Form.ProductsForm;
+import com.example.Aptech_Final.Repository.ProductDetailRepository;
 import com.example.Aptech_Final.Repository.ProductsRepository;
 
 @Service
@@ -22,19 +24,9 @@ public class ProductsService {
 	private ProductsRepository productsRepository;
 	@Autowired
 	private ImageService imageService;
-
-//    <p class="card-text">📦 Số lượng: <span th:text="${product.quantity}"></span></p>
-//    <input type="number" class="form-control mb-2"
-//        th:id="'quantity-' + ${product.id}" value="1" min="1">
-//
-//    <!-- Dùng data-* attributes để lưu thông tin sản phẩm -->
-//    <button class="btn btn-success w-100 add-to-cart"
-//        th:data-name="${product.productName}"
-//        th:data-price="${product.price}"
-//        th:data-quantity-id="'quantity-' + ${product.id}">
-//        🛒 Thêm vào giỏ hàng
-//    </button>
-
+	@Autowired
+	private ProductDetailRepository productDetailRepository;
+	
 	// Phương thức để thêm sản phẩm vào database
 	public String saveProduct(ProductsForm productsForm, MultipartFile multipartFile) {
 		try {
@@ -238,5 +230,33 @@ public class ProductsService {
 	public void deleteInfoById (Long id) {
 		productsRepository.deleteById(id);
 	}
-
+	
+	// Phương thức lấy mô tả sản phẩm dựa theo id sản phẩm
+	public String getProductDescription(Long id) {
+		// Gọi phương thức từ productDetailRepository
+		ProductDetail productDetail = productDetailRepository.findByProductId(id);
+		// Dùng if-else rút gọn để trả về mô tả
+		String product = (productDetail != null) ? productDetail.getDescription() : "Chưa có mô tả cho sản phẩm này";
+		
+		return product;		
+	}
+	
+	// Phương thức để lưu hoặc cập nhập mô tả sản phẩm
+	public void saveProductDescription(Long id, String description) {
+		// Tìm kiếm sản phẩm bằng id
+		ProductDetail productDetail = productDetailRepository.findByProductId(id);
+		
+		// Nếu trả về null, gọi đối tượng ProductDetail mới rồi gán id vào
+		if (productDetail == null) {
+			// Gán đối tượng mới của ProductDetail
+			productDetail = new ProductDetail();
+			// Gán id vào đối tượng mới
+			productDetail.setProductId(id);
+		}
+		
+		// Gán mô tả vào đối tượng ProductDetail
+		productDetail.setDescription(description);
+		// Lưu vào database
+		productDetailRepository.save(productDetail);
+	}
 }

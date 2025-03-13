@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supplements</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/styles.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -34,46 +34,34 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container-fluid">
-            <!-- Góc trái: Icon -->
             <a class="navbar-brand" th:href="@{/ComplexGym/home}">
                 <i class="fas fa-dumbbell"></i>
             </a>
 
-            <!-- Button toggle menu cho mobile -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- Navbar -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" th:href="@{/ComplexGym/home}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="bookingLink" role="button">
-                            Schedule
-                        </a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link active" th:href="@{/ComplexGym/home}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" id="bookingLink">Schedule</a></li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Products
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="productsDropdown">
+                            data-bs-toggle="dropdown">Products</a>
+                        <ul class="dropdown-menu">
                             <li><a class="dropdown-item" th:href="@{/products/supplements}">Supplement</a></li>
                             <li><a class="dropdown-item" th:href="@{/products/gears}">Gears</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/cart}">
-                            <i class="fas fa-shopping-cart"></i> Cart
+                            <i class="fas fa-shopping-cart"></i> Cart <span id="cart-count">(0)</span>
                         </a>
                     </li>
                 </ul>
 
-                <!-- Hiển thị theo trạng thái đăng nhập -->
                 <div class="ms-3">
                     <th:block th:if="${role == 'Anonymous'}">
                         <a class="btn btn-warning" th:href="@{/login}">Login</a>
@@ -81,10 +69,10 @@
                     <th:block th:if="${role != 'Anonymous'}">
                         <div class="dropdown">
                             <button class="btn btn-warning dropdown-toggle" type="button" id="userMenu"
-                                data-bs-toggle="dropdown" aria-expanded="false">
+                                data-bs-toggle="dropdown">
                                 <i class="fas fa-user"></i> <span th:text="${username}"></span>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                            <ul class="dropdown-menu dropdown-menu-end">
                                 <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/userManagement}">User Management</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/products/productManagement}">Product Management</a></li>
@@ -98,75 +86,71 @@
         </div>
     </nav>
 
-    <header>
-        <h1>Danh sách sản phẩm PT</h1>
-        <a href="cart.html">
-            <div id="cart-icon" class="cart-icon">
-                <img src="cart-icon.png" alt="Giỏ hàng">
-            </div>
-        </a>
+    <header class="container text-center mt-4">
+        <h1>Gears list</h1>
     </header>
+	 <button class="btn btn-primary mb-3" onclick="location.href='/ComplexGym/home'">Back to Home</button>  
 
-    <div class="product-list">
-        <!-- Example product item -->
-        <div class="product-item">
-            <img src="product1.jpg" alt="Sản phẩm 1">
-            <h2>Sản phẩm hỗ trợ 1</h2>
-            <p>Giá: 100.000 VND</p>
-            <button class="add-to-cart" onclick="addToCart('Sản phẩm PT 1', 100000)">Thêm vào giỏ hàng</button>
-        </div>
-
-        <div class="product-item">
-            <img src="product2.jpg" alt="Sản phẩm 2">
-            <h2>Sản phẩm hỗ trợ 2</h2>
-            <p>Giá: 200.000 VND</p>
-            <button class="add-to-cart" onclick="addToCart('Sản phẩm PT 2', 200000)">Thêm vào giỏ hàng</button>
-        </div>
-		<a href="/products/add?type=gears" class="btn btn-success">
-		    <i class="fas fa-plus"></i> Thêm sản phẩm
-		</a>
-
-        <!-- Add more products as needed -->
-    </div>
+	<div class="container mt-4">
+	    <div class="row">
+	        <!-- Lặp qua danh sách sản phẩm -->
+	        <div th:each="product : ${products}" class="col-md-4 mb-4">
+	            <div class="card">
+	                <div class="position-relative">
+	                    <a th:href="@{/products/detailProduct(id=${product.id})}" class="stretched-link">
+	                        <img th:src="${product.imagePath}" class="card-img-top" style="width:300px;height:400px;" alt="Product Image">
+	                    </a>
+	                </div>
+	                <div class="card-body text-center">
+	                    <a th:href="@{/products/detailProduct(id=${product.id})}" class="text-decoration-none">
+	                        <h5 class="card-title" th:text="${product.productName}" style="color: black;"></h5>
+	                    </a>
+	                    <p class="card-text">💰 Giá: <span th:text="${product.price}"></span> VND</p>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-        function addToCart(productName, price) {
-            const quantity = 1; // Fixed quantity
-            // Add product with default quantity to cart
-            let existingProduct = cart.find(item => item.productName === productName);
-            if (existingProduct) {
-                existingProduct.quantity += quantity; // Update quantity if product already in cart
-            } else {
-                cart.push({ productName, price, quantity });
+        document.addEventListener("DOMContentLoaded", function () {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+            document.querySelectorAll(".add-to-cart").forEach(button => {
+                button.addEventListener("click", function () {
+                    let productName = this.getAttribute("data-name");
+                    let price = parseFloat(this.getAttribute("data-price"));
+                    let quantityInputId = this.getAttribute("data-quantity-id");
+                    let quantity = parseInt(document.getElementById(quantityInputId).value);
+
+                    if (isNaN(quantity) || quantity < 1) {
+                        alert("❌ Số lượng không hợp lệ!");
+                        return;
+                    }
+
+                    let existingProduct = cart.find(item => item.productName === productName);
+                    if (existingProduct) {
+                        existingProduct.quantity += quantity;
+                    } else {
+                        cart.push({ productName, price, quantity });
+                    }
+
+                    localStorage.setItem("cart", JSON.stringify(cart));
+                    updateCartIcon();
+                    alert(`✅ Đã thêm ${quantity} x ${productName} vào giỏ hàng!`);
+                });
+            });
+
+            function updateCartIcon() {
+                let cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+                document.getElementById("cart-count").textContent = `(${cartCount})`;
             }
 
-            // Save cart to localStorage
-            localStorage.setItem('cart', JSON.stringify(cart));
-
-            // Update cart icon with new item count
             updateCartIcon();
-
-            // Make the cart icon blink
-            const cartIcon = document.getElementById("cart-icon");
-            cartIcon.classList.add("blinking");
-            setTimeout(() => {
-                cartIcon.classList.remove("blinking");
-            }, 1000);
-        }
-
-        function updateCartIcon() {
-            const cart = JSON.parse(localStorage.getItem('cart')) || [];
-            const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0); // Sum of quantities
-            document.getElementById("cart-icon").textContent = `Giỏ hàng (${cartCount})`;
-        }
-
-        // Initialize cart count on page load
-        window.onload = function () {
-            updateCartIcon();
-        };
+        });
     </script>
 </body>
 

@@ -34,7 +34,8 @@ public class SecurityConfig {
 					.requestMatchers("/doLogin",  "/doChangePass", "/changePass", "/logout").permitAll() 
 					.requestMatchers("/ComplexGym/home").hasAnyRole("ADMIN", "USER") // Cả user và admin thực hiện search
 					.requestMatchers("/register","/doRegister", "/userManagement", "/searchUserInformation", "/userManagement/updateUser", "/userManagement/doUpdateUserInfo", "/userManagement/doDeleteUser").hasRole("ADMIN") // admin: có toàn quyền
-					.requestMatchers("/products/productManagement").hasRole("ADMIN") // admin: có toàn quyền					
+					.requestMatchers("/products/productManagement").hasRole("ADMIN") // admin: có toàn quyền
+	                .requestMatchers("/api/products/updateDescription").hasRole("ADMIN") // Chỉ cho phép admin truy cập endpoint updateDescription
 					.anyRequest().authenticated() // Yêu cầu khác phải đăng nhập
 			)
 			.formLogin(login -> login

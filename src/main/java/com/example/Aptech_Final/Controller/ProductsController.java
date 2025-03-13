@@ -1,7 +1,6 @@
 package com.example.Aptech_Final.Controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -193,16 +192,31 @@ public class ProductsController {
 	// Phương thức để đi vào trang chi tiết sản phẩm
     @GetMapping("/detailProduct")
     public String getProductDetail(Model model, @RequestParam("id") Long id) {
-    	// Gọi phương thức xác định vai trò của user (là admin) từ @Service
-    	String role = homeService.getCurrentUserRole();
-		// Thêm thông tin về role vào form ở html
-		model.addAttribute("role", role);
-		// Lấy đối tượng Product để cập nhật (gọi từ service)
-		Products product = productsService.findProductByID(id).orElse(new Products());
-		// Thêm đối tượng để binding với th:object ở form
-		model.addAttribute("product", product);
+        // Gọi phương thức xác định vai trò của user (là admin) từ @Service
+        String role = homeService.getCurrentUserRole();
+        model.addAttribute("role", role);
+        
+        // Lấy đối tượng Product để cập nhật (gọi từ service)
+        Products product = productsService.findProductByID(id).orElse(new Products());
+        model.addAttribute("product", product);
+        
+        // Lấy mô tả sản phẩm từ bảng PRODUCT_DETAIL qua ProductDetailService
+        String description = productsService.getProductDescription(id);
+        model.addAttribute("description", description);
 		
         return "productDetail";
+    }
+    
+    @PostMapping("/saveDescription")
+    public String saveProductDescription(Model model, @RequestParam("id") Long id,
+                                         @RequestParam("description") String description) {
+        // Gọi phương thức xác định vai trò của user (là admin) từ @Service
+        String role = homeService.getCurrentUserRole();
+        model.addAttribute("role", role);
+    	// Gọi service để lưu hoặc cập nhật mô tả sản phẩm
+    	productsService.saveProductDescription(id, description);
+        // Chuyển hướng trở lại trang chi tiết sản phẩm
+        return "redirect:/products/detailProduct?id=" + id;
     }
 
 }
