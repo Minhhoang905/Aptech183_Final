@@ -29,12 +29,12 @@ public class SecurityConfig {
 		.authorizeHttpRequests(auth -> auth
                 	.requestMatchers("/images/**", "/css/**", "/js/**").permitAll() // Cho phép truy cập ảnh, CSS, JS
 					.requestMatchers("/ComplexGym/home", "/loginAPI", "/loginAPI/getDistrictDropdown", "/loginAPI/getWardDropdown").permitAll() //Không đăng nhập: Chỉ được phép xem home
-					.requestMatchers("/cart/**","/products/**", "/payment").permitAll()
+					.requestMatchers("/ComplexGym/cart/**","/ComplexGym/products/**", "/ComplexGym/payment/**").permitAll()
 					.requestMatchers("/forgot-password/**","/reset-password/**").permitAll() 
 					.requestMatchers("/doLogin",  "/doChangePass", "/changePass", "/logout").permitAll() 
 					.requestMatchers("/ComplexGym/home").hasAnyRole("ADMIN", "USER") // Cả user và admin thực hiện search
 					.requestMatchers("/register","/doRegister", "/userManagement", "/searchUserInformation", "/userManagement/updateUser", "/userManagement/doUpdateUserInfo", "/userManagement/doDeleteUser").hasRole("ADMIN") // admin: có toàn quyền
-					.requestMatchers("/products/productManagement").hasRole("ADMIN") // admin: có toàn quyền
+					.requestMatchers("/ComplexGym/products/productManagement").hasRole("ADMIN") // admin: có toàn quyền
 	                .requestMatchers("/api/products/updateDescription").hasRole("ADMIN") // Chỉ cho phép admin truy cập endpoint updateDescription
 					.anyRequest().authenticated() // Yêu cầu khác phải đăng nhập
 			)

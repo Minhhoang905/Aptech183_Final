@@ -24,7 +24,7 @@ import com.example.Aptech_Final.Service.ProductsService;
 import org.springframework.ui.Model;
 
 @Controller
-@RequestMapping("/products")
+@RequestMapping("/ComplexGym/products")
 public class ProductsController {
     @Autowired
     private ProductsRepository productsRepository;
@@ -88,11 +88,11 @@ public class ProductsController {
         // Nếu có lỗi, redirect về trang add-product với thông báo lỗi
         if (result.startsWith("error: ")) {
         	redirectAttributes.addFlashAttribute("errorMessage", result.substring(6));
-            return "redirect:/products/addProduct";
+            return "redirect:/ComplexGym/products/addProduct";
         }
         // Nếu thành công, redirect về trang danh sách sản phẩm theo loại
         redirectAttributes.addFlashAttribute("successMessage", result.substring(8));
-        return "redirect:/products/addProduct";
+        return "redirect:/ComplexGym/products/addProduct";
     }
     
 	// Phương thức để xử lý yêu cầu GET cho đường dẫn `product management`
@@ -167,11 +167,11 @@ public class ProductsController {
         	//Giữ nguyên đối tượng để Thymeleaf có thể hiển thị lại giá trị đã nhập
         	model.addAttribute("productManagementObject", new Products());
         	
-            return "redirect:/products/updateProducts?id=" + productsForm.getId();
+            return "redirect:/ComplexGym/products/updateProducts?id=" + productsForm.getId();
         }else {
             // Nếu thành công, redirect về trang danh sách sản phẩm theo loại
             redirectAttributes.addFlashAttribute("successMessage", result.substring(8));
-            return "redirect:/products/productManagement";       	
+            return "redirect:/ComplexGym/products/productManagement";       	
         }
     }
     
@@ -186,7 +186,7 @@ public class ProductsController {
 		productsService.deleteInfoById(id);
 		
 		// Trả về html `userManagement`
-		return "redirect:/products/productManagement";
+		return "redirect:/ComplexGym/products/productManagement";
 	}
 	
 	// Phương thức để đi vào trang chi tiết sản phẩm
@@ -216,7 +216,7 @@ public class ProductsController {
     	// Gọi service để lưu hoặc cập nhật mô tả sản phẩm
     	productsService.saveProductDescription(id, description);
         // Chuyển hướng trở lại trang chi tiết sản phẩm
-        return "redirect:/products/detailProduct?id=" + id;
+        return "redirect:/ComplexGym/products/detailProduct?id=" + id;
     }
 
 }

@@ -7,6 +7,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+<script th:src="@{/js/cart.js}"></script>
 
 </head>
 <body>
@@ -30,13 +31,13 @@
                         <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button"
                             data-bs-toggle="dropdown">Products</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" th:href="@{/products/supplements}">Supplement</a></li>
-                            <li><a class="dropdown-item" th:href="@{/products/gears}">Gears</a></li>
+                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/supplements}">Supplement</a></li>
+                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/gears}">Gears</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/cart}">
-                            <i class="fas fa-shopping-cart"></i> Cart <span id="cart-count">(0)</span>
+                        <a class="nav-link" th:href="@{/ComplexGym/cart}">
+                            <i class="fas fa-shopping-cart"></i> Cart <span id="cart-count"></span>
                         </a>
                     </li>
                 </ul>
@@ -54,7 +55,7 @@
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/userManagement}">User Management</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/products/productManagement}">Product Management</a></li>
+                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/ComplexGym/products/productManagement}">Product Management</a></li>
                                 <li><hr class="dropdown-divider"></li>                                
                                 <li><a class="dropdown-item logout-item" th:href="@{/logout}">Logout</a></li>
                             </ul>
@@ -103,7 +104,7 @@
         <div class="row mt-4" th:if="${role == 'ROLE_ADMIN'}">
             <div class="col">
                 <h4>Chỉnh sửa mô tả sản phẩm</h4>
-                <form th:action="@{/products/saveDescription}" method="post">
+                <form th:action="@{/ComplexGym/products/saveDescription}" method="post">
                     <input type="hidden" name="id" th:value="${product.id}">
                     <textarea id="editor" name="description" rows="10" class="form-control" th:text="${description}"></textarea>
                     <button type="submit" class="btn btn-primary mt-2">Save</button>
@@ -116,95 +117,133 @@
     <!-- CKEditor để hỗ trợ chỉnh sửa mô tả (chỉ kích hoạt nếu tồn tại textarea) -->
     <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
 	<script>
-        // Nếu element có id "editor" tồn tại, khởi tạo CKEditor
-        if (document.getElementById('editor')) {
-            CKEDITOR.replace('editor');
-        }
-        
-        document.addEventListener("DOMContentLoaded", function () {
-            let quantityInput = document.getElementById("quantity");
+	// Kiểm tra nếu phần tử có ID "editor" tồn tại, thì khởi tạo CKEditor để chỉnh sửa mô tả sản phẩm.
+	if (document.getElementById('editor')) {
+	    CKEDITOR.replace('editor');
+	}
 
-            quantityInput.addEventListener("input", function () {
-                this.value = this.value.replace(/[^0-9]/g, ""); // Chỉ cho phép số
-            });
-        });
+	// Khi trang được tải hoàn tất, thêm sự kiện kiểm tra số lượng nhập vào ô input.
+	document.addEventListener("DOMContentLoaded", function () {
+	    let quantityInput = document.getElementById("quantity");
 
-        document.addEventListener("DOMContentLoaded", function () {
-            let productName = "[[${product.productName}]]";
-            let price = parseFloat("[[${product.price}]]");
-            let imagePath = "[[${product.imagePath}]]";
-            let availableQuantity = parseInt("[[${product.quantity}]]"); // Lấy số lượng còn lại
+	    // Ngăn chặn nhập ký tự không phải số vào ô số lượng sản phẩm
+	    quantityInput.addEventListener("input", function () {
+	        this.value = this.value.replace(/[^0-9]/g, ""); // Chỉ cho phép số
+	    });
+	});
 
-            document.getElementById("add-to-cart").addEventListener("click", function () {
-                let quantity = parseInt(document.getElementById("quantity").value);
+	// Khi trang tải xong, lấy thông tin sản phẩm từ Thymeleaf để xử lý thêm vào giỏ hàng
+	document.addEventListener("DOMContentLoaded", function () {
+	    let productName = "[[${product.productName}]]";
+	    let price = parseFloat("[[${product.price}]]");
+	    let imagePath = "[[${product.imagePath}]]";
+	    let availableQuantity = parseInt("[[${product.quantity}]]"); // Số lượng tồn kho
 
-                if (quantity < 1) {
-                    alert("❌ Số lượng không hợp lệ!");
-                    return;
-                }
+	    // Xử lý sự kiện khi nhấn nút "Thêm vào giỏ hàng"
+	    document.getElementById("add-to-cart").addEventListener("click", function () {
+	        let quantity = parseInt(document.getElementById("quantity").value);
 
-                let cart = JSON.parse(localStorage.getItem("cart")) || [];
-                let existingProduct = cart.find(item => item.productName === productName);
+	        // Kiểm tra số lượng nhập vào có hợp lệ không
+	        if (quantity < 1) {
+	            alert("❌ Số lượng không hợp lệ!");
+	            return;
+	        }
 
-                let totalQuantityInCart = existingProduct ? existingProduct.quantity + quantity : quantity;
+	        // Lấy giỏ hàng từ localStorage (nếu có), nếu chưa có thì tạo mảng rỗng
+	        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+	        let existingProduct = cart.find(item => item.productName === productName);
 
-                if (totalQuantityInCart > availableQuantity) {
-                    alert(`❌ Không thể thêm vào giỏ hàng! Số lượng tồn kho chỉ còn ${availableQuantity}.`);
-                    return;
-                }
+	        // Tính tổng số lượng sản phẩm trong giỏ hàng sau khi thêm
+	        let totalQuantityInCart = existingProduct ? existingProduct.quantity + quantity : quantity;
 
-                if (existingProduct) {
-                    existingProduct.quantity += quantity;
-                } else {
-                    cart.push({ productName, price, quantity, imagePath });
-                }
+	        // Kiểm tra nếu số lượng trong giỏ vượt quá số lượng tồn kho
+	        if (totalQuantityInCart > availableQuantity) {
+	            alert(`❌ Không thể thêm vào giỏ hàng! Số lượng tồn kho chỉ còn ${availableQuantity}.`);
+	            return;
+	        }
 
-                localStorage.setItem("cart", JSON.stringify(cart));
-                alert(`✅ Đã thêm ${quantity} ${productName} vào giỏ hàng!`);
-            });
-        });
-        
-        function goToCheckout() {
-            let productName = "[[${product.productName}]]";
-            let price = parseFloat("[[${product.price}]]");
-            let quantity = parseInt(document.getElementById("quantity").value);
-            let imagePath = "[[${product.imagePath}]]";
-            let availableQuantity = parseInt("[[${product.quantity}]]");
+	        // Nếu sản phẩm đã tồn tại trong giỏ hàng, cập nhật số lượng
+	        if (existingProduct) {
+	            existingProduct.quantity += quantity;
+	        } else {
+	            // Nếu sản phẩm chưa có trong giỏ hàng, thêm mới vào danh sách
+	            cart.push({ productName, price, quantity, imagePath });
+	        }
 
-            if (quantity < 1) {
-                alert("❌ Số lượng không hợp lệ!");
-                return;
-            }
+	        // Lưu giỏ hàng mới vào localStorage
+	        localStorage.setItem("cart", JSON.stringify(cart));
 
-            if (quantity > availableQuantity) {
-                alert(`❌ Không thể mua! Chỉ còn ${availableQuantity} sản phẩm.`);
-                return;
-            }
+	        // Cập nhật số lượng hiển thị trên icon giỏ hàng
+	        updateCartIcon();
 
-            let cart = JSON.parse(localStorage.getItem("cart")) || [];
-            let existingProduct = cart.find(item => item.productName === productName);
+	        alert(`✅ Đã thêm ${quantity} ${productName} vào giỏ hàng!`);
+	    });
+	});
 
-            let totalQuantityInCart = existingProduct ? existingProduct.quantity + quantity : quantity;
-            if (totalQuantityInCart > availableQuantity) {
-                alert(`❌ Không thể thêm vào giỏ hàng! Số lượng tồn kho chỉ còn ${availableQuantity}.`);
-                return;
-            }
+	// Hàm cập nhật số lượng hiển thị trên icon giỏ hàng
+	function updateCartIcon() {
+	    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+	    let totalItems = cart.reduce((sum, item) => sum + item.quantity, 0); // Tổng số sản phẩm trong giỏ
 
-            if (existingProduct) {
-                existingProduct.quantity += quantity;
-            } else {
-                cart.push({ productName, price, quantity, imagePath });
-            }
-            
-            localStorage.setItem("cart", JSON.stringify(cart));
+	    // Cập nhật số lượng trên icon giỏ hàng
+	    document.getElementById("cart-count").textContent = totalItems > 0 ? `(${totalItems})` : "";
+	}
 
-            let totalPrice = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-            localStorage.setItem('checkoutInfo', JSON.stringify({ cart: cart, totalPrice }));
+	// Hàm xử lý khi nhấn nút "Mua ngay"
+	function goToCheckout() {
+	    let productName = "[[${product.productName}]]";
+	    let price = parseFloat("[[${product.price}]]");
+	    let quantity = parseInt(document.getElementById("quantity").value);
+	    let imagePath = "[[${product.imagePath}]]";
+	    let availableQuantity = parseInt("[[${product.quantity}]]");
 
-            alert("🔔 Chuyển đến trang thanh toán...");
-            window.location.href = "/payment";
-        }
+	    // Kiểm tra số lượng hợp lệ
+	    if (quantity < 1) {
+	        alert("❌ Số lượng không hợp lệ!");
+	        return;
+	    }
 
+	    // Kiểm tra nếu số lượng mua lớn hơn tồn kho
+	    if (quantity > availableQuantity) {
+	        alert(`❌ Không thể mua! Chỉ còn ${availableQuantity} sản phẩm.`);
+	        return;
+	    }
+
+	    // Lấy giỏ hàng từ localStorage
+	    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+	    let existingProduct = cart.find(item => item.productName === productName);
+
+	    let totalQuantityInCart = existingProduct ? existingProduct.quantity + quantity : quantity;
+	    
+	    // Nếu tổng số lượng trong giỏ lớn hơn tồn kho, hiển thị cảnh báo
+	    if (totalQuantityInCart > availableQuantity) {
+	        alert(`❌ Không thể thêm vào giỏ hàng! Số lượng tồn kho chỉ còn ${availableQuantity}.`);
+	        return;
+	    }
+
+	    // Cập nhật hoặc thêm mới sản phẩm vào giỏ hàng
+	    if (existingProduct) {
+	        existingProduct.quantity += quantity;
+	    } else {
+	        cart.push({ productName, price, quantity, imagePath });
+	    }
+
+	    // Lưu giỏ hàng vào localStorage
+	    localStorage.setItem("cart", JSON.stringify(cart));
+
+	    // Cập nhật icon giỏ hàng
+	    updateCartIcon();
+
+	    // Tính tổng tiền và lưu thông tin thanh toán vào localStorage
+	    let totalPrice = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+	    localStorage.setItem('checkoutInfo', JSON.stringify({ cart: cart, totalPrice }));
+
+	    alert("🔔 Chuyển đến trang thanh toán...");
+	    window.location.href = "/ComplexGym/payment";
+	}
+
+	// Khi trang tải, cập nhật icon giỏ hàng
+	document.addEventListener("DOMContentLoaded", updateCartIcon);
     </script>
 </body>
 </html>

@@ -12,7 +12,7 @@ public class CartController {
     @Autowired
     private HomeService homeService;
 
-	@GetMapping("/cart")
+	@GetMapping("/ComplexGym/cart")
 	public String getCart(Model model) {
     	// Gọi phương thức xác định vai trò của user từ @Service
     	String role = homeService.getCurrentUserRole();

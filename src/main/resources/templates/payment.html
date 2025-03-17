@@ -43,12 +43,12 @@
                             Products
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="productsDropdown">
-                            <li><a class="dropdown-item" th:href="@{/products/supplements}">Supplement</a></li>
-                            <li><a class="dropdown-item" th:href="@{/products/gears}">Gears</a></li>
+                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/supplements}">Supplement</a></li>
+                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/gears}">Gears</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/cart}">
+                        <a class="nav-link" th:href="@{/ComplexGym/cart}">
                             <i class="fas fa-shopping-cart"></i> Cart
                         </a>
                     </li>
@@ -68,7 +68,7 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
                                 <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/userManagement}">User Management</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/products/productManagement}">Product Management</a></li>
+                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/ComplexGym/products/productManagement}">Product Management</a></li>
                                 <li><hr class="dropdown-divider"></li>                                
                                 <li><a class="dropdown-item logout-item" th:href="@{/logout}">Logout</a></li>
                             </ul>
@@ -89,53 +89,76 @@
             <button class="btn btn-success btn-lg mt-3" onclick="confirmPayment()">
                 <i class="fas fa-check"></i> Xác nhận thanh toán
             </button>
-            <button class="btn btn-secondary btn-lg mt-3" onclick="location.href='/cart'">
+            <button class="btn btn-secondary btn-lg mt-3" onclick="location.href='/ComplexGym/cart'">
                 <i class="fas fa-arrow-left"></i> Quay lại giỏ hàng
             </button>
         </div>
     </div>
     
     <!-- Script của Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>    
-    <script>
-        function loadCheckoutDetails() {
-            const checkoutInfo = JSON.parse(localStorage.getItem('checkoutInfo')) || {};
-            const { cart = [], totalPrice = 0 } = checkoutInfo;
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+	function loadCheckoutDetails() {
+	    let checkoutInfo = JSON.parse(localStorage.getItem('checkoutInfo')) || {};
+	    let cart = checkoutInfo.cart || [];
+	    let checkoutTotal = document.getElementById('checkout-total');
 
-            const checkoutItemsContainer = document.getElementById('checkout-items');
-            checkoutItemsContainer.innerHTML = '';
+	    let cartItemsContainer = document.getElementById('checkout-items');
+	    cartItemsContainer.innerHTML = '';
 
-            if (cart.length === 0) {
-                checkoutItemsContainer.innerHTML = "<p class='text-center text-danger'>Giỏ hàng của bạn đang trống.</p>";
-                return;
-            }
+	    cart.forEach((item, index) => {
+	        const itemDiv = document.createElement('div');
+	        itemDiv.classList.add('col-md-12', 'mb-3');
+	        itemDiv.innerHTML = `
+	            <div class="card shadow-sm border-0">
+	                <div class="row g-0">
+	                    <div class="col-md-4 d-flex align-items-center">
+	                        <img src="${item.imagePath}" class="img-fluid rounded-start" alt="Product Image">
+	                    </div>
+	                    <div class="col-md-8">
+	                        <div class="card-body">
+	                            <h5 class="card-title">${item.productName}</h5>
+	                            <p class="card-text">💰 Giá: <strong>${item.price.toLocaleString()} VND</strong></p>
+	                            <p class="card-text">🔢 Số lượng: <strong>${item.quantity}</strong></p>
+	                            <p class="card-text">💵 Tổng cộng: <strong>${(item.price * item.quantity).toLocaleString()} VND</strong></p>
+	                            <button class="btn btn-danger btn-sm" onclick="removeItemFromCheckout(${index})">
+	                                <i class="fas fa-times"></i> Xóa
+	                            </button>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        `;
+	        cartItemsContainer.appendChild(itemDiv);
+	    });
 
-            cart.forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.classList.add('col');
+	    // Cập nhật tổng tiền
+	    checkoutTotal.textContent = checkoutInfo.totalPrice.toLocaleString() + " VND";
+	}
+	
+    // Xóa sản phẩm ra khỏi localStorage
+    function removeItemFromCheckout(index) {
+        let checkoutInfo = JSON.parse(localStorage.getItem('checkoutInfo')) || {};
+        let cart = checkoutInfo.cart || [];
 
-                itemDiv.innerHTML = `
-                    <div class="card shadow-sm border-0">
-                        <div class="row g-0">
-                            <div class="col-md-4 d-flex align-items-center">
-                                <img src="${item.imagePath}" class="img-fluid rounded-start" alt="Product Image">
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card-body">
-                                    <h5 class="card-title">${item.productName}</h5>
-                                    <p class="card-text">💰 Giá: <strong>${item.price.toLocaleString()} VND</strong></p>
-                                    <p class="card-text">🔢 Số lượng: <strong>${item.quantity}</strong></p>
-                                    <p class="card-text">💵 Tổng cộng: <strong>${(item.price * item.quantity).toLocaleString()} VND</strong></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                checkoutItemsContainer.appendChild(itemDiv);
-            });
-
-            document.getElementById('checkout-total').textContent = `${totalPrice.toLocaleString()} VND`;
+        if (cart.length > index) {
+            cart.splice(index, 1); // Xóa sản phẩm tại vị trí index
         }
+
+        // Cập nhật tổng tiền
+        checkoutInfo.cart = cart;
+        checkoutInfo.totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+        // Lưu lại vào localStorage
+        localStorage.setItem('checkoutInfo', JSON.stringify(checkoutInfo));
+        localStorage.setItem('cart', JSON.stringify(cart));  
+
+        // Cập nhật hiển thị trên giao diện
+        document.getElementById('checkout-total').textContent = checkoutInfo.totalPrice.toLocaleString() + " VND";
+        
+        // Load lại danh sách sản phẩm
+        loadCheckoutDetails();
+    }
 
         function confirmPayment() {
             if (!localStorage.getItem('checkoutInfo')) {
@@ -146,7 +169,7 @@
             alert("Cảm ơn bạn đã thanh toán! Đơn hàng của bạn sẽ được xử lý ngay.");
             localStorage.removeItem('cart');
             localStorage.removeItem('checkoutInfo');
-            window.location.href = "/cart";
+            window.location.href = "/ComplexGym/cart";
         }
 
         window.onload = function () {
