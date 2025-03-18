@@ -99,15 +99,20 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
 	function loadCheckoutDetails() {
-	    let checkoutInfo = JSON.parse(localStorage.getItem('checkoutInfo')) || {};
+	    let checkoutInfo = JSON.parse(localStorage.getItem("checkoutInfo")) || {};
 	    let cart = checkoutInfo.cart || [];
-	    let checkoutTotal = document.getElementById('checkout-total');
-
+	    let totalPrice = checkoutInfo.totalPrice || 0;
 	    let cartItemsContainer = document.getElementById('checkout-items');
 	    cartItemsContainer.innerHTML = '';
 
+	    if (cart.length === 0) {
+	        cartItemsContainer.innerHTML = '<p class="text-center text-muted">🛒 Không có sản phẩm nào để thanh toán.</p>';
+	        document.getElementById('checkout-total').textContent = '0 VND';
+	        return;
+	    }
+
 	    cart.forEach((item, index) => {
-	        const itemDiv = document.createElement('div');
+	        let itemDiv = document.createElement('div');
 	        itemDiv.classList.add('col-md-12', 'mb-3');
 	        itemDiv.innerHTML = `
 	            <div class="card shadow-sm border-0">
@@ -121,9 +126,6 @@
 	                            <p class="card-text">💰 Giá: <strong>${item.price.toLocaleString()} VND</strong></p>
 	                            <p class="card-text">🔢 Số lượng: <strong>${item.quantity}</strong></p>
 	                            <p class="card-text">💵 Tổng cộng: <strong>${(item.price * item.quantity).toLocaleString()} VND</strong></p>
-	                            <button class="btn btn-danger btn-sm" onclick="removeItemFromCheckout(${index})">
-	                                <i class="fas fa-times"></i> Xóa
-	                            </button>
 	                        </div>
 	                    </div>
 	                </div>
@@ -132,49 +134,45 @@
 	        cartItemsContainer.appendChild(itemDiv);
 	    });
 
-	    // Cập nhật tổng tiền
-	    checkoutTotal.textContent = checkoutInfo.totalPrice.toLocaleString() + " VND";
+	    document.getElementById('checkout-total').textContent = totalPrice.toLocaleString() + " VND";
 	}
-	
-    // Xóa sản phẩm ra khỏi localStorage
-    function removeItemFromCheckout(index) {
-        let checkoutInfo = JSON.parse(localStorage.getItem('checkoutInfo')) || {};
-        let cart = checkoutInfo.cart || [];
 
-        if (cart.length > index) {
-            cart.splice(index, 1); // Xóa sản phẩm tại vị trí index
-        }
+	function confirmPayment() {
+	    let checkoutInfo = JSON.parse(localStorage.getItem("checkoutInfo")) || {};
+	    let cart = checkoutInfo.cart || [];
 
-        // Cập nhật tổng tiền
-        checkoutInfo.cart = cart;
-        checkoutInfo.totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+	    if (cart.length === 0) {
+	        alert("⚠️ Không có sản phẩm nào để thanh toán!");
+	        return;
+	    }
 
-        // Lưu lại vào localStorage
-        localStorage.setItem('checkoutInfo', JSON.stringify(checkoutInfo));
-        localStorage.setItem('cart', JSON.stringify(cart));  
+	    // Hiển thị thông báo
+	    alert("✅ Thanh toán thành công! Đơn hàng của bạn sẽ được xử lý.");
 
-        // Cập nhật hiển thị trên giao diện
-        document.getElementById('checkout-total').textContent = checkoutInfo.totalPrice.toLocaleString() + " VND";
-        
-        // Load lại danh sách sản phẩm
-        loadCheckoutDetails();
-    }
+	    // Xóa dữ liệu giỏ hàng khỏi localStorage
+	    localStorage.removeItem('cart');
+	    localStorage.removeItem('checkoutInfo');
 
-        function confirmPayment() {
-            if (!localStorage.getItem('checkoutInfo')) {
-                alert("Không có sản phẩm nào trong giỏ hàng để thanh toán.");
-                return;
-            }
+	    // Xóa hình ảnh và nội dung giỏ hàng trên giao diện
+	    let cartItemsContainer = document.getElementById('checkout-items');
+	    cartItemsContainer.innerHTML = '';  // Xóa tất cả nội dung
 
-            alert("Cảm ơn bạn đã thanh toán! Đơn hàng của bạn sẽ được xử lý ngay.");
-            localStorage.removeItem('cart');
-            localStorage.removeItem('checkoutInfo');
-            window.location.href = "/ComplexGym/cart";
-        }
+	    // Cập nhật tổng tiền
+	    document.getElementById('checkout-total').textContent = '0 VND';
 
-        window.onload = function () {
-            loadCheckoutDetails();
-        };
+	    // Cập nhật icon giỏ hàng
+	    updateCartIcon();
+
+	    // Ép trình duyệt làm mới nội dung (nếu vẫn hiển thị)
+	    setTimeout(() => {
+	        cartItemsContainer.innerHTML = '<p class="text-center text-muted">🛒 Không có sản phẩm nào để thanh toán.</p>';
+	    }, 100);
+
+	}
+
+	window.onload = function () {
+	    loadCheckoutDetails();
+	};
     </script>
 </body>
 

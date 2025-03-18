@@ -91,7 +91,7 @@
                 <div class="card p-3">
                     <h3 class="text-center">Tổng tiền:</h3>
                     <h4 class="text-center text-danger"><span id="total-price">0</span> VND</h4>
-                    <button class="btn btn-primary w-100 mt-3" id="checkout-btn" onclick="confirmPayment()">Thanh toán</button>
+                    <button class="btn btn-primary w-100 mt-3" id="checkout-btn" onclick="location.href='/ComplexGym/payment'">Thanh toán</button>
                 </div>
             </div>
         </div>
@@ -100,83 +100,120 @@
     <!-- Script của Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
-// Cập nhật số lượng sản phẩm hiển thị trên biểu tượng giỏ hàng 
-function updateCartIcon() {
-    let cart = JSON.parse(localStorage.getItem("cart")) || []; // Lấy dữ liệu giỏ hàng từ localStorage
-    let cartCount = cart.reduce((acc, item) => acc + item.quantity, 0); // Tính tổng số lượng sản phẩm
-    document.getElementById("cart-count").textContent = `(${cartCount})`; // Hiển thị số lượng trên icon giỏ hàng
-}
+	// Cập nhật số lượng sản phẩm hiển thị trên biểu tượng giỏ hàng 
+	function updateCartIcon() {
+	    let cart = JSON.parse(localStorage.getItem("cart")) || []; // Lấy giỏ hàng từ localStorage, nếu không có thì dùng mảng rỗng
+	    let cartCount = cart.reduce((acc, item) => acc + item.quantity, 0); // Tính tổng số lượng sản phẩm trong giỏ
+	    document.getElementById("cart-count").textContent = `(${cartCount})`; // Hiển thị số lượng trên biểu tượng giỏ hàng
+	}
 
-// Tải danh sách sản phẩm từ localStorage và hiển thị trong trang giỏ hàng
-function loadCartItems() {
-    let cart = JSON.parse(localStorage.getItem('cart')) || []; // Lấy giỏ hàng từ localStorage
-    let cartItemsContainer = document.getElementById('cart-items');
-    cartItemsContainer.innerHTML = ''; // Xóa nội dung cũ trước khi cập nhật
-    let totalPrice = 0;
+	// Tải danh sách sản phẩm từ localStorage và hiển thị trong trang giỏ hàng
+	function loadCartItems() {
+	    let cart = JSON.parse(localStorage.getItem("cart")) || []; // Lấy giỏ hàng từ localStorage
+	    let cartItemsContainer = document.getElementById('cart-items'); // Lấy phần tử hiển thị danh sách sản phẩm
+	    cartItemsContainer.innerHTML = ''; // Xóa nội dung cũ
+	    let totalPrice = 0; // Khởi tạo tổng tiền
 
-    // Kiểm tra nếu giỏ hàng trống
-    if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<p class="text-center text-muted">🛒 Giỏ hàng trống.</p>';
-        document.getElementById('total-price').textContent = '0';
-        return;
-    }
+	    // Kiểm tra nếu giỏ hàng trống
+	    if (cart.length === 0) {
+	        cartItemsContainer.innerHTML = '<p class="text-center text-muted">🛒 Giỏ hàng trống.</p>';
+	        document.getElementById('total-price').textContent = '0 VND'; // Cập nhật tổng tiền
+	        return;
+	    }
 
-    // Duyệt qua từng sản phẩm và hiển thị trên giao diện
-    cart.forEach((item, index) => {
-        let itemDiv = document.createElement('div');
-        itemDiv.classList.add('col-md-6', 'mb-3');
-        itemDiv.innerHTML = `
-            <div class="card shadow-sm">
-                <img src="${item.imagePath}" class="card-img-top" alt="${item.productName}" style="height: 200px; object-fit: cover;">
-                <div class="card-body">
-                    <h5 class="card-title">${item.productName}</h5>
-                    <p class="card-text text-danger fw-bold">Giá: ${item.price} VND</p>
-                    <p class="card-text fw-bold">Số lượng: ${item.quantity}</p>
-                    <p class="fw-bold">Tổng: ${item.price * item.quantity} VND</p>
-                    <button class="btn btn-danger w-100" onclick="removeCartItem(${index})">
-                        <i class="fas fa-trash-alt"></i> Xóa
-                    </button>
-                </div>
-            </div>
-        `;
-        cartItemsContainer.appendChild(itemDiv);
-        totalPrice += item.price * item.quantity; // Cộng tổng giá trị đơn hàng
-    });
+	    // Lặp qua từng sản phẩm trong giỏ hàng để hiển thị
+	    cart.forEach((item, index) => {
+	        let itemDiv = document.createElement('div');
+	        itemDiv.classList.add('col-md-6', 'mb-3'); // Thiết lập lớp CSS cho hiển thị đẹp hơn
+	        itemDiv.innerHTML = `
+	            <div class="card shadow-sm">
+	                <img src="${item.imagePath}" class="card-img-top" alt="${item.productName}" style="height: 200px; object-fit: cover;">
+	                <div class="card-body">
+	                    <h5 class="card-title">${item.productName}</h5>
+	                    <p class="card-text text-danger fw-bold">Giá: ${item.price.toLocaleString()} VND</p>
+	                    
+	                    <div class="d-flex justify-content-between align-items-center">
+	                        <button class="btn btn-sm btn-outline-secondary" onclick="changeQuantity(${index}, -1)">➖</button>
+	                        <span class="fw-bold"> ${item.quantity} </span>
+	                        <button class="btn btn-sm btn-outline-primary" onclick="changeQuantity(${index}, 1)">➕</button>
+	                    </div>
 
-    document.getElementById('total-price').textContent = totalPrice; // Cập nhật tổng tiền
-}
+	                    <p class="fw-bold mt-2">Tổng: <span id="total-${index}">${(item.price * item.quantity).toLocaleString()}</span> VND</p>
 
-// Xóa sản phẩm khỏi giỏ hàng và cập nhật giao diện
- function removeCartItem(index) {
-    let cart = JSON.parse(localStorage.getItem('cart')) || []; // Lấy giỏ hàng từ localStorage
+	                    <button class="btn btn-danger w-100 mt-2" onclick="removeCartItem(${index})">
+	                        <i class="fas fa-trash-alt"></i> Xóa
+	                    </button>
+	                </div>
+	            </div>
+	        `;
+	        cartItemsContainer.appendChild(itemDiv); // Thêm sản phẩm vào giao diện
+	        totalPrice += item.price * item.quantity; // Cộng tổng tiền
+	    });
 
-    if (cart.length > index) {
-        cart.splice(index, 1); // Xóa sản phẩm khỏi giỏ hàng
-        localStorage.setItem('cart', JSON.stringify(cart)); // Lưu giỏ hàng mới vào localStorage
-    }
+	    // Cập nhật tổng tiền vào giao diện
+	    document.getElementById('total-price').textContent = totalPrice.toLocaleString() + " VND";
 
-    loadCartItems(); // Cập nhật danh sách giỏ hàng trên giao diện
-    updateCartIcon(); // Cập nhật số lượng trên icon giỏ hàng
-}
+	    // Lưu thông tin giỏ hàng và tổng tiền vào localStorage để sử dụng ở trang thanh toán
+	    localStorage.setItem("checkoutInfo", JSON.stringify({ cart, totalPrice }));
+	}
 
-// Xác nhận thanh toán đơn hàng
-function confirmPayment() {
+	// Thay đổi số lượng sản phẩm (+1 hoặc -1), kiểm tra tồn kho
+	function changeQuantity(index, amount) {
+	    let cart = JSON.parse(localStorage.getItem("cart")) || []; // Lấy giỏ hàng từ localStorage
 
-    let cart = JSON.parse(localStorage.getItem('cart')) || []; // Lấy giỏ hàng từ localStorage
-    // Nếu giỏ hàng trống thì không cho thanh toán
-    if (cart.length === 0) {
-        alert("❌ Không có sản phẩm nào trong giỏ hàng để thanh toán!");
-        return;
-    }
+	    if (cart[index]) {
+	        let newQuantity = cart[index].quantity + amount; // Cập nhật số lượng
 
-    window.location.href = "/ComplexGym/payment"; // Chuyển hướng về trang thanh toán
-}
+	        // Kiểm tra số lượng không được nhỏ hơn 1
+	        if (newQuantity < 1) {
+	            newQuantity = 1;
+	        }
 
-// Thực hiện các hành động sau khi load trang
-window.onload = function () {
-    loadCartItems(); // Cập nhật danh sách giỏ hàng
-    updateCartIcon(); // Cập nhật số lượng trên icon giỏ hàng
-};
+	        // Kiểm tra số lượng không vượt quá số lượng tồn kho
+	        if (newQuantity > cart[index].stock) {
+	            alert(`Số lượng không thể vượt quá ${cart[index].stock} sản phẩm!`);
+	            return;
+	        }
+
+	        // Cập nhật số lượng sản phẩm trong giỏ
+	        cart[index].quantity = newQuantity;
+
+	        // Cập nhật tổng giá của sản phẩm
+	        document.getElementById(`total-${index}`).textContent = (cart[index].price * cart[index].quantity).toLocaleString();
+
+	        // Lưu dữ liệu cập nhật vào localStorage
+	        localStorage.setItem("cart", JSON.stringify(cart));
+	        localStorage.setItem("checkoutInfo", JSON.stringify({ 
+	            cart, 
+	            totalPrice: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) 
+	        }));
+
+	        // Cập nhật lại giao diện giỏ hàng
+	        loadCartItems();
+	        updateCartIcon();
+	    }
+	}
+
+	// Xóa sản phẩm khỏi giỏ hàng
+	function removeCartItem(index) {
+	    let cart = JSON.parse(localStorage.getItem("cart")) || []; // Lấy giỏ hàng từ localStorage
+	    if (cart.length > index) {
+	        cart.splice(index, 1); // Xóa sản phẩm theo chỉ mục
+	        localStorage.setItem("cart", JSON.stringify(cart)); // Lưu giỏ hàng mới vào localStorage
+	        localStorage.setItem("checkoutInfo", JSON.stringify({ 
+	            cart, 
+	            totalPrice: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) 
+	        }));
+	    }
+	    loadCartItems(); // Cập nhật lại giao diện giỏ hàng
+	    updateCartIcon(); // Cập nhật số lượng trên biểu tượng giỏ hàng
+	}
+
+	// Khi trang tải xong, tự động tải dữ liệu giỏ hàng và cập nhật biểu tượng giỏ hàng
+	window.onload = function () {
+	    loadCartItems();
+	    updateCartIcon();
+	};
 </script>
 </body>
 
