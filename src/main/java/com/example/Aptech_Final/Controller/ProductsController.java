@@ -24,7 +24,7 @@ import com.example.Aptech_Final.Service.ProductsService;
 import org.springframework.ui.Model;
 
 @Controller
-@RequestMapping("/products")
+@RequestMapping("/ComplexGym/products")
 public class ProductsController {
     @Autowired
     private ProductsRepository productsRepository;
@@ -37,12 +37,14 @@ public class ProductsController {
     public String getSupplement(Model model, @AuthenticationPrincipal UserDetails userDetails) {
     	// Lấy sản phẩm từ DB
         List<Products> supplements = productsRepository.findByType("supplements"); 
+
     	// Gọi phương thức xác định vai trò của user từ @Service
     	String role = homeService.getCurrentUserRole();
 		// Thêm thông tin về role vào form ở html
 		model.addAttribute("role", role);
-        model.addAttribute("products", supplements);
-        return "supplements"; 
+        model.addAttribute("supplements", supplements);
+
+        return "products"; 
     }
 
     // Phương thức hiển thị danh sách sản phẩm Gears
@@ -52,10 +54,15 @@ public class ProductsController {
     	String role = homeService.getCurrentUserRole();
 		// Thêm thông tin về role vào form ở html
 		model.addAttribute("role", role);
-
-        List<Products> gears = productsRepository.findByType("gears"); // Lấy sản phẩm từ DB
-        model.addAttribute("products", gears);
-        return "gears";
+		
+		// Lấy sản phẩm từ DB
+        List<Products> gears = productsRepository.findByType("gears"); 
+        
+		// Thêm thông tin về role vào form ở html
+		model.addAttribute("role", role);
+        model.addAttribute("gears", gears);
+        
+        return "products";
     }
         
     // Phương thức để vào trang thêm sản phẩm
@@ -88,11 +95,11 @@ public class ProductsController {
         // Nếu có lỗi, redirect về trang add-product với thông báo lỗi
         if (result.startsWith("error: ")) {
         	redirectAttributes.addFlashAttribute("errorMessage", result.substring(6));
-            return "redirect:/products/addProduct";
+            return "redirect:/ComplexGym/products/addProduct";
         }
         // Nếu thành công, redirect về trang danh sách sản phẩm theo loại
         redirectAttributes.addFlashAttribute("successMessage", result.substring(8));
-        return "redirect:/products/addProduct";
+        return "redirect:/ComplexGym/products/addProduct";
     }
     
 	// Phương thức để xử lý yêu cầu GET cho đường dẫn `product management`
@@ -167,11 +174,11 @@ public class ProductsController {
         	//Giữ nguyên đối tượng để Thymeleaf có thể hiển thị lại giá trị đã nhập
         	model.addAttribute("productManagementObject", new Products());
         	
-            return "redirect:/products/updateProducts?id=" + productsForm.getId();
+            return "redirect:/ComplexGym/products/updateProducts?id=" + productsForm.getId();
         }else {
             // Nếu thành công, redirect về trang danh sách sản phẩm theo loại
             redirectAttributes.addFlashAttribute("successMessage", result.substring(8));
-            return "redirect:/products/productManagement";       	
+            return "redirect:/ComplexGym/products/productManagement";       	
         }
     }
     
@@ -186,7 +193,7 @@ public class ProductsController {
 		productsService.deleteInfoById(id);
 		
 		// Trả về html `userManagement`
-		return "redirect:/products/productManagement";
+		return "redirect:/ComplexGym/products/productManagement";
 	}
 	
 	// Phương thức để đi vào trang chi tiết sản phẩm
@@ -216,7 +223,7 @@ public class ProductsController {
     	// Gọi service để lưu hoặc cập nhật mô tả sản phẩm
     	productsService.saveProductDescription(id, description);
         // Chuyển hướng trở lại trang chi tiết sản phẩm
-        return "redirect:/products/detailProduct?id=" + id;
+        return "redirect:/ComplexGym/products/detailProduct?id=" + id;
     }
 
 }

@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html xmlns="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Detail product</title>
-<link rel="stylesheet" href="/styles.css">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-
+    <meta charset="UTF-8">
+    <title>Detail product</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <script th:src="@{/js/cart.js}" defer></script> <!-- Pending, tí nữa chỉnh sửa để không sử dụng localStorage -->
 </head>
 <body>
+
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container-fluid">
@@ -30,13 +31,13 @@
                         <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button"
                             data-bs-toggle="dropdown">Products</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" th:href="@{/products/supplements}">Supplement</a></li>
-                            <li><a class="dropdown-item" th:href="@{/products/gears}">Gears</a></li>
+                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/supplements}">Supplement</a></li>
+                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/gears}">Gears</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/cart}">
-                            <i class="fas fa-shopping-cart"></i> Cart <span id="cart-count">(0)</span>
+                        <a class="nav-link" th:href="@{/ComplexGym/cart}">
+                            <i class="fas fa-shopping-cart"></i> Cart <span id="cart-count"></span>
                         </a>
                     </li>
                 </ul>
@@ -54,8 +55,8 @@
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/userManagement}">User Management</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/products/productManagement}">Product Management</a></li>
-                                <li><hr class="dropdown-divider"></li>                                
+                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/ComplexGym/products/productManagement}">Product Management</a></li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item logout-item" th:href="@{/logout}">Logout</a></li>
                             </ul>
                         </div>
@@ -65,146 +66,104 @@
         </div>
     </nav>
 
-    <!-- Nội dung trang chi tiết sản phẩm -->
-    <div class="container mt-4">
-        <div class="row">
-            <!-- Cột hình ảnh sản phẩm -->
-            <div class="col-md-6">
-                <img th:src="${product.imagePath}" class="img-fluid" alt="Product Image">
-            </div>
-            <!-- Cột thông tin sản phẩm -->
-            <div class="col-md-6">
-                <h2 th:text="${product.productName}"></h2>
-                <p>💰 Giá: <span th:text="${product.price}"></span> VND</p>
-                <p>📦 Số lượng còn lại: <span th:text="${product.quantity}"></span></p>
-
-                <label for="quantity">Chọn số lượng:</label>
-                <input type="number" id="quantity" class="form-control mb-3" value="1" min="1">
-
-                <button class="btn btn-success w-100 mb-2" id="add-to-cart">
-                    🛒 Thêm vào giỏ hàng
-                </button>
-                <button class="btn btn-danger w-100" id="buy-now" onclick="goToCheckout()">
-                    🛍️ Mua ngay
-                </button>
-            </div>
-        </div>
-        
-        <!-- Phần hiển thị mô tả sản phẩm -->
-        <div class="row mt-4">
-            <div class="col">
-                <h4>Mô tả sản phẩm</h4>
-                <!-- Dùng th:utext để hiển thị nội dung HTML của mô tả -->
-                <div th:utext="${description}"></div>
-            </div>
-        </div>
-        
-        <!-- Form chỉnh sửa mô tả (chỉ hiển thị cho Admin) -->
-        <div class="row mt-4" th:if="${role == 'ROLE_ADMIN'}">
-            <div class="col">
-                <h4>Chỉnh sửa mô tả sản phẩm</h4>
-                <form th:action="@{/products/saveDescription}" method="post">
-                    <input type="hidden" name="id" th:value="${product.id}">
-                    <textarea id="editor" name="description" rows="10" class="form-control" th:text="${description}"></textarea>
-                    <button type="submit" class="btn btn-primary mt-2">Save</button>
-                </form>
-            </div>
-        </div>
-    </div>
+	<!-- Hiển thị thông báo từ backend -->
+	<div class="container mt-3">
+	    <!-- Hiển thị lỗi -->
+	    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+	        <span th:text="${errorMessage}"></span>
+	    </div>
+	    <!-- Hiển thị thành công -->
+	    <div th:if="${successMessage}" class="alert alert-success" role="alert">
+	        <span th:text="${successMessage}"></span>
+	    </div>
+	</div>
+	
+	<!-- Nội dung trang chi tiết sản phẩm -->
+	<div class="container mt-4">
+	    <div class="row">
+	        <!-- Cột hình ảnh sản phẩm -->
+	        <div class="col-md-6">
+	            <img th:src="${product.imagePath}" class="img-fluid" alt="Product Image">
+	        </div>
+	
+	        <!-- Cột thông tin sản phẩm -->
+	        <div class="col-md-6">
+	            <h2 th:text="${product.productName}"></h2>
+	            <p>💰 Giá: <span th:text="${#numbers.formatInteger(product.price, 3, 'POINT')}"></span> VND</p>
+	            <p>📦 Số lượng còn lại: <span th:text="${product.quantity}"></span></p>
+	
+	            <!-- Form thêm vào giỏ hàng -->
+	            <form id="addToCartForm" th:action="@{/ComplexGym/cart/add}" method="post" onsubmit="return validateCartQuantity()">
+	                <input type="hidden" name="productId" th:value="${product.id}">
+	                
+	                <label for="quantity">Chọn số lượng:</label>
+	                <input type="number" name="quantity" id="quantity" class="form-control mb-2"
+	                       value="1" min="1" th:max="${product.quantity}" 
+	                       oninput="checkQuantity()">
+	
+	                <p class="text-danger small d-none" id="cartWarning">⚠ Số lượng không đủ!</p>
+	
+	                <button type="submit" class="btn btn-success w-100">
+	                    🛒 Thêm vào giỏ hàng
+	                </button>
+	            </form>
+	
+	            <!-- Mua ngay -->
+	            <form id="buyNowForm" th:action="@{/ComplexGym/payment}" method="post" onsubmit="return validateBuyNowQuantity()">
+	                <input type="hidden" name="productId" th:value="${product.id}">
+	                <input type="hidden" name="quantity" id="quantityBuyNow" value="1">
+	
+	                <button type="submit" class="btn btn-danger w-100">
+	                    🛍️ Mua ngay
+	                </button>
+	            </form>
+	        </div>
+	    </div>
+	</div>
     <!-- Script của Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- CKEditor để hỗ trợ chỉnh sửa mô tả (chỉ kích hoạt nếu tồn tại textarea) -->
-    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
-	<script>
-        // Nếu element có id "editor" tồn tại, khởi tạo CKEditor
-        if (document.getElementById('editor')) {
-            CKEDITOR.replace('editor');
-        }
-        
-        document.addEventListener("DOMContentLoaded", function () {
-            let quantityInput = document.getElementById("quantity");
+    <!-- Script thêm sản phẩm vào giỏ hàng -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const quantityInput = document.getElementById("quantity");
+        const cartWarning = document.getElementById("cartWarning");
 
-            quantityInput.addEventListener("input", function () {
-                this.value = this.value.replace(/[^0-9]/g, ""); // Chỉ cho phép số
-            });
-        });
+        function checkQuantity() {
+            const maxQuantity = parseInt(quantityInput.getAttribute("max"));
+            let currentValue = parseInt(quantityInput.value);
 
-        document.addEventListener("DOMContentLoaded", function () {
-            let productName = "[[${product.productName}]]";
-            let price = parseFloat("[[${product.price}]]");
-            let imagePath = "[[${product.imagePath}]]";
-            let availableQuantity = parseInt("[[${product.quantity}]]"); // Lấy số lượng còn lại
-
-            document.getElementById("add-to-cart").addEventListener("click", function () {
-                let quantity = parseInt(document.getElementById("quantity").value);
-
-                if (quantity < 1) {
-                    alert("❌ Số lượng không hợp lệ!");
-                    return;
-                }
-
-                let cart = JSON.parse(localStorage.getItem("cart")) || [];
-                let existingProduct = cart.find(item => item.productName === productName);
-
-                let totalQuantityInCart = existingProduct ? existingProduct.quantity + quantity : quantity;
-
-                if (totalQuantityInCart > availableQuantity) {
-                    alert(`❌ Không thể thêm vào giỏ hàng! Số lượng tồn kho chỉ còn ${availableQuantity}.`);
-                    return;
-                }
-
-                if (existingProduct) {
-                    existingProduct.quantity += quantity;
-                } else {
-                    cart.push({ productName, price, quantity, imagePath });
-                }
-
-                localStorage.setItem("cart", JSON.stringify(cart));
-                alert(`✅ Đã thêm ${quantity} ${productName} vào giỏ hàng!`);
-            });
-        });
-        
-        function goToCheckout() {
-            let productName = "[[${product.productName}]]";
-            let price = parseFloat("[[${product.price}]]");
-            let quantity = parseInt(document.getElementById("quantity").value);
-            let imagePath = "[[${product.imagePath}]]";
-            let availableQuantity = parseInt("[[${product.quantity}]]");
-
-            if (quantity < 1) {
-                alert("❌ Số lượng không hợp lệ!");
-                return;
-            }
-
-            if (quantity > availableQuantity) {
-                alert(`❌ Không thể mua! Chỉ còn ${availableQuantity} sản phẩm.`);
-                return;
-            }
-
-            let cart = JSON.parse(localStorage.getItem("cart")) || [];
-            let existingProduct = cart.find(item => item.productName === productName);
-
-            let totalQuantityInCart = existingProduct ? existingProduct.quantity + quantity : quantity;
-            if (totalQuantityInCart > availableQuantity) {
-                alert(`❌ Không thể thêm vào giỏ hàng! Số lượng tồn kho chỉ còn ${availableQuantity}.`);
-                return;
-            }
-
-            if (existingProduct) {
-                existingProduct.quantity += quantity;
+            if (currentValue > maxQuantity) {
+                cartWarning.classList.remove("d-none");
+                quantityInput.value = maxQuantity;  // Reset về max nếu nhập sai
             } else {
-                cart.push({ productName, price, quantity, imagePath });
+                cartWarning.classList.add("d-none");
             }
-            
-            localStorage.setItem("cart", JSON.stringify(cart));
-
-            let totalPrice = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-            localStorage.setItem('checkoutInfo', JSON.stringify({ cart: cart, totalPrice }));
-
-            alert("🔔 Chuyển đến trang thanh toán...");
-            window.location.href = "/payment";
         }
 
+        function validateCartQuantity() {
+            const maxQuantity = parseInt(quantityInput.getAttribute("max"));
+            let currentValue = parseInt(quantityInput.value);
+
+            if (currentValue > maxQuantity) {
+                alert("Số lượng không đủ trong kho!");
+                return false;  // Chặn gửi form
+            }
+            return true;
+        }
+
+        function validateBuyNowQuantity() {
+            const maxQuantity = parseInt(quantityInput.getAttribute("max"));
+            let buyNowQuantity = parseInt(document.getElementById("quantityBuyNow").value);
+
+            if (buyNowQuantity > maxQuantity) {
+                alert("Số lượng không đủ trong kho!");
+                return false;  // Chặn gửi form
+            }
+            return true;
+        }
+
+        quantityInput.addEventListener("input", checkQuantity);
+    });
     </script>
 </body>
 </html>

@@ -35,7 +35,7 @@ public class HomeController {
 		// Gắn các thông tin vào model để hiển thị trong html
 		model.addAttribute("role", role);
 		// Trả về tên file template Thymeleaf (home.html)
-		return "home";
+		return "html_resources/home";
 	}
 
 	// Tạo method xử lý exception IllegalArgumentException

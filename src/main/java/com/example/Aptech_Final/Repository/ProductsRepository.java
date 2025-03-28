@@ -18,7 +18,8 @@ public interface ProductsRepository extends JpaRepository<Products, Long> {
 	List<ProductManagementDTO> findAllProducts(Long id, String productName, BigDecimal price, String type, int quantity, String imagePath);
 	// Phương thức tìm kiếm theo thể loại
 	List<Products> findByType(String type);
-	
+	// Tìm kiếm đối tượng theo id
+	Products findById(long id);
 	// Phương thức tìm kiếm sản phẩm
 	@Query(value = """
 	        SELECT PRODUCT_ID AS id, PRODUCT_NAME AS productName, PRICE, TYPE, QUANTITY, IMAGE_PATH FROM PRODUCT 
