@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complex Gym</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+	<link rel="stylesheet" th:href="@{/css_resources/home.css}">
+
+</head>
+
+<body>
+    <header>
+        <a href="#" class="logo">Complex<span> Gym</span></a>
+        <nav class="navbar">
+            <ul>
+                <li><a th:href="@{/ComplexGym/home}">HOME</a></li>
+                <li><a href="#">PRODUCTS +</a>
+                    <ul>
+                        <li><a th:href="@{/ComplexGym/products/supplements}">Supplements</a></li>
+                        <li><a th:href="@{/ComplexGym/products/gears}">Gears</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">SCHEDULE</a></li>
+                <li><a th:href="@{/cart}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> CART</a></li>
+                <li th:if="${role == 'Anonymous'}"><a th:href="@{/login}" type="button" class="button">LOGIN</a></li>
+                <li th:if="${role != 'Anonymous'}"><a class="welcome" href="#"><i
+                            class="fa-solid fa-circle-user"></i>WELCOME!</a>
+                    <ul>
+                        <li th:if="${role == 'ROLE_ADMIN'}"><a th:href="@{/userManagement}">User<br>management</a></li>
+                        <li th:if="${role == 'ROLE_ADMIN'}"><a
+                                th:href="@{/ComplexGym/products/productManagement}">Product<br>management</a></li>
+                        <li><a th:href="@{/ComplexGym/products/orderManagement}">Order<br>management</a></li>
+                        <li><a th:href="@{/logout}">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="sec_1">
+            <h3>THE</h3>
+            <h2>COMPLEX</h2>
+            <h3>GYM</h3>
+        </section>
+
+        <!-- Phần giới thiệu 3 yếu tố cốt lỗi style, strive, skill -->
+        <section id="sec_2">
+            <div class="content_left sec_2_common">
+                <span>STYLE</span>
+            </div>
+            <div class="content_center sec_2_common">
+                <span>STRIVE</span>
+            </div>
+            <div class="content_right sec_2_common">
+                <span>SKILL</span>
+            </div>
+        </section>
+        <section id="sec_insert"></section>
+        <!-- Phần giới thiệu product-->
+        <section id="sec_3">
+            <div class="sec_3_img"></div>
+            <div class="sec_3_text">
+                <h2 class="line1">BETTER <span>PRODUCT</span></h2>
+                <h2 class="line2">BETTER <span>RESULT</span></h2>
+                <h3 id="text">Achieve your fitness goals with the best gym gear and supplements designed to maximize
+                    performance
+                    and recovery. </h3>
+                <h3>From high-performance apparel to cutting-edge supplements, our products help you train harder,
+                    recover faster, and see real results.</h3>
+                <h3>Whether you're lifting, running, or pushing your limits, quality matters. Choose the best, fuel your
+                    progress, and elevate your fitness journey.</h3>
+            </div>
+        </section>
+        <section id="sec_insert"></section>
+        <section id="sec_insert"></section>
+
+        <!--Phần giới thiệu schedule-->
+        <section id="sec_4">
+            <!--Vùng giới thiệu chức năng-->
+            <div class="sec_4_intro">
+                <h3>Get ready to welcome the new feature at Complex Gym</h3>
+                <h3>Exclusively for <span>FPT employees!</span></h3>
+                <h2>Complex <span>Schedule</span> Feature</h2>
+            </div>
+            <section id="sec_insert"></section>
+            <section id="sec_insert"></section>
+            <div class="sec_4_content">
+                <!-- Bỏ: <div class="sec_4_img"></div> -->
+                <div class="sec_4_text">
+                    <div class="text_1">
+                        <h3>Reserve your spot</h3>
+                        <span>No more waiting, secure your workout space in advance.</span>
+                    </div>
+                    <div class="text_2">
+                        <h3>Book a personal trainer</h3>
+                        <span>Personalized training programs for maximum results.</span>
+                    </div>
+                    <div class="text_3">
+                        <h3>Adjust your workout time</h3>
+                        <span>Flexible scheduling to fit your work routine.</span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <section id="sec_insert"></section>
+        <section id="sec_insert"></section>
+
+        <!--SECTION 5: End-content-->
+        <section id="sec_5">
+            <h3 th:if="${role == 'Anonymous'}" class="not_login_status">LET'S LOGIN NOW</h3>
+            <h3 th:if="${role != 'Anonymous'}" class="already_login_status">LET'S SHOPPING NOW</h3>
+            <div th:if="${role == 'Anonymous'}"><a href="@{/login}" type="button">CLICK HERE!</a></div>
+            <div th:if="${role != 'Anonymous'}"><a href="@{/ComplexGym/products/supplements}" type="button">CLICK HERE!</a></div>
+        </section>
+
+        <!--FOOTER-->
+        <footer>
+            <h3>Complex Gym ©</h3>
+            <ul>
+                <li>+84 01234567899</li>
+                <li>Nam ky khoi nghia, Ngu Hanh Son, Da Nang</li>
+                <li>complexgym@gmail.com</li>
+            </ul>
+            <h4>© 2025 Copyright: SanNHT & HoangDNM2</h4>
+        </footer>
+    </main>
+
+    <script th:src="@{https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js}"></script>
+    <script th:src="@{https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js}"></script>
+    <script th:src="@{https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/TextPlugin.min.js}"></script>
+
+    <script th:src="@{/js_resources/home.js}"></script>
+
+</body>
+
+</html>

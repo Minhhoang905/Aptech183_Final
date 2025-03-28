@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.Aptech_Final.Controller.DTO.UserManagementDTO;
+import com.example.Aptech_Final.Enity.Cart;
 import com.example.Aptech_Final.Enity.Users;
 
 
@@ -25,6 +26,10 @@ public interface UserRepository extends JpaRepository<Users, Long>{
 	// Tạo phương thức kiểm tra xem có email của người dùng trong DB không ?
 	boolean existsByEmail(String email);
 	
+    // Tìm User theo username (USER_NAME trong database)
+    @Query("SELECT u FROM Users u WHERE u.name = :username")
+    Users findByUsername(@Param("username") String username);
+    
 	// Tạo phương thức để tìm kiếm theo email
 	Users findByEmail(String email);
 	

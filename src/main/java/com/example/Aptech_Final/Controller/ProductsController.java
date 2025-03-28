@@ -37,12 +37,14 @@ public class ProductsController {
     public String getSupplement(Model model, @AuthenticationPrincipal UserDetails userDetails) {
     	// Lấy sản phẩm từ DB
         List<Products> supplements = productsRepository.findByType("supplements"); 
+
     	// Gọi phương thức xác định vai trò của user từ @Service
     	String role = homeService.getCurrentUserRole();
 		// Thêm thông tin về role vào form ở html
 		model.addAttribute("role", role);
-        model.addAttribute("products", supplements);
-        return "supplements"; 
+        model.addAttribute("supplements", supplements);
+
+        return "products"; 
     }
 
     // Phương thức hiển thị danh sách sản phẩm Gears
@@ -52,10 +54,15 @@ public class ProductsController {
     	String role = homeService.getCurrentUserRole();
 		// Thêm thông tin về role vào form ở html
 		model.addAttribute("role", role);
-
-        List<Products> gears = productsRepository.findByType("gears"); // Lấy sản phẩm từ DB
-        model.addAttribute("products", gears);
-        return "gears";
+		
+		// Lấy sản phẩm từ DB
+        List<Products> gears = productsRepository.findByType("gears"); 
+        
+		// Thêm thông tin về role vào form ở html
+		model.addAttribute("role", role);
+        model.addAttribute("gears", gears);
+        
+        return "products";
     }
         
     // Phương thức để vào trang thêm sản phẩm

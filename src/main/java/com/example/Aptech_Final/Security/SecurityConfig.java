@@ -27,12 +27,15 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf().disable()
 		.authorizeHttpRequests(auth -> auth
+					.requestMatchers("/css_resources/**","/js_resources/**","/image_resources/**").permitAll()
                 	.requestMatchers("/images/**", "/css/**", "/js/**").permitAll() // Cho phép truy cập ảnh, CSS, JS
 					.requestMatchers("/ComplexGym/home", "/loginAPI", "/loginAPI/getDistrictDropdown", "/loginAPI/getWardDropdown").permitAll() //Không đăng nhập: Chỉ được phép xem home
-					.requestMatchers("/ComplexGym/cart/**","/ComplexGym/products/**", "/ComplexGym/payment/**").permitAll()
+					.requestMatchers("/ComplexGym/products/**", "/ComplexGym/payment/**").permitAll()
 					.requestMatchers("/forgot-password/**","/reset-password/**").permitAll() 
 					.requestMatchers("/doLogin",  "/doChangePass", "/changePass", "/logout").permitAll() 
-					.requestMatchers("/ComplexGym/home").hasAnyRole("ADMIN", "USER") // Cả user và admin thực hiện search
+					.requestMatchers("/ComplexGym/home").hasAnyRole("ADMIN", "USER","PT") // Cả user và admin thực hiện search
+	                .requestMatchers("/ComplexGym/cart/**").hasAnyRole("ADMIN", "USER","PT") // Giỏ hàng
+	                .requestMatchers("/API/ComplexGym/cart/**").hasAnyRole("ADMIN", "USER","PT") // API của giỏ hàng
 					.requestMatchers("/register","/doRegister", "/userManagement", "/searchUserInformation", "/userManagement/updateUser", "/userManagement/doUpdateUserInfo", "/userManagement/doDeleteUser").hasRole("ADMIN") // admin: có toàn quyền
 					.requestMatchers("/ComplexGym/products/productManagement").hasRole("ADMIN") // admin: có toàn quyền
 	                .requestMatchers("/api/products/updateDescription").hasRole("ADMIN") // Chỉ cho phép admin truy cập endpoint updateDescription
@@ -63,6 +66,15 @@ public class SecurityConfig {
     @Autowired
     protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+    }
+    protected void configure(HttpSecurity httpSecurity) throws Exception {
+    	String [] staticResources = {
+    		"/css_resources/**",
+    		"/js_resources/**"
+    	};
+    	httpSecurity
+        .authorizeRequests()
+        .requestMatchers(staticResources).permitAll();
     }
     
     @Bean
