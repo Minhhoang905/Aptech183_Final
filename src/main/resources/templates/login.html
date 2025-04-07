@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
@@ -7,15 +8,17 @@
         body {
             color: white;
             font-family: 'Impact', Arial, sans-serif;
-            background: linear-gradient(45deg, black, rgb(28, 249, 139), black, rgb(227, 77, 2), black, rgb(83, 143, 241));
+            background: linear-gradient(45deg, black, rgb(199, 60, 21), black, rgb(11, 211, 85));
             background-size: 300% 300%;
             animation: color 12s ease-in-out infinite;
+            flex-direction: column;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             background-clip: text;
+            text-decoration: none !important;
         }
 
         @keyframes color {
@@ -32,6 +35,95 @@
             }
         }
 
+        header {
+            text-decoration: none;
+            backdrop-filter: blur(5px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0px 3%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+
+        }
+
+        header .logo {
+            color: white;
+            font-size: 30px;
+            text-decoration: none;
+        }
+
+        header .logo span {
+            color: rgb(11, 211, 85);
+        }
+
+        header .navbar ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        header .navbar ul li {
+            position: relative;
+            float: left;
+        }
+
+        header .navbar ul li a {
+            display: block;
+            padding: 20px;
+            color: white;
+            font-size: 20px;
+            transition: ease-in 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        header .navbar ul li .fa-circle-user {
+            font-size: 20px;
+            padding-right: 10px;
+        }
+
+        nav ul li a:hover {
+            color: rgb(11, 211, 85);
+        }
+
+        header .navbar ul li ul {
+            position: absolute;
+            left: 0;
+            width: 200px;
+            display: none;
+        }
+
+        header .navbar ul li ul li {
+            width: 100%;
+        }
+
+        header .navbar ul li:hover>ul {
+            display: initial;
+        }
+
+        header .navbar ul li .button {
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 120px;
+            padding: 7px 7px;
+            background-color: rgb(11, 211, 85);
+            transition: ease-in-out 0.3s;
+            cursor: pointer;
+            margin-left: 20px;
+        }
+
+        header .navbar ul li .button:hover {
+            color: white;
+        }
+
         .login-container {
             background: rgba(0, 0, 0, 0.2);
             backdrop-filter: saturate(180%) blur(2px);
@@ -40,6 +132,16 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 300px;
             box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            text-shadow: black 10px;
+            color: rgb(11, 211, 85);
+            letter-spacing: 2px;
+            font-size: 50px;
+
+
         }
 
         h2 {
@@ -121,14 +223,26 @@
         }
     </style>
 </head>
+
 <body>
+    <header>
+        <a th:href="@{/ComplexGym/home}" class="logo">Complex<span> Gym</span></a>
+        <nav class="navbar">
+            <ul>
+                <li><a th:href="@{/ComplexGym/home}">BACK TO HOME</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h1>LOGIN</h1>
     <div class="login-container">
+
         <form method="POST" th:action="@{/login}">
-            <h2>Username</h2>
-            <input type="text" name="username" placeholder="Enter username" required="required"> 
-            <h2>Password</h2>
+
+            <h2>USERNAME</h2>
+            <input type="text" name="username" placeholder="Enter username" required="required">
+            <h2>PASSWORD</h2>
             <div class="input-container">
-                <input type="password" name="password" id="password" placeholder="Enter password" required="required"> 
+                <input type="password" name="password" id="password" placeholder="Enter password" required="required">
                 <span class="toggle-password" id="toggle-password" onclick="togglePassword()">🙈</span>
             </div>
             <div class="checkbox-container">
@@ -137,8 +251,8 @@
                 </label>
             </div>
             <button type="submit" class="submit-button">Login</button>
-             <a href="changePass" class="change-password-link">Change Password</a>
-             <a href="forgot-password" class="change-password-link">Forgot Password ?</a>              
+            <a href="changePass" class="change-password-link">Change Password</a>
+            <a href="forgot-password" class="change-password-link">Forgot Password ?</a>
         </form>
         <p class="error" th:text="${errMes}"></p>
         <p class="success" th:text="${okMess}"></p>
@@ -156,4 +270,5 @@
         }
     </script>
 </body>
+
 </html>

@@ -205,14 +205,14 @@
 	    .then(response => response.text()) // Nhận dữ liệu từ server
 	    .then(data => {
 	        console.log("Server response:", data);
-	
+
 	        let [updatedAmount, totalAmount] = data.split("|"); // ✅ Tách dữ liệu từ server
 	        updatedAmount = parseInt(updatedAmount);
 	        totalAmount = parseFloat(totalAmount);
-	
+
 	        let inputField = document.querySelector(`input[data-product-id="${cartId}"]`);
 	        if (inputField) inputField.value = updatedAmount; // ✅ Cập nhật số lượng mới trên giao diện
-	
+
 	        if (!isNaN(totalAmount)) {
 	            updateTotalAmount(totalAmount); // ✅ Cập nhật tổng tiền trên giao diện
 	        }
@@ -223,16 +223,21 @@
 	// ✅ Tự động tính tổng tiền dựa trên số lượng sản phẩm hiển thị (phòng khi API bị lỗi)
 	function calculateTotal() {
 	    let total = 0;
-
+	
 	    // Lặp qua từng sản phẩm trong giỏ hàng
 	    document.querySelectorAll(".quantity-input").forEach(input => {
 	        let quantity = parseInt(input.value); // Lấy số lượng sản phẩm
-	        let priceElement = input.closest(".card-body").querySelector(".text-danger span"); 
-	        let price = parseFloat(priceElement.textContent.replace(/\./g, "")); // Lấy giá sản phẩm
-
+	        if (isNaN(quantity) || quantity < 1) return; // Nếu số lượng không hợp lệ, bỏ qua
+	
+	        let priceElement = input.closest(".card-body").querySelector(".text-danger span");
+	        let priceText = priceElement ? priceElement.textContent.replace(/\./g, "") : "0"; // Lấy giá sản phẩm, bỏ dấu chấm phân cách hàng nghìn
+	        let price = parseFloat(priceText); // Đảm bảo giá là số
+	
+	        if (isNaN(price) || price <= 0) return; // Nếu giá không hợp lệ, bỏ qua
+	
 	        total += quantity * price; // Tính tổng tiền
 	    });
-
+	
 	    updateTotalAmount(total); // Cập nhật tổng tiền trên giao diện
 	}
 

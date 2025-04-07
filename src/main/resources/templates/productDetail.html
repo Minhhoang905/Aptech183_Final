@@ -78,92 +78,113 @@
 	    </div>
 	</div>
 	
-	<!-- Nội dung trang chi tiết sản phẩm -->
-	<div class="container mt-4">
-	    <div class="row">
-	        <!-- Cột hình ảnh sản phẩm -->
-	        <div class="col-md-6">
-	            <img th:src="${product.imagePath}" class="img-fluid" alt="Product Image">
-	        </div>
-	
-	        <!-- Cột thông tin sản phẩm -->
-	        <div class="col-md-6">
-	            <h2 th:text="${product.productName}"></h2>
-	            <p>💰 Giá: <span th:text="${#numbers.formatInteger(product.price, 3, 'POINT')}"></span> VND</p>
-	            <p>📦 Số lượng còn lại: <span th:text="${product.quantity}"></span></p>
-	
-	            <!-- Form thêm vào giỏ hàng -->
-	            <form id="addToCartForm" th:action="@{/ComplexGym/cart/add}" method="post" onsubmit="return validateCartQuantity()">
-	                <input type="hidden" name="productId" th:value="${product.id}">
-	                
-	                <label for="quantity">Chọn số lượng:</label>
-	                <input type="number" name="quantity" id="quantity" class="form-control mb-2"
-	                       value="1" min="1" th:max="${product.quantity}" 
-	                       oninput="checkQuantity()">
-	
-	                <p class="text-danger small d-none" id="cartWarning">⚠ Số lượng không đủ!</p>
-	
-	                <button type="submit" class="btn btn-success w-100">
-	                    🛒 Thêm vào giỏ hàng
-	                </button>
-	            </form>
-	
-	            <!-- Mua ngay -->
-	            <form id="buyNowForm" th:action="@{/ComplexGym/payment}" method="post" onsubmit="return validateBuyNowQuantity()">
-	                <input type="hidden" name="productId" th:value="${product.id}">
-	                <input type="hidden" name="quantity" id="quantityBuyNow" value="1">
-	
-	                <button type="submit" class="btn btn-danger w-100">
-	                    🛍️ Mua ngay
-	                </button>
-	            </form>
-	        </div>
-	    </div>
-	</div>
-    <!-- Script của Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Script thêm sản phẩm vào giỏ hàng -->
-    <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const quantityInput = document.getElementById("quantity");
-        const cartWarning = document.getElementById("cartWarning");
+<!-- Nội dung trang chi tiết sản phẩm -->
+<div class="container mt-4">
+    <div class="row">
+        <!-- Cột hình ảnh sản phẩm -->
+        <div class="col-md-6">
+            <img th:src="${product.imagePath}" class="img-fluid" alt="Product Image">
+        </div>
 
-        function checkQuantity() {
-            const maxQuantity = parseInt(quantityInput.getAttribute("max"));
-            let currentValue = parseInt(quantityInput.value);
+        <!-- Cột thông tin sản phẩm -->
+        <div class="col-md-6">
+            <h2 th:text="${product.productName}"></h2>
+            <p>💰 Giá: <span th:text="${#numbers.formatInteger(product.price, 3, 'POINT')}"></span> VND</p>
+            <p>📦 Số lượng còn lại: <span th:text="${product.quantity}"></span></p>
 
-            if (currentValue > maxQuantity) {
-                cartWarning.classList.remove("d-none");
-                quantityInput.value = maxQuantity;  // Reset về max nếu nhập sai
+            <!-- Form xử lý giỏ hàng (Thêm vào giỏ hàng & Mua ngay) -->
+            <form id="cartForm" th:action="@{/ComplexGym/cart/add}" method="post">
+                <input type="hidden" name="productId" th:value="${product.id}">
+                <label for="quantity">Chọn số lượng:</label>
+                <input type="number" name="quantity" id="quantity" class="form-control mb-2"
+                       value="1" min="1" th:max="${product.quantity}" 
+                       oninput="checkQuantity()">
+                <p class="text-danger small d-none" id="cartWarning">⚠ Số lượng không đủ!</p>
+            </form>
+
+            <!-- Nút Thêm vào giỏ hàng -->
+            <button type="button" class="btn btn-success w-100" onclick="addToCart(false)">
+                🛒 Thêm vào giỏ hàng
+            </button>
+
+            <!-- Nút Mua ngay -->
+            <button type="button" class="btn btn-danger w-100 mt-2" onclick="addToCart(true)">
+                🛍️ Mua ngay
+            </button>
+                    <!-- Phần hiển thị mô tả sản phẩm -->
+        <div class="row mt-4">
+            <div class="col">
+                <h4>Mô tả sản phẩm</h4>
+                <!-- Dùng th:utext để hiển thị nội dung HTML của mô tả -->
+                <div th:utext="${description}"></div>
+            </div>
+        </div>
+        
+        <!-- Form chỉnh sửa mô tả (chỉ hiển thị cho Admin) -->
+        <div class="row mt-4" th:if="${role == 'ROLE_ADMIN'}">
+            <div class="col">
+                <h4>Chỉnh sửa mô tả sản phẩm</h4>
+                <form th:action="@{/ComplexGym/products/saveDescription}" method="post">
+                    <input type="hidden" name="id" th:value="${product.id}">
+                    <textarea id="editor" name="description" rows="10" class="form-control" th:text="${description}"></textarea>
+                    <button type="submit" class="btn btn-primary mt-2">Save</button>
+                </form>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+<!-- CKEditor để hỗ trợ chỉnh sửa mô tả (chỉ kích hoạt nếu tồn tại textarea) -->
+<script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+<!-- Script của Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Script kiểm tra số lượng và xử lý "Mua ngay" -->
+<script>
+
+// Kiểm tra nếu phần tử có ID "editor" tồn tại, thì khởi tạo CKEditor để chỉnh sửa mô tả sản phẩm.
+if (document.getElementById('editor')) {
+    CKEDITOR.replace('editor');
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const quantityInput = document.getElementById("quantity");
+    const cartWarning = document.getElementById("cartWarning");
+
+    function checkQuantity() {
+        const maxQuantity = parseInt(quantityInput.getAttribute("max"));
+        let currentValue = parseInt(quantityInput.value);
+
+        if (currentValue > maxQuantity) {
+            cartWarning.classList.remove("d-none");
+            quantityInput.value = maxQuantity;  // Reset về max nếu nhập sai
+        } else {
+            cartWarning.classList.add("d-none");
+        }
+    }
+
+    window.addToCart = function (isBuyNow) {
+        let formData = new FormData(document.getElementById("cartForm"));
+
+        fetch("/ComplexGym/cart/add", {
+            method: "POST",
+            body: formData,
+        }).then(response => {
+            if (response.ok) {
+                if (isBuyNow) {
+                    // Nếu là "Mua ngay", chuyển đến trang thanh toán
+                    window.location.href = "/ComplexGym/payment";
+                } else {
+                    alert("🛒 Sản phẩm đã thêm vào giỏ hàng!");
+                }
             } else {
-                cartWarning.classList.add("d-none");
+                alert("❌ Đã có lỗi xảy ra!");
             }
-        }
+        });
+    };
 
-        function validateCartQuantity() {
-            const maxQuantity = parseInt(quantityInput.getAttribute("max"));
-            let currentValue = parseInt(quantityInput.value);
-
-            if (currentValue > maxQuantity) {
-                alert("Số lượng không đủ trong kho!");
-                return false;  // Chặn gửi form
-            }
-            return true;
-        }
-
-        function validateBuyNowQuantity() {
-            const maxQuantity = parseInt(quantityInput.getAttribute("max"));
-            let buyNowQuantity = parseInt(document.getElementById("quantityBuyNow").value);
-
-            if (buyNowQuantity > maxQuantity) {
-                alert("Số lượng không đủ trong kho!");
-                return false;  // Chặn gửi form
-            }
-            return true;
-        }
-
-        quantityInput.addEventListener("input", checkQuantity);
-    });
-    </script>
+    quantityInput.addEventListener("input", checkQuantity);
+});
+</script>
 </body>
 </html>

@@ -12,7 +12,6 @@ import jakarta.persistence.Table;
 @Entity
 // Gọi tên của table
 @Table(name = "PRODUCT") //Sẽ lấy theo tên của Table này (nếu đặt tên class đúng với tên table thì k cần cũng được)
-
 public class Products {
 	// Tạo các thuộc tính = tên trường trong database (k cần đúng tên, nhưng nên đặt giống cho khỏe):
     // Đánh dấu trường này là khóa chính (primary key) của bảng LOGIN

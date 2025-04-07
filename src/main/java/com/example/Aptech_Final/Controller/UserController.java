@@ -246,7 +246,7 @@ public class UserController {
 		// Đối tượng rỗng để binding với th:object ở form
 		model.addAttribute("userForm", new UserForm());
 				
-		// Tạo boolean và gọi phương thức từ service
+		// Tạo và gọi phương thức từ service
         String doUpdate = userService.isUserInfoUpdateValid(userForm, model);
         // Tạo if-else để chuyển về controller
         if (doUpdate.startsWith("success: ")) {

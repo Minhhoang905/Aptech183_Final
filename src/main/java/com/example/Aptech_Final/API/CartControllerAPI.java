@@ -11,8 +11,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.example.Aptech_Final.Controller.DTO.CartDTO;
 import com.example.Aptech_Final.Enity.Users;
+import com.example.Aptech_Final.Form.CartForm;
 import com.example.Aptech_Final.Repository.CartRepository;
 import com.example.Aptech_Final.Repository.OrdersManagementRepository;
 import com.example.Aptech_Final.Repository.UserRepository;
@@ -51,7 +51,7 @@ public class CartControllerAPI {
 
 	//API lấy giỏ hàng từ local storage vào database
     @GetMapping("/cart")
-    public ResponseEntity<List<CartDTO>> getCartItems(Model model, Authentication authentication) {
+    public ResponseEntity<List<CartForm>> getCartItems(Model model, Authentication authentication) {
 		// Gọi phương thức để lấy role và tên của người dùng vào form
         addCommonAttributes(model, authentication);
 
@@ -59,7 +59,7 @@ public class CartControllerAPI {
         // Lấy user từ database
         Users user = userRepository.findByUsername(username);
 
-        List<CartDTO> cartItems = cartService.getCartItems(user.getId());
+        List<CartForm> cartItems = cartService.getCartItems(user.getId());
         return ResponseEntity.ok(cartItems);
     }
 

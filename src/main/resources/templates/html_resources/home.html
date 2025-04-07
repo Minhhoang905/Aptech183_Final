@@ -23,7 +23,7 @@
                     </ul>
                 </li>
                 <li><a href="#">SCHEDULE</a></li>
-                <li><a th:href="@{/cart}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> CART</a></li>
+                <li><a th:href="@{/ComplexGym/cart}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> CART</a></li>
                 <li th:if="${role == 'Anonymous'}"><a th:href="@{/login}" type="button" class="button">LOGIN</a></li>
                 <li th:if="${role != 'Anonymous'}"><a class="welcome" href="#"><i
                             class="fa-solid fa-circle-user"></i>WELCOME!</a>
@@ -31,7 +31,7 @@
                         <li th:if="${role == 'ROLE_ADMIN'}"><a th:href="@{/userManagement}">User<br>management</a></li>
                         <li th:if="${role == 'ROLE_ADMIN'}"><a
                                 th:href="@{/ComplexGym/products/productManagement}">Product<br>management</a></li>
-                        <li><a th:href="@{/ComplexGym/products/orderManagement}">Order<br>management</a></li>
+                        <li><a th:href="@{/ComplexGym/payment/ordersManagement}">Order<br>management</a></li>
                         <li><a th:href="@{/logout}">Logout</a></li>
                     </ul>
                 </li>

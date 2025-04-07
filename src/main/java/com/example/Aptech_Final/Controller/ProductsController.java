@@ -44,7 +44,7 @@ public class ProductsController {
 		model.addAttribute("role", role);
         model.addAttribute("supplements", supplements);
 
-        return "products"; 
+        return "html_resources/product"; 
     }
 
     // Phương thức hiển thị danh sách sản phẩm Gears
@@ -62,7 +62,7 @@ public class ProductsController {
 		model.addAttribute("role", role);
         model.addAttribute("gears", gears);
         
-        return "products";
+        return "html_resources/product";
     }
         
     // Phương thức để vào trang thêm sản phẩm
