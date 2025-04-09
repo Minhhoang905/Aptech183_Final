@@ -23,7 +23,7 @@ public class ForgotPasswordController {
 	@GetMapping(path ="/forgot-password")
     public String showForgotPasswordForm(Model model) {
 		model.addAttribute("userForm", new UserForm());
-        return "forgot-password";
+        return "html_resources/forgot-password";
     }
 	
 	// Bước 2 & 3: Nhận email, xử lý và gửi link
@@ -63,7 +63,7 @@ public class ForgotPasswordController {
         model.addAttribute("token", token);
         model.addAttribute("changeNewPass", new UserForm());
 
-		return "reset-password";
+		return "html_resources/reset-password";
 	}
 	
     // Bước 5: Cập nhật mật khẩu mới

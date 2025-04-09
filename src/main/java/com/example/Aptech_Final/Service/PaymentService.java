@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,14 +13,11 @@ import org.springframework.ui.Model;
 
 import com.example.Aptech_Final.Controller.DTO.OrderDetailDTO;
 import com.example.Aptech_Final.Controller.DTO.OrdersManagementDTO;
-import com.example.Aptech_Final.Enity.Cart;
 import com.example.Aptech_Final.Enity.OrdersDetail;
 import com.example.Aptech_Final.Enity.OrdersManagement;
-import com.example.Aptech_Final.Enity.Products;
 import com.example.Aptech_Final.Form.CartForm;
 import com.example.Aptech_Final.Form.OrdersDetailForm;
 import com.example.Aptech_Final.Form.OrdersManagementForm;
-import com.example.Aptech_Final.Repository.CartRepository;
 import com.example.Aptech_Final.Repository.OrdersDetailRepository;
 import com.example.Aptech_Final.Repository.OrdersManagementRepository;
 import com.example.Aptech_Final.Repository.ProductsRepository;

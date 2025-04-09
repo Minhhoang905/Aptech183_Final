@@ -64,7 +64,7 @@ public class UserController {
 			model.addAttribute("remember", true);
 		}
 		// Nếu chưa đăng nhập thì đưa về lại login
-		return "login";
+		return "html_resources/login";
 	}
     
 	// Phương thức để hiển thị page register.html
@@ -82,7 +82,7 @@ public class UserController {
 		model.addAttribute("ward", new Ward());
 		// Đối tượng rỗng để binding với th:object ở form
 		model.addAttribute("userForm", new UserForm());
-		return "register";
+		return "html_resources/register";
 	} 
 	// Phương thức để thực hiện submit ở register.html
 	@PostMapping("/doRegister")
@@ -124,7 +124,7 @@ public class UserController {
         	// Bỏ "error:"
         	model.addAttribute("errorMessage", response.substring(6));
         	// Trở về trang đăng ký nếu có lỗi
-            return "register";
+            return "html_resources/register";
         }
 	}
 	
@@ -156,7 +156,7 @@ public class UserController {
 			// Nếu thất bại => Thêm thuộc tính "mes" ở trang đổi mật khẩu với thông báo
 			model.addAttribute("errorMessage", isPasswordChanged.substring(6));
 			// Quay trở lại trang ChangePass.html
-			return "changePass";
+			return "html_resources/changePass";
 		}
 	}	
 	
@@ -185,7 +185,7 @@ public class UserController {
 		model.addAttribute("usersResults", usersDTO.getUserManagementDTO());
 		
 		// Trả về tên file template Thymeleaf trong back-end (userManagement.html)		
-		return "userManagement";
+		return "html_resources/userManagement";
 	}
 	
 	// Phương thức để tìm kiếm thông tin ở đường dẫn `userManagement`
@@ -203,7 +203,7 @@ public class UserController {
         // Đưa danh sách kết quả (List<UserManagementDTO>) vào model
         model.addAttribute("usersResults", usersDTO.getUserManagementDTO());
 		
-	    return "userManagement"; 
+	    return "html_resources/userManagement"; 
 	}
 	
 	// Phương thức xử lý yêu cầu GET cho đường dẫn "/userManagement/update"
@@ -227,7 +227,7 @@ public class UserController {
 	    // Thêm đối tượng userUpdate để binding với th:object ở form update
 		model.addAttribute("userUpdate", userUpdate);
 		// Trả về html "updateInfo"
-		return "updateUserInfo";
+		return "html_resources/updateUserInfo";
 	}
 	
 	// Phương thức thực hiện cập nhập thông tin người dùng theo id

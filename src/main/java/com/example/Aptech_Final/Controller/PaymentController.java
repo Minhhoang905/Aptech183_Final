@@ -158,7 +158,7 @@ public class PaymentController {
         // Gọi phương thức prepareData() để chuẩn bị dữ liệu
         prepareData(ordersManagementForm, id, userId, model);
         
-		return "payment";
+		return "html_resources/payment";
 	}
 	
 	@PostMapping("/confirmPayment")
@@ -278,7 +278,7 @@ public class PaymentController {
 		}   
         
         // Trả về trang orderManagement.html
-        return "ordersManagement";
+        return "html_resources/ordersManagement";
     }
     
     // Phương thức cập nhập trạng thái đơn hàng

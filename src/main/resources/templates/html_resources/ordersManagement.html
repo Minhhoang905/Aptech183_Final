@@ -68,9 +68,8 @@
                                 <li><hr class="dropdown-divider"></li>
                                 <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/ComplexGym/products/productManagement}">Product Management</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                        		<li><a th:href="@{/ComplexGym/products/ordersManagement}">Order<br>management</a></li>
-                                <li><hr class="dropdown-divider"></li>                                
-                                                                
+                        		<li><a th:href="@{/ComplexGym/payment/ordersManagement}">Order<br>management</a></li>
+                                <li><hr class="dropdown-divider"></li>                                                                                               
                                 <li><a class="dropdown-item logout-item" th:href="@{/logout}">Logout</a></li>
                             </ul>
                         </div>
