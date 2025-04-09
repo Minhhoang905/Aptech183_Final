@@ -108,7 +108,7 @@ main{
 
 /*SECTION 1: LOGO*/
 #sec_1{
-    background-color: rgb(212, 59, 17);
+    background-color: rgb(199, 60, 21);
     width: 100%;
     box-sizing: border-box;
     display: flex;
@@ -130,7 +130,7 @@ main{
 
 /*SECTION 2: 3 skill*/
 #sec_2{
-    background-color: rgb(212, 59, 17);
+    background-color:rgb(199, 60, 21);
     width: 100%;
     box-sizing: border-box;
     display: flex;

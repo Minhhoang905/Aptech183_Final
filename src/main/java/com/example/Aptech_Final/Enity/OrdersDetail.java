@@ -1,7 +1,6 @@
 package com.example.Aptech_Final.Enity;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -10,7 +9,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "ORDERS_DETAIL")
@@ -41,10 +39,9 @@ public class OrdersDetail {
     @Column(name = "UNIT_PRICE", nullable = false, precision = 18, scale = 2)
     private BigDecimal unitPrice;
     
-    // Phương thức tính tổng tiền
-    public BigDecimal  getTotalPrice() {
-    	return (unitPrice != null) ? unitPrice.multiply(BigDecimal.valueOf(amount)) : BigDecimal.ZERO;
-    }
+    // Tổng tiền của sản phẩm trong đơn hàng
+    @Column(name = "TOTAL_PRICE", nullable = false, precision = 18, scale = 2)
+    private BigDecimal totalPrice;
     
 	// Getter và Setter
 	public Long getOrdersDetailId() {
@@ -94,5 +91,13 @@ public class OrdersDetail {
 	public void setUnitPrice(BigDecimal unitPrice) {
 		this.unitPrice = unitPrice;
 	}
-             
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+    
 }

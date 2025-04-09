@@ -1,6 +1,7 @@
 package com.example.Aptech_Final.Service;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,12 +9,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.Aptech_Final.Controller.DTO.CartDTO;
 import com.example.Aptech_Final.Enity.Cart;
 import com.example.Aptech_Final.Enity.OrdersDetail;
 import com.example.Aptech_Final.Enity.OrdersManagement;
 import com.example.Aptech_Final.Enity.Products;
 import com.example.Aptech_Final.Enity.Users;
+import com.example.Aptech_Final.Form.CartForm;
 import com.example.Aptech_Final.Repository.*;
 import jakarta.transaction.Transactional;
 
@@ -23,11 +24,7 @@ public class CartService {
 	@Autowired
 	private CartRepository cartRepository;
 	@Autowired
-	private OrdersManagementRepository ordersManagementRepository;
-	@Autowired
 	private UserRepository userRepository;
-	@Autowired
-	private OrdersDetailRepository ordersDetailRepository;
 	@Autowired
 	private ProductsRepository productsRepository;
 
@@ -49,17 +46,17 @@ public class CartService {
 	}
 
 	// Phương thức lấy danh sách sản phẩm trong giỏ hàng của người dùng từ database
-	public List<CartDTO> getCartItems(Long userId) {
+	public List<CartForm> getCartItems(Long userId) {
 	    // Gọi phương thức trong repository để lấy dữ liệu giỏ hàng của người dùng (dưới dạng danh sách Object[])
 	    List<Object[]> results = cartRepository.findCartWithProductInfo(userId);
 	    
 	    // Tạo danh sách để lưu các sản phẩm trong giỏ hàng sau khi chuyển đổi từ Object[] sang CartDTO
-	    List<CartDTO> cartItems = new ArrayList<>();
+	    List<CartForm> cartItems = new ArrayList<>();
 
 	    // Duyệt qua danh sách kết quả trả về từ database
 	    for (Object[] row : results) {
 	        // Tạo một đối tượng CartDTO để lưu thông tin của từng sản phẩm trong giỏ hàng
-	        CartDTO dto = new CartDTO();
+	        CartForm dto = new CartForm();
 
 			// Gán giá trị từ mảng Object[] vào các thuộc tính của DTO
 			// Lấy Cart ID từ cột đầu tiên
@@ -74,6 +71,8 @@ public class CartService {
 			dto.setPrice((BigDecimal) row[4]);
 			// Lấy số lượng tồn kho của sản phẩm
 			dto.setQuantity(((Number) row[5]).intValue());;
+			// Lấy product Id
+			dto.setProductId((Long) row[6]);
 	        // Thêm sản phẩm đã được chuyển đổi vào danh sách cartItems
 	        cartItems.add(dto);
 	    }
@@ -126,7 +125,7 @@ public class CartService {
 	
     // Cập nhật số lượng sản phẩm trong giỏ hàng (có kiểm tra tồn kho)
     @Transactional
-    public String updateCartAmount(Long cartId, Integer amount) {
+    public String updateCartAmount(Long cartId, Integer amount, Long userId) {
         Cart cartItem = cartRepository.findById(cartId).orElse(null);
         if (cartItem == null) {
             return "error: Cart item not found!";
@@ -151,12 +150,13 @@ public class CartService {
         }
         
         // Tính tổng tiền mới sau khi cập nhật giỏ hàng
-        BigDecimal totalAmount = cartRepository.getTotalAmount();
+        BigDecimal totalAmount = cartRepository.getTotalAmount(userId);
         // Dùng if-else rút gọn để tính tổng tiền
         totalAmount = totalAmount != null ? totalAmount : BigDecimal.ZERO;
 
         return "success: Update successful! Total: " + totalAmount + " VND";
     }
+    
 
 	// Xóa 1 sản phẩm khỏi giỏ hàng
 	public void deleteCartItem(Long cartId) {
@@ -164,6 +164,7 @@ public class CartService {
 	}
 	
 	// Xóa toàn bộ giỏ hàng khi đã thanh toán
+    @Transactional
 	public void clearCart(Long userId) {
 	    cartRepository.deleteByUserId(userId);
 	}

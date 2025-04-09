@@ -1,11 +1,13 @@
-package com.example.Aptech_Final.Controller.DTO;
+package com.example.Aptech_Final.Form;
 
 import java.math.BigDecimal;
 
 // DTO giúp truyền dữ liệu từ Controller sang View (Thymeleaf)
-public class CartDTO {
+public class CartForm {
 	// ID của giỏ hàng
     private Long id; 
+    // ID của sản phẩm
+    private Long productId;
     // Số lượng sản phẩm
     private int amount; 
     // Đường dẫn ảnh sản phẩm
@@ -17,12 +19,33 @@ public class CartDTO {
     // Số lượng tồn kho của sản phẩm
     private int quantity; 
     
-    // Getter & Setter
+    
+    //Constructor
+    public CartForm() {}
+
+	public CartForm(Long id, Long productId, int amount, String imagePath, String productName, BigDecimal price,
+			int quantity) {
+		this.id = id;
+		this.productId = productId;
+		this.amount = amount;
+		this.imagePath = imagePath;
+		this.productName = productName;
+		this.price = price;
+		this.quantity = quantity;
+	}
+    
+	// Getter & Setter
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
+	}
+	public Long getProductId() {
+		return productId;
+	}
+	public void setProductId(Long productId) {
+		this.productId = productId;
 	}
 	public int getAmount() {
 		return amount;

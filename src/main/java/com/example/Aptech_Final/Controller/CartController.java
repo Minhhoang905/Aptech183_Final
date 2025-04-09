@@ -1,12 +1,9 @@
 package com.example.Aptech_Final.Controller;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.Aptech_Final.Controller.DTO.CartDTO;
 import com.example.Aptech_Final.Enity.Users;
+import com.example.Aptech_Final.Form.CartForm;
 import com.example.Aptech_Final.Repository.CartRepository;
 import com.example.Aptech_Final.Repository.UserRepository;
 import com.example.Aptech_Final.Service.CartService;
@@ -44,7 +41,8 @@ public class CartController {
             Users user = userRepository.findByUsername(username);
             
             if (user != null) {
-                model.addAttribute("userId", user.getId());  // Thêm USER_ID vào model
+            	// Thêm các thông tin sau vào model
+                model.addAttribute("userId", user.getId());  
                 model.addAttribute("username", user.getName());
                 model.addAttribute("role", role);
             }
@@ -63,17 +61,17 @@ public class CartController {
         }
 
         // Gọi service để lấy danh sách sản phẩm trong giỏ hàng
-        List<CartDTO> cartItems = cartService.getCartItems(userId);
+        List<CartForm> cartItems = cartService.getCartItems(userId);
         // Đưa dữ liệu vào Model để hiển thị trên giao diện
         model.addAttribute("cartItems", cartItems);
         
         // Gọi getTotalAmount() để lấy tổng tiền giỏ hàng sau khi cập nhật
-        BigDecimal totalAmount = cartRepository.getTotalAmount();
+        BigDecimal totalAmount = cartRepository.getTotalAmount(userId);
         totalAmount = totalAmount != null ? totalAmount : BigDecimal.ZERO;
         // Đưa dữ liệu vào Model để hiển thị trên giao diện
         model.addAttribute("totalAmount", totalAmount);
         
-		return "cart";
+		return "html_resources/cart";
 	}
 	
     
@@ -104,18 +102,27 @@ public class CartController {
     @ResponseBody
     public String updateCartItems(
             @RequestParam("cartId") Long cartId,
-            @RequestParam("amount") Integer amount) {
+            @RequestParam("amount") Integer amount,
+            Authentication authentication, 
+            Model model) {
+    	
+		// Gọi phương thức để lấy role và tên của người dùng vào form
+        addCommonAttributes(model, authentication);
+        
+        // Lấy userId từ model
+        Long userId = (Long) model.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login"; // Nếu userId null, điều hướng về trang login
+        }
 
-        String responseMessage = cartService.updateCartAmount(cartId, amount);
+        String responseMessage = cartService.updateCartAmount(cartId, amount, userId);
 
         // Kiểm tra lỗi từ service
         if (responseMessage.startsWith("error")) {
             return responseMessage;
         }
-        // Cập nhật số lượng trong database
-        cartService.updateCartAmount(cartId, amount);
         // Gọi getTotalAmount() để lấy tổng tiền giỏ hàng sau khi cập nhật
-        BigDecimal totalAmount = cartRepository.getTotalAmount();
+        BigDecimal totalAmount = cartRepository.getTotalAmount(userId);
         totalAmount = totalAmount != null ? totalAmount : BigDecimal.ZERO;
         
         return amount + "|" + totalAmount.toString();

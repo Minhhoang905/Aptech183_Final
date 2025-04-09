@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail product</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/ComplexGym/home}">
+                <i class="fas fa-dumbbell"></i>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" th:href="@{/ComplexGym/home}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" id="bookingLink">Schedule</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button"
+                            data-bs-toggle="dropdown">Products</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/supplements}">Supplement</a></li>
+                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/gears}">Gears</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/ComplexGym/cart}">
+                            <i class="fas fa-shopping-cart"></i> Cart <span id="cart-count"></span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="ms-3">
+                    <th:block th:if="${role == 'Anonymous'}">
+                        <a class="btn btn-warning" th:href="@{/login}">Login</a>
+                    </th:block>
+                    <th:block th:if="${role != 'Anonymous'}">
+                        <div class="dropdown">
+                            <button class="btn btn-warning dropdown-toggle" type="button" id="userMenu"
+                                data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> <span th:text="${username}"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/userManagement}">User Management</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/ComplexGym/products/productManagement}">Product Management</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a th:href="@{/ComplexGym/payment/ordersManagement}">Order<br>management</a></li>
+                                <li><hr class="dropdown-divider"></li>                                                                                                                                                                                                                                                              
+                                <li><a class="dropdown-item logout-item" th:href="@{/logout}">Logout</a></li>
+                            </ul>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+	<!-- Hiển thị thông báo từ backend -->
+	<div class="container mt-3">
+	    <!-- Hiển thị lỗi -->
+	    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+	        <span th:text="${errorMessage}"></span>
+	    </div>
+	    <!-- Hiển thị thành công -->
+	    <div th:if="${successMessage}" class="alert alert-success" role="alert">
+	        <span th:text="${successMessage}"></span>
+	    </div>
+	</div>
+	
+<!-- Nội dung trang chi tiết sản phẩm -->
+<div class="container mt-4">
+    <div class="row">
+        <!-- Cột hình ảnh sản phẩm -->
+        <div class="col-md-6">
+            <img th:src="${product.imagePath}" class="img-fluid" alt="Product Image">
+        </div>
+
+        <!-- Cột thông tin sản phẩm -->
+        <div class="col-md-6">
+            <h2 th:text="${product.productName}"></h2>
+            <p>💰 Giá: <span th:text="${#numbers.formatInteger(product.price, 3, 'POINT')}"></span> VND</p>
+            <p>📦 Số lượng còn lại: <span th:text="${product.quantity}"></span></p>
+
+            <!-- Form xử lý giỏ hàng (Thêm vào giỏ hàng & Mua ngay) -->
+            <form id="cartForm" th:action="@{/ComplexGym/cart/add}" method="post">
+                <input type="hidden" name="productId" th:value="${product.id}">
+                <label for="quantity">Chọn số lượng:</label>
+                <input type="number" name="quantity" id="quantity" class="form-control mb-2"
+                       value="1" min="1" th:max="${product.quantity}" 
+                       oninput="checkQuantity()">
+                <p class="text-danger small d-none" id="cartWarning">⚠ Số lượng không đủ!</p>
+            </form>
+
+            <!-- Nút Thêm vào giỏ hàng -->
+            <button type="button" class="btn btn-success w-100" onclick="addToCart(false)">
+                🛒 Thêm vào giỏ hàng
+            </button>
+
+            <!-- Nút Mua ngay -->
+            <button type="button" class="btn btn-danger w-100 mt-2" onclick="addToCart(true)">
+                🛍️ Mua ngay
+            </button>
+                    <!-- Phần hiển thị mô tả sản phẩm -->
+        <div class="row mt-4">
+            <div class="col">
+                <h4>Mô tả sản phẩm</h4>
+                <!-- Dùng th:utext để hiển thị nội dung HTML của mô tả -->
+                <div th:utext="${description}"></div>
+            </div>
+        </div>
+        
+        <!-- Form chỉnh sửa mô tả (chỉ hiển thị cho Admin) -->
+        <div class="row mt-4" th:if="${role == 'ROLE_ADMIN'}">
+            <div class="col">
+                <h4>Chỉnh sửa mô tả sản phẩm</h4>
+                <form th:action="@{/ComplexGym/products/saveDescription}" method="post">
+                    <input type="hidden" name="id" th:value="${product.id}">
+                    <textarea id="editor" name="description" rows="10" class="form-control" th:text="${description}"></textarea>
+                    <button type="submit" class="btn btn-primary mt-2">Save</button>
+                </form>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+<!-- CKEditor để hỗ trợ chỉnh sửa mô tả (chỉ kích hoạt nếu tồn tại textarea) -->
+<script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+<!-- Script của Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Script của SweetAlert -->	
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>	
+
+<!-- Script kiểm tra số lượng và xử lý "Mua ngay" -->
+<script>
+
+// Kiểm tra nếu phần tử có ID "editor" tồn tại, thì khởi tạo CKEditor để chỉnh sửa mô tả sản phẩm.
+if (document.getElementById('editor')) {
+    CKEDITOR.replace('editor');
+}
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const quantityInput = document.getElementById("quantity");
+    const cartWarning = document.getElementById("cartWarning");
+    const addToCartBtn = document.querySelector('.btn-success');
+    const buyNowBtn = document.querySelector('.btn-danger');
+
+    // ✅ Âm thanh "pop" khi thêm thành công
+    const successSound = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_5a5015fba7.mp3"); // sound effect miễn phí
+
+    // ✅ Kiểm tra số lượng nhập vào
+    function checkQuantity() {
+        const maxQuantity = parseInt(quantityInput.getAttribute("max"));
+        let currentValue = parseInt(quantityInput.value);
+
+        if (currentValue > maxQuantity) {
+            cartWarning.classList.remove("d-none");
+            quantityInput.value = maxQuantity;
+        } else {
+            cartWarning.classList.add("d-none");
+        }
+    }
+
+    // ✅ Hàm thêm vào giỏ
+    window.addToCart = function (isBuyNow) {
+        const targetBtn = isBuyNow ? buyNowBtn : addToCartBtn;
+
+        // 👉 Đổi nút sang trạng thái loading
+        const originalText = targetBtn.innerHTML;
+        targetBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Processing...';
+        targetBtn.disabled = true;
+
+        let formData = new FormData(document.getElementById("cartForm"));
+
+        fetch("/ComplexGym/cart/add", {
+            method: "POST",
+            body: formData,
+        }).then(response => {
+            if (response.ok) {
+                if (isBuyNow) {
+                    // 🛍️ Mua ngay → chuyển trang
+                    window.location.href = "/ComplexGym/payment";
+                } else {
+                    // 🔊 Phát âm thanh khi thêm thành công
+                    successSound.play();
+
+                    // ✅ SweetAlert với lựa chọn
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Added to cart!',
+                        text: 'The product has been added to your cart.',
+                        showCancelButton: true,
+                        confirmButtonText: '🛒 View Cart',
+                        cancelButtonText: '🛍️ Continue Shopping',
+                        confirmButtonColor: '#198754',
+                        cancelButtonColor: '#6c757d'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/ComplexGym/cart";
+                        }
+                    });
+                }
+            } else {
+                // ❌ Lỗi từ server → hiệu ứng rung
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong while adding the product to cart!',
+                    customClass: {
+                        popup: 'animate__animated animate__shakeX'
+                    }
+                });
+            }
+        }).catch(error => {
+            // ❌ Lỗi mạng → hiệu ứng rung
+            Swal.fire({
+                icon: 'error',
+                title: 'Network error',
+                text: 'Please check your connection and try again.',
+                customClass: {
+                    popup: 'animate__animated animate__shakeX'
+                }
+            });
+            console.error("Add to cart error:", error);
+        }).finally(() => {
+            // 🔁 Khôi phục nút về trạng thái ban đầu
+            targetBtn.innerHTML = originalText;
+            targetBtn.disabled = false;
+        });
+    };
+
+    quantityInput.addEventListener("input", checkQuantity);
+});
+</script>
+</body>
+</html>

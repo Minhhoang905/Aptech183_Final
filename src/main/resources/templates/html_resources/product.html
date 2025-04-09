@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complex Gym</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css_resources/product.css}">
+
+</head>
+
+<body>
+    <header>
+        <a href="#" class="logo">Complex<span> Gym</span></a>
+        <nav class="navbar">
+            <ul>
+                <li><a th:href="@{/ComplexGym/home}">HOME</a></li>
+                <li><a href="#">PRODUCTS +</a>
+                    <ul>
+                        <li><a th:href="@{/ComplexGym/products/supplements}">Supplements</a></li>
+                        <li><a th:href="@{/ComplexGym/products/gears}">Gears</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">SCHEDULE</a></li>
+                <li><a th:href="@{/ComplexGym/cart}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> CART</a></li>
+                <li th:if="${role == 'Anonymous'}"><a th:href="@{/login}" type="button" class="button">LOGIN</a></li>
+                <li th:if="${role != 'Anonymous'}"><a class="welcome" href="#"><i
+                            class="fa-solid fa-circle-user"></i>WELCOME!</a>
+                    <ul>
+                        <li th:if="${role == 'ROLE_ADMIN'}"><a th:href="@{/userManagement}">User<br>management</a></li>
+                        <li th:if="${role == 'ROLE_ADMIN'}"><a
+                                th:href="@{/ComplexGym/products/productManagement}">Product<br>management</a></li>
+                        <li><a th:href="@{/ComplexGym/payment/ordersManagement}">Order<br>management</a></li>
+                        <li><a th:href="@{/logout}">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Products</h2>
+        <div class="product_container">
+
+            <div class="product_card" th:each="product : ${supplements}">
+                <a th:href="@{/ComplexGym/products/detailProduct(id=${product.id})}">
+                    <div class="product_img"><img th:src="${product.imagePath}" alt=""></div>
+                    <div class="product_content">
+                        <span th:text="${product.productName}" class="product_name"></span>
+                        <p class="vnd"><span th:text="${#numbers.formatInteger(product.price, 3, 'POINT')}" class="product_price"></span>VND</p>
+                       
+                       
+                    </div>
+                </a>
+            </div>
+            
+            <div class="product_card" th:each="product : ${gears}">
+                <a th:href="@{/ComplexGym/products/detailProduct(id=${product.id})}">
+                    <div class="product_img"><img th:src="${product.imagePath}" alt=""></div>
+                    <div class="product_content">
+                        <span th:text="${product.productName}" class="product_name"></span>
+                        <p class="vnd"><span th:text="${#numbers.formatInteger(product.price, 3, 'POINT')}" class="product_price"></span>VND</p>
+                    </div>
+                </a>
+            </div>
+            
+        </div>
+	
+
+
+        <!--FOOTER-->
+        <footer>
+            <h3>Complex Gym ©</h3>
+            <ul>
+                <li>+84 01234567899</li>
+                <li>Nam ky khoi nghia, Ngu Hanh Son, Da Nang</li>
+                <li>complexgym@gmail.com</li>
+            </ul>
+            <h4>© 2025 Copyright: SanNHT & HoangDNM2</h4>
+        </footer>
+    </main>
+
+    <script th:src="@{https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js}"></script>
+    <script th:src="@{https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js}"></script>
+    <script th:src="@{https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/TextPlugin.min.js}"></script>
+
+    <script th:src="@{/js_resources/home.js}"></script>
+
+</body>
+
+</html>

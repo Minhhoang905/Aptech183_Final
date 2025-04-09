@@ -44,7 +44,7 @@ public class ProductsController {
 		model.addAttribute("role", role);
         model.addAttribute("supplements", supplements);
 
-        return "products"; 
+        return "html_resources/product"; 
     }
 
     // Phương thức hiển thị danh sách sản phẩm Gears
@@ -62,7 +62,7 @@ public class ProductsController {
 		model.addAttribute("role", role);
         model.addAttribute("gears", gears);
         
-        return "products";
+        return "html_resources/product";
     }
         
     // Phương thức để vào trang thêm sản phẩm
@@ -76,7 +76,7 @@ public class ProductsController {
 		// Đối tượng rỗng để binding với th:object ở form
 		model.addAttribute("productForm", new ProductsForm());
 	
-        return "add-product";
+        return "html_resources/add-product";
     }
     
     // Phương thức để lưu sản phẩm vào db
@@ -117,7 +117,7 @@ public class ProductsController {
     	model.addAttribute("productResults", productDTO.getProductManagementDTOs());
     	
 		// Trả về tên file template Thymeleaf trong back-end (productManagement.html)			
-    	return "productManagement";
+    	return "html_resources/productManagement";
     }
       
 	// Phương thức để tìm kiếm thông tin ở đường dẫn `productManagement`
@@ -135,7 +135,7 @@ public class ProductsController {
     	model.addAttribute("productResults", productDTO.getProductManagementDTOs());
     	
 		// Trả về tên file template Thymeleaf trong back-end (productManagement.html)			
-    	return "productManagement";
+    	return "html_resources/productManagement";
     }
     
 	// Phương thức xử lý yêu cầu GET cho đường dẫn "/products/updateProduct"
@@ -150,7 +150,7 @@ public class ProductsController {
 		// Thêm đối tượng để binding với th:object ở form
 		model.addAttribute("productUpdate", product);
 		
-		return "updateProducts";
+		return "html_resources/updateProducts";
     }
     
 	// Phương thức thực hiện cập nhập thông tin theo id
@@ -211,7 +211,7 @@ public class ProductsController {
         String description = productsService.getProductDescription(id);
         model.addAttribute("description", description);
 		
-        return "productDetail";
+        return "html_resources/productDetail";
     }
     
     @PostMapping("/saveDescription")

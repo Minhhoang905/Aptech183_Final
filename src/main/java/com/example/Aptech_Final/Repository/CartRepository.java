@@ -25,7 +25,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
 
 	// Query để lấy giỏ hàng kèm thông tin sản phẩm từ bảng PRODUCT
 	@Query(value = """
-			SELECT c.CART_ID, c.AMOUNT, p.IMAGE_PATH, p.PRODUCT_NAME, p.PRICE, p.QUANTITY
+			SELECT c.CART_ID, c.AMOUNT, p.IMAGE_PATH, p.PRODUCT_NAME, p.PRICE, p.QUANTITY, p.PRODUCT_ID
 			FROM CART c
 			JOIN PRODUCT p ON c.PRODUCT_ID = p.PRODUCT_ID
 			WHERE c.USER_ID = :userId
@@ -33,7 +33,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
 	List<Object[]> findCartWithProductInfo(@Param("userId") Long userId);
 	
 	// Tính tổng tiền sản phẩm
-	@Query("SELECT SUM(c.amount * p.price) FROM Cart c JOIN Products p ON c.productID = p.id")
-	BigDecimal getTotalAmount();
+	@Query(value = "SELECT SUM(c.AMOUNT * p.PRICE) FROM CART c JOIN PRODUCT p ON c.PRODUCT_ID = p.PRODUCT_ID WHERE c.USER_ID = :userId", nativeQuery = true)
+	BigDecimal getTotalAmount(@Param("userId") Long userId);
 
 }
