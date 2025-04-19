@@ -236,7 +236,7 @@ public class ProductsService {
 		// Gọi phương thức từ productDetailRepository
 		ProductDetail productDetail = productDetailRepository.findByProductId(id);
 		// Dùng if-else rút gọn để trả về mô tả
-		String product = (productDetail != null) ? productDetail.getDescription() : "Chưa có mô tả cho sản phẩm này";
+		String product = (productDetail != null) ? productDetail.getDescription() : "No description available for this product -_-";
 		
 		return product;		
 	}
