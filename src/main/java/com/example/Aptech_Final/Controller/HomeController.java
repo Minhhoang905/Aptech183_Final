@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.Aptech_Final.Enity.Users;
+import com.example.Aptech_Final.Repository.UserRepository;
 import com.example.Aptech_Final.Service.HomeService;
 
 
@@ -19,6 +21,28 @@ public class HomeController {
 	// Tự động inject (tiêm) instace của HomeService vào Controller
 	@Autowired
 	private HomeService homeService;
+	@Autowired
+	private UserRepository userRepository;
+
+    // Tạo phương thức để thêm role và username vào model
+    public void addCommonAttributes(Model model, Authentication authentication) {
+        if (authentication != null) {
+            String role = homeService.getCurrentUserRole();
+            String username = authentication.getName();           
+            // Lấy user từ database
+            Users user = userRepository.findByUsername(username);
+            
+            if (user != null) {
+                model.addAttribute("userId", user.getId());
+                model.addAttribute("username", user.getName());
+                model.addAttribute("role", role);
+                model.addAttribute("email", user.getEmail());
+                model.addAttribute("phoneNumber", user.getPhoneNumber());
+                model.addAttribute("address", user.getAddress());
+            }
+        }
+    }
+
 	// Tạo method xử lý yêu cầu GET cho đường dẫn "/home"
 	@GetMapping("/home")
 	public String printString(Model model, Authentication authentication) {

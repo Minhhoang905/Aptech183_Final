@@ -1,249 +1,565 @@
 <!DOCTYPE html>
 <html xmlns="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Detail product</title>
     <link rel="stylesheet" href="/styles.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-decoration: none;
+
+        }
+
+        .pop_up {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Impact', Haettenschweiler, sans-serif;
+            min-height: 100vh;
+            background-color: rgb(213, 60, 17);
+        }
+
+        header {
+            backdrop-filter: blur(5px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0px 3%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            background-color: rgb(213, 60, 17);
+            ;
+
+        }
+
+        header .logo {
+            color: white;
+            font-size: 30px;
+        }
+
+        header .logo span {
+            color: rgb(11, 211, 85);
+        }
+
+        header .navbar ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        header .navbar ul li {
+            position: relative;
+            float: left;
+        }
+
+        header .navbar ul li a {
+            display: block;
+            padding: 20px;
+            color: white;
+            font-size: 20px;
+            transition: ease-in 0.3s;
+        }
+
+        header .navbar ul li .fa-circle-user {
+            font-size: 20px;
+            padding-right: 10px;
+        }
+
+        nav ul li a:hover {
+            color: rgb(11, 211, 85);
+        }
+
+        header .navbar ul li ul {
+            background-color: rgb(213, 60, 17);
+            position: absolute;
+            left: 0;
+            width: 200px;
+            display: none;
+        }
+
+        header .navbar ul li ul li {
+            width: 100%;
+        }
+
+        header .navbar ul li:hover>ul {
+            display: initial;
+        }
+
+        header .navbar ul li .button {
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 120px;
+            padding: 7px 7px;
+            background-color: rgb(11, 211, 85);
+            transition: ease-in-out 0.3s;
+            cursor: pointer;
+            margin-left: 20px;
+        }
+
+        header .navbar ul li .button:hover {
+            color: white;
+        }
+
+        /*Main*/
+        .main_content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            justify-content: flex-start;
+            display: flex;
+            margin-left: 60px;
+            margin-right: 60px;
+            margin-top: 65px;
+            margin-bottom: 60px;
+            background-color: white;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            border-radius: 40px;
+            color: black;
+
+        }
+
+        .product_upper_content {
+            width: 100%;
+            height: 75vh;
+            display: flex;
+            flex-direction: row;
+
+        }
+
+        .product_lower_content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-left: 60px;
+            padding-bottom: 60px;
+            padding-right: 60px;
+            padding-top: 20px;
+
+        }
+
+        .product_upper_content .img_area {
+            flex: 1.3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .product_upper_content .detail_area {
+            flex: 1;
+
+        }
+
+        .product_upper_content .img_area .product_img {
+            width: 600px;
+            height: 600px;
+            padding: 20px;
+        }
+
+        .product_upper_content .img_area .product_img img {
+        	padding-top:50px;
+            background-position: center;
+            background-repeat: none;
+            object-fit: contain;
+            height: 90%;
+            width: 90%;
+        }
+
+        .detail_area_content {
+            font-size: 28px;
+            padding-top: 68px;
+            display: flex;
+            flex-direction: column;
+            overflow-wrap: break-word;
+            text-overflow: ellipsis;
+        }
+
+        .detail_area_content * {
+            padding-bottom: 6px;
+        }
+
+        .detail_area_content h2 {
+            font-size: 36px;
+        }
+
+        .quantity_input {
+            display: flex;
+            flex-direction: row;
+
+        }
+
+        .button_area {
+            display: flex;
+            flex-direction: column;
+            padding-top: 15px;
+            justify-content: flex-start;
+
+        }
+
+        .button_area button {
+            border-radius: 19px;
+            margin: 13px 0px;
+            height: 40px;
+            width: 350px;
+            border: none;
+            font-family: 'Impact', Haettenschweiler, sans-serif;
+            font-size: 20px;
+            color: aliceblue;
+            cursor: pointer;
+
+        }
+
+        .button_area .buy_now {
+            background-color: rgb(11, 211, 85);
+            transition: ease-in 0.3s;
+        }
+
+        .button_area .buy_now:hover {
+            background-color: rgb(213, 60, 17);
+        }
+
+        .button_area .add_to {
+            color: black;
+            border: 3px solid;
+            background-color: transparent;
+            border-color: rgb(11, 211, 85);
+            transition: ease-in 0.3s;
+        }
+
+        .button_area .add_to:hover {
+            color: rgb(213, 60, 17);
+            border-color: rgb(213, 60, 17);
+
+        }
+
+        .product_description {
+            display: flex;
+
+        }
+
+        .product_description div h4 {
+            font-size: 30px;
+        }
+
+        .product_description div div {
+            font-size: 25px;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: left;
+            overflow-wrap: break-word;
+        }
+
+        .product_description_editor {
+            padding-top: 20px;
+        }
+
+        .product_description_editor div h4 {
+            font-size: 30px;
+        }
+
+        .product_description_editor div form button {
+            border-radius: 19px;
+            margin: 13px 0px;
+            height: 40px;
+            width: 250px;
+            border: none;
+            font-family: 'Impact', Haettenschweiler, sans-serif;
+            font-size: 20px;
+            color: aliceblue;
+            cursor: pointer;
+            background-color: rgb(11, 211, 85);
+            transition: ease-in 0.3s;
+        }
+
+        .product_description_editor div form button:hover {
+            background-color: rgb(213, 60, 17);
+        }
+
+        input[type='number'] {
+            font-size: 20px;
+            width: 50px;
+            height: 30px;
+            text-align: right;
+            padding: 10px;
+            margin-left: 5px
+        }
+
+        /*FOOTER*/
+
+        footer {
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 20vh;
+            width: 100%;
+            color: black;
+            font-family: 'Courier New', Courier, monospace;
+            flex-direction: column;
+        }
+
+        footer ul {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 100%;
+        }
+    </style>
 </head>
+
 <body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" th:href="@{/ComplexGym/home}">
-                <i class="fas fa-dumbbell"></i>
-            </a>
+    <header>
+        <a th:href="@{/ComplexGym/home}" class="logo">Complex<span> Gym</span></a>
+        <nav class="navbar">
+            <ul>
+                <li><a th:href="@{/ComplexGym/home}">HOME</a></li>
+                <li><a href="#">PRODUCTS +</a>
+                    <ul>
+                        <li><a th:href="@{/ComplexGym/products/supplements}">Supplements</a></li>
+                        <li><a th:href="@{/ComplexGym/products/gears}">Gears</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">SCHEDULE</a></li>
+                <li><a th:href="@{/ComplexGym/cart}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> CART</a>
+                </li>
+                <li th:if="${role == 'Anonymous'}"><a th:href="@{/login}" type="button" class="button">LOGIN</a></li>
+                <li th:if="${role != 'Anonymous'}"><a class="welcome" href="#"><i
+                            class="fa-solid fa-circle-user"></i>WELCOME!</a>
+                    <ul>
+                        <li th:if="${role == 'ROLE_ADMIN'}"><a th:href="@{/userManagement}">User<br>management</a></li>
+                        <li th:if="${role == 'ROLE_ADMIN'}"><a
+                                th:href="@{/ComplexGym/products/productManagement}">Product<br>management</a></li>
+                        <li><a th:href="@{/ComplexGym/payment/ordersManagement}">Order<br>management</a></li>
+                        <li><a th:href="@{/logout}">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link active" th:href="@{/ComplexGym/home}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="bookingLink">Schedule</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button"
-                            data-bs-toggle="dropdown">Products</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/supplements}">Supplement</a></li>
-                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/gears}">Gears</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/ComplexGym/cart}">
-                            <i class="fas fa-shopping-cart"></i> Cart <span id="cart-count"></span>
-                        </a>
-                    </li>
-                </ul>
-
-                <div class="ms-3">
-                    <th:block th:if="${role == 'Anonymous'}">
-                        <a class="btn btn-warning" th:href="@{/login}">Login</a>
-                    </th:block>
-                    <th:block th:if="${role != 'Anonymous'}">
-                        <div class="dropdown">
-                            <button class="btn btn-warning dropdown-toggle" type="button" id="userMenu"
-                                data-bs-toggle="dropdown">
-                                <i class="fas fa-user"></i> <span th:text="${username}"></span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/userManagement}">User Management</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/ComplexGym/products/productManagement}">Product Management</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a th:href="@{/ComplexGym/payment/ordersManagement}">Order<br>management</a></li>
-                                <li><hr class="dropdown-divider"></li>                                                                                                                                                                                                                                                              
-                                <li><a class="dropdown-item logout-item" th:href="@{/logout}">Logout</a></li>
-                            </ul>
-                        </div>
-                    </th:block>
-                </div>
-            </div>
+    <!-- Hiển thị thông báo từ backend -->
+    <div class="pop_up">
+        <!-- Hiển thị lỗi -->
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+            <span th:text="${errorMessage}"></span>
         </div>
-    </nav>
-
-	<!-- Hiển thị thông báo từ backend -->
-	<div class="container mt-3">
-	    <!-- Hiển thị lỗi -->
-	    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
-	        <span th:text="${errorMessage}"></span>
-	    </div>
-	    <!-- Hiển thị thành công -->
-	    <div th:if="${successMessage}" class="alert alert-success" role="alert">
-	        <span th:text="${successMessage}"></span>
-	    </div>
-	</div>
-	
-<!-- Nội dung trang chi tiết sản phẩm -->
-<div class="container mt-4">
-    <div class="row">
-        <!-- Cột hình ảnh sản phẩm -->
-        <div class="col-md-6">
-            <img th:src="${product.imagePath}" class="img-fluid" alt="Product Image">
-        </div>
-
-        <!-- Cột thông tin sản phẩm -->
-        <div class="col-md-6">
-            <h2 th:text="${product.productName}"></h2>
-            <p>💰 Giá: <span th:text="${#numbers.formatInteger(product.price, 3, 'POINT')}"></span> VND</p>
-            <p>📦 Số lượng còn lại: <span th:text="${product.quantity}"></span></p>
-
-            <!-- Form xử lý giỏ hàng (Thêm vào giỏ hàng & Mua ngay) -->
-            <form id="cartForm" th:action="@{/ComplexGym/cart/add}" method="post">
-                <input type="hidden" name="productId" th:value="${product.id}">
-                <label for="quantity">Chọn số lượng:</label>
-                <input type="number" name="quantity" id="quantity" class="form-control mb-2"
-                       value="1" min="1" th:max="${product.quantity}" 
-                       oninput="checkQuantity()">
-                <p class="text-danger small d-none" id="cartWarning">⚠ Số lượng không đủ!</p>
-            </form>
-
-            <!-- Nút Thêm vào giỏ hàng -->
-            <button type="button" class="btn btn-success w-100" onclick="addToCart(false)">
-                🛒 Thêm vào giỏ hàng
-            </button>
-
-            <!-- Nút Mua ngay -->
-            <button type="button" class="btn btn-danger w-100 mt-2" onclick="addToCart(true)">
-                🛍️ Mua ngay
-            </button>
-                    <!-- Phần hiển thị mô tả sản phẩm -->
-        <div class="row mt-4">
-            <div class="col">
-                <h4>Mô tả sản phẩm</h4>
-                <!-- Dùng th:utext để hiển thị nội dung HTML của mô tả -->
-                <div th:utext="${description}"></div>
-            </div>
-        </div>
-        
-        <!-- Form chỉnh sửa mô tả (chỉ hiển thị cho Admin) -->
-        <div class="row mt-4" th:if="${role == 'ROLE_ADMIN'}">
-            <div class="col">
-                <h4>Chỉnh sửa mô tả sản phẩm</h4>
-                <form th:action="@{/ComplexGym/products/saveDescription}" method="post">
-                    <input type="hidden" name="id" th:value="${product.id}">
-                    <textarea id="editor" name="description" rows="10" class="form-control" th:text="${description}"></textarea>
-                    <button type="submit" class="btn btn-primary mt-2">Save</button>
-                </form>
-            </div>
-        </div>
+        <!-- Hiển thị thành công -->
+        <div th:if="${successMessage}" class="alert alert-success" role="alert">
+            <span th:text="${successMessage}"></span>
         </div>
     </div>
-</div>
-<!-- CKEditor để hỗ trợ chỉnh sửa mô tả (chỉ kích hoạt nếu tồn tại textarea) -->
-<script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
-<!-- Script của Bootstrap -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Script của SweetAlert -->	
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>	
 
-<!-- Script kiểm tra số lượng và xử lý "Mua ngay" -->
-<script>
+    <!-- Nội dung trang chi tiết sản phẩm -->
+    <div class="main_content">
+        <div class="container">
+            <div class="product_upper_content">
+                <div class="img_area">
+                    <div class="product_img">
+                        <img th:src="${product.imagePath}" alt="Product image">
+                    </div>
+                </div>
+                <div class="detail_area">
+                    <div class="detail_area_content">
+                        <h2 th:text="${product.productName}"></h2>
+                        <p>Price: <span th:text="${#numbers.formatInteger(product.price, 3, 'POINT')}"></span> VND</p>
+                        <p>Stock: <span th:text="${product.quantity}"></span></p>
 
-// Kiểm tra nếu phần tử có ID "editor" tồn tại, thì khởi tạo CKEditor để chỉnh sửa mô tả sản phẩm.
-if (document.getElementById('editor')) {
-    CKEDITOR.replace('editor');
-}
+                        <!-- Form xử lý giỏ hàng (Thêm vào giỏ hàng & Mua ngay) -->
+                        <form id="cartForm" th:action="@{/ComplexGym/cart/add}" method="post">
+                            <input type="hidden" name="productId" th:value="${product.id}">
+                            <div class="quantity_input">
+                                <label for="quantity">Quantity:</label>
+                                <input type="number" name="quantity" id="quantity" class="form-control mb-2" value="1"
+                                    min="1" th:max="${product.quantity}" oninput="checkQuantity()">
+                            </div>
+                            <p class="text-danger small d-none" id="cartWarning">Not enough stock avaliable!</p>
+                        </form>
+
+                        <div class="button_area">
+                            <!-- Nút Thêm vào giỏ hàng -->
+                            <button type="button" class="btn btn-success w-100 add_to"
+                                onclick="addToCart(false)">
+                                Add to cart
+                            </button>
+
+                            <!-- Nút Mua ngay -->
+                            <button type="button" class="btn btn-danger w-100 mt-2 buy_now"
+                                onclick="addToCart(true)">
+                                Buy now
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="product_lower_content">
+                <div class="product_description">
+                    <div>
+                        <h4>Product description</h4>
+                        <!-- Dùng th:utext để hiển thị nội dung HTML của mô tả -->
+                        <div style="font-family:Tahoma" th:utext="${description}"></div>
+                    </div>
+                </div>
+                <div class="product_description_editor" th:if="${role == 'ROLE_ADMIN'}">
+                    <div>
+                        <h4>Product description editor</h4>
+                        <form th:action="@{/ComplexGym/products/saveDescription}" method="post">
+                            <input type="hidden" name="id" th:value="${product.id}">
+                            <textarea id="editor" name="description" rows="10" class="form-control"
+                                th:text="${description}"></textarea>
+                            <button type="submit" class="btn btn-primary mt-2">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <footer>
+                <h3>Complex Gym ©</h3>
+                <ul>
+                    <li>+84 01234567899</li>
+                    <li>Nam ky khoi nghia, Ngu Hanh Son, Da Nang</li>
+                    <li>complexgym@gmail.com</li>
+                </ul>
+                <h4>© 2025 Copyright: SanNHT & HoangDNM2</h4>
+            </footer>
+
+        </div>
+    </div>
 
 
-document.addEventListener("DOMContentLoaded", function () {
-    const quantityInput = document.getElementById("quantity");
-    const cartWarning = document.getElementById("cartWarning");
-    const addToCartBtn = document.querySelector('.btn-success');
-    const buyNowBtn = document.querySelector('.btn-danger');
 
-    // ✅ Âm thanh "pop" khi thêm thành công
-    const successSound = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_5a5015fba7.mp3"); // sound effect miễn phí
+    <!-- CKEditor để hỗ trợ chỉnh sửa mô tả (chỉ kích hoạt nếu tồn tại textarea) -->
+    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+    <!-- Script của Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Script của SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    // ✅ Kiểm tra số lượng nhập vào
-    function checkQuantity() {
-        const maxQuantity = parseInt(quantityInput.getAttribute("max"));
-        let currentValue = parseInt(quantityInput.value);
+    <!-- Script kiểm tra số lượng và xử lý "Mua ngay" -->
+    <script>
 
-        if (currentValue > maxQuantity) {
-            cartWarning.classList.remove("d-none");
-            quantityInput.value = maxQuantity;
-        } else {
-            cartWarning.classList.add("d-none");
+        // Kiểm tra nếu phần tử có ID "editor" tồn tại, thì khởi tạo CKEditor để chỉnh sửa mô tả sản phẩm.
+        if (document.getElementById('editor')) {
+            CKEDITOR.replace('editor');
         }
-    }
 
-    // ✅ Hàm thêm vào giỏ
-    window.addToCart = function (isBuyNow) {
-        const targetBtn = isBuyNow ? buyNowBtn : addToCartBtn;
 
-        // 👉 Đổi nút sang trạng thái loading
-        const originalText = targetBtn.innerHTML;
-        targetBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Processing...';
-        targetBtn.disabled = true;
+        document.addEventListener("DOMContentLoaded", function () {
+            const quantityInput = document.getElementById("quantity");
+            const cartWarning = document.getElementById("cartWarning");
+            const addToCartBtn = document.querySelector('.btn-success');
+            const buyNowBtn = document.querySelector('.btn-danger');
 
-        let formData = new FormData(document.getElementById("cartForm"));
+            // ✅ Âm thanh "pop" khi thêm thành công
+            const successSound = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_5a5015fba7.mp3"); // sound effect miễn phí
 
-        fetch("/ComplexGym/cart/add", {
-            method: "POST",
-            body: formData,
-        }).then(response => {
-            if (response.ok) {
-                if (isBuyNow) {
-                    // 🛍️ Mua ngay → chuyển trang
-                    window.location.href = "/ComplexGym/payment";
+            // ✅ Kiểm tra số lượng nhập vào
+            function checkQuantity() {
+                const maxQuantity = parseInt(quantityInput.getAttribute("max"));
+                let currentValue = parseInt(quantityInput.value);
+
+                if (currentValue > maxQuantity) {
+                    cartWarning.classList.remove("d-none");
+                    quantityInput.value = maxQuantity;
                 } else {
-                    // 🔊 Phát âm thanh khi thêm thành công
-                    successSound.play();
+                    cartWarning.classList.add("d-none");
+                }
+            }
 
-                    // ✅ SweetAlert với lựa chọn
+            // ✅ Hàm thêm vào giỏ
+            window.addToCart = function (isBuyNow) {
+                const targetBtn = isBuyNow ? buyNowBtn : addToCartBtn;
+
+                // 👉 Đổi nút sang trạng thái loading
+                const originalText = targetBtn.innerHTML;
+                targetBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Processing...';
+                targetBtn.disabled = true;
+
+                let formData = new FormData(document.getElementById("cartForm"));
+
+                fetch("/ComplexGym/cart/add", {
+                    method: "POST",
+                    body: formData,
+                }).then(response => {
+                    if (response.ok) {
+                        if (isBuyNow) {
+                            // 🛍️ Mua ngay → chuyển trang
+                            window.location.href = "/ComplexGym/payment";
+                        } else {
+                            // 🔊 Phát âm thanh khi thêm thành công
+                            successSound.play();
+
+                            // ✅ SweetAlert với lựa chọn
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Added to cart!',
+                                text: 'The product has been added to your cart.',
+                                showCancelButton: true,
+                                confirmButtonText: '🛒 View Cart',
+                                cancelButtonText: '🛍️ Continue Shopping',
+                                confirmButtonColor: '#198754',
+                                cancelButtonColor: '#6c757d'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = "/ComplexGym/cart";
+                                }
+                            });
+                        }
+                    } else {
+                        // ❌ Lỗi từ server → hiệu ứng rung
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Something went wrong while adding the product to cart!',
+                            customClass: {
+                                popup: 'animate__animated animate__shakeX'
+                            }
+                        });
+                    }
+                }).catch(error => {
+                    // ❌ Lỗi mạng → hiệu ứng rung
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Added to cart!',
-                        text: 'The product has been added to your cart.',
-                        showCancelButton: true,
-                        confirmButtonText: '🛒 View Cart',
-                        cancelButtonText: '🛍️ Continue Shopping',
-                        confirmButtonColor: '#198754',
-                        cancelButtonColor: '#6c757d'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = "/ComplexGym/cart";
+                        icon: 'error',
+                        title: 'Network error',
+                        text: 'Please check your connection and try again.',
+                        customClass: {
+                            popup: 'animate__animated animate__shakeX'
                         }
                     });
-                }
-            } else {
-                // ❌ Lỗi từ server → hiệu ứng rung
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Something went wrong while adding the product to cart!',
-                    customClass: {
-                        popup: 'animate__animated animate__shakeX'
-                    }
+                    console.error("Add to cart error:", error);
+                }).finally(() => {
+                    // 🔁 Khôi phục nút về trạng thái ban đầu
+                    targetBtn.innerHTML = originalText;
+                    targetBtn.disabled = false;
                 });
-            }
-        }).catch(error => {
-            // ❌ Lỗi mạng → hiệu ứng rung
-            Swal.fire({
-                icon: 'error',
-                title: 'Network error',
-                text: 'Please check your connection and try again.',
-                customClass: {
-                    popup: 'animate__animated animate__shakeX'
-                }
-            });
-            console.error("Add to cart error:", error);
-        }).finally(() => {
-            // 🔁 Khôi phục nút về trạng thái ban đầu
-            targetBtn.innerHTML = originalText;
-            targetBtn.disabled = false;
-        });
-    };
+            };
 
-    quantityInput.addEventListener("input", checkQuantity);
-});
-</script>
+            quantityInput.addEventListener("input", checkQuantity);
+        });
+    </script>
 </body>
+
 </html>

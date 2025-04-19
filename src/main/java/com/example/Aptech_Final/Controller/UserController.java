@@ -131,7 +131,7 @@ public class UserController {
 	// Phương thức để hiển thị changePass.html
 	@GetMapping("/changePass")
 	public String changePass(ModelMap model) {
-		return "changePass";
+		return "html_resources/changePass";
 	}
 	
 	// Phương thức để cập nhập mật khẩu ở changePass.html

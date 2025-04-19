@@ -34,8 +34,6 @@ import com.example.Aptech_Final.Service.*;
 @RequestMapping("/ComplexGym/payment")
 public class PaymentController {
 
-
-
 	@Autowired
 	private UserRepository userRepository;
     @Autowired
@@ -51,7 +49,7 @@ public class PaymentController {
 
     
     // Tạo phương thức để thêm role và username vào model
-    private void addCommonAttributes(Model model, Authentication authentication) {
+    public void addCommonAttributes(Model model, Authentication authentication) {
         if (authentication != null) {
             String role = homeService.getCurrentUserRole();
             String username = authentication.getName();           
