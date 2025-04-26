@@ -79,13 +79,89 @@
             </div>
         </div>
     </nav>
-    
+<!-- Thông báo từ controller -->
 <!-- Thông báo từ controller -->
 <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
 <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-<h2>Schedule for the Week</h2>
-<p>Your role: <strong th:text="${role}"></strong></p>
 
+<h2>Lịch Tập Theo Tuần</h2>
+<p>Vai trò: <strong th:text="${role}"></strong></p>
+
+<div>
+	<p>Id: <span th:text="${userId}"></span></p>	
+    <p>Xin chào, <span th:text="${username}"></span></p>
+    <p>Email: <span th:text="${email}"></span></p>
+    <p>SĐT: <span th:text="${phoneNumber}"></span></p>
+    <p>Địa chỉ: <span th:text="${address}"></span></p>
+</div>
+
+<table class="table table-bordered text-center">
+    <thead>
+        <tr>
+            <th>Giờ</th>
+            <th th:each="entry : ${scheduleMap}" th:text="${#temporals.format(entry.key, 'dd/MM/yyyy')}"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="hour : ${#numbers.sequence(5, 20)}">
+            <td th:text="${hour + ':00'}"></td>
+
+            <td th:each="entry : ${scheduleMap}" th:with="forms=${entry.value}">
+                
+                <!-- Nếu không có form, hiển thị dấu gạch -->
+                <th:block th:if="${forms == null or forms.isEmpty()}">
+                    <span class="text-muted">—</span>
+                </th:block>
+
+                <!-- Nếu có form, xử lý -->
+                <th:block th:if="${forms != null and !forms.isEmpty()}" 
+                          th:with="form=${forms[0]}, slotInfo=${form.hours.get(hour)}">
+
+                    <!-- USER -->
+					<th:block th:if="${#strings.contains(role, 'ROLE_USER')}">
+					    <th:block th:if="${slotInfo != null and (slotInfo.ptCount > 0 or slotInfo.bookedByCurrentUser)}">
+					        <div>PT: <span th:text="${slotInfo.ptCount}"></span></div>
+					        <div>User: <span th:text="${slotInfo.userCount}"></span></div>
+					
+					        <div th:if="${slotInfo.bookedByCurrentUser}" class="text-info">Đã đặt</div>
+					
+					        <form th:if="${!slotInfo.bookedByCurrentUser and slotInfo.ptCount > slotInfo.userCount}"
+					              method="post" th:action="@{/ComplexGym/schedule/book}">
+					            <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" />
+					            <input type="hidden" name="hour" th:value="${hour}" />
+					            <button type="submit" class="btn btn-sm btn-primary">Đặt Hẹn</button>
+					        </form>
+					    </th:block>
+					    <th:block th:if="${slotInfo == null or (slotInfo.ptCount == 0 and !slotInfo.bookedByCurrentUser)}">
+					        <span class="text-muted">—</span>
+					    </th:block>
+					</th:block>
+
+                    <!-- PT / ADMIN -->
+                    <th:block th:if="${#strings.contains(role, 'ROLE_PT') or #strings.contains(role, 'ROLE_ADMIN')}">
+                        <th:block th:if="${slotInfo != null}">
+                            <div>PT: <span th:text="${slotInfo.ptCount}"></span></div>
+                            <div>User: <span th:text="${slotInfo.userCount}"></span></div>
+
+                            <form th:if="${!slotInfo.bookedByCurrentUser}"
+                                  method="post" th:action="@{/ComplexGym/schedule/book}">
+                                <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" />
+                                <input type="hidden" name="hour" th:value="${hour}" />
+                                <button type="submit" class="btn btn-sm btn-primary">Đặt Hẹn</button>
+                            </form>
+
+                            <div th:if="${slotInfo.bookedByCurrentUser}" class="text-info">Đã đặt</div>
+                        </th:block>
+                        <th:block th:if="${slotInfo == null}">
+                            <span class="text-muted">—</span>
+                        </th:block>
+                    </th:block>
+
+                </th:block>
+            </td>
+        </tr>
+    </tbody>
+</table>
 
 <!-- SweetAlert + Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

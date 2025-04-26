@@ -18,11 +18,7 @@ public class Schedule {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "SCHEDULE_ID")
 	private Long scheduleId;
-	
-	// Id của User
-    @Column(name = "USER_ID", nullable = false)
-    private Long userId;
-    
+	    
     // Ngày của lịch
     @Column(name = "DATE", nullable = false)
     private LocalDate date;   
@@ -98,14 +94,6 @@ public class Schedule {
 
 	public void setScheduleId(Long scheduleId) {
 		this.scheduleId = scheduleId;
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
 	}
 
 	public LocalDate getDate() {

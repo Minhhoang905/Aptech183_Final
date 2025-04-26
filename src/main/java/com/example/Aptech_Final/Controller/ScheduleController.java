@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.Aptech_Final.Controller.DTO.SlotInfo;
 import com.example.Aptech_Final.Enity.Users;
 import com.example.Aptech_Final.Form.ScheduleForm;
 import com.example.Aptech_Final.Repository.UserRepository;
@@ -35,22 +38,48 @@ public class ScheduleController {
 	@Autowired
 	private HomeService homeService;
 	
-	// Tạo khung giờ từ 5h đến 20h (15 slot)
-	private List<Integer> generateTime() {
-	    List<Integer> slots = new ArrayList<>();
-	    for (int i = 5; i <= 20; i++) {
-	        slots.add(i);
-	    }
-	    return slots;
-	}
+	@GetMapping("")
+	public String getScheduleView(Model model, Authentication authentication) {
+	    // Thêm các thuộc tính chung vào model (ví dụ: userId, role,...)
+	    homeController.addCommonAttributes(model, authentication);
 
-	// Tạo danh sách ngày từ hôm nay đến 6 ngày sau
-	private List<LocalDate> generate7Days() {
+	    // Lấy userId và role từ model
+	    Long userId = (Long) model.getAttribute("userId");
+	    String role = (String) model.getAttribute("role");
+
+	    // Kiểm tra nếu userId và role không tồn tại, chuyển hướng về trang login hoặc trang khác nếu cần thiết
+	    if (userId == null || role == null) {
+	        return "redirect:/login"; // Chỉnh sửa theo đường dẫn login của bạn
+	    }
+
+	    // Lấy lịch theo vai trò người dùng từ service
+	    Map<LocalDate, List<ScheduleForm>> scheduleMap = scheduleService.getScheduleByUserRole(userId, role);
+	    System.out.println(scheduleMap.toString());
+	    // Danh sách ngày từ hôm nay đến 6 ngày tiếp theo
 	    List<LocalDate> dates = new ArrayList<>();
 	    LocalDate today = LocalDate.now();
-	    for (int i = 0; i < 7; i++) {
-	        dates.add(today.plusDays(i));
+
+	    // Tạo vòng lặp với số ngày hiện tại + 6 ngày tiếp theo
+	    for (int i = 0; i <= 6; i++) {
+	    	// Tạo biến LocalDate và gán ngày hiện tại vào
+	        LocalDate currentDate = today.plusDays(i);
+	        // Add này hiện tại vào trong List<LocalDate> ở trên
+	        dates.add(currentDate);
+
+	        // Đảm bảo mỗi ngày đều có entry trong scheduleMap, tránh null trong view
+	        // Note: Dùng putIfAbsent để tránh ghi đè key - value
+	        scheduleMap.putIfAbsent(currentDate, new ArrayList<>());
 	    }
-	    return dates;
+
+	    // Thêm lịch vào model
+	    // Map<LocalDate, List<ScheduleForm>> scheduleMap
+	    model.addAttribute("scheduleMap", scheduleMap);  
+	    // List<LocalDate> dates
+	    model.addAttribute("dates", dates);
+	    // Tạo danh sách khung giờ (IntStream.rangeClosed) 5h -> 20h, rồi chuyển từ int => Integer, rồi chuyển thành List
+	    model.addAttribute("timeSlots", IntStream.rangeClosed(5, 20).boxed().toList());
+
+	    // Trả về view
+	    return "html_resources/schedule";
 	}
 }
