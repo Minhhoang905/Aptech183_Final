@@ -25,8 +25,6 @@ public class ScheduleService {
 	private ScheduleRepository scheduleRepository;
 	@Autowired
 	private ScheduleBookingRepository scheduleBookingRepository;
-	@Autowired
-	private HomeService homeService;
 	
 	// Phương thức để hiển thị trên view của người dùng
 	public Map<LocalDate, List<ScheduleForm>> getScheduleByUserRole(Long userId, String role) {
@@ -70,11 +68,6 @@ public class ScheduleService {
 	            int ptCount = scheduleBookingRepository.countPTInSlot(dto.getScheduleId(), hour);
 	            int userCount = scheduleBookingRepository.countUserInSlot(dto.getScheduleId(), hour);
 
-	            System.out.println("ScheduleId: " + dto.getScheduleId() +
-	                " | Giờ: " + hour +
-	                " | PT: " + ptCount +
-	                " | User: " + userCount);
-
 	            // Gọi đối tượng SlotInfo và gán cho từng khung giờ
 	            SlotInfo slotInfo = new SlotInfo();
 	            slotInfo.setPtCount(ptCount);
@@ -98,8 +91,6 @@ public class ScheduleService {
 	                // Gán kết quả boolean vào đối tượng SlotInfo
 	                slotInfo.setBookedByCurrentUser(isBooked);
 
-	                System.out.println("-> UserId: " + userId +
-	                    (isBooked ? " đã đặt." : " chưa đặt."));
 	            }
 
 	            // Thêm SlotInfo vào map theo khung giờ
@@ -214,10 +205,9 @@ public class ScheduleService {
 
 	// Phương thức để lưu thông tin đặt lịch vào trong database 
 	@Transactional
-	public String bookSchedule(ScheduleBookingForm bookingForm) {
+	public String bookSchedule(ScheduleBookingForm bookingForm, Long userId) {
 		
-		// Lấy thông tin user hiện tại (lấy từ homeservice, sau khi đã đăng nhập)
-		Long userId = homeService.getCurrentUserId();
+		// Lấy thông tin user hiện tại
 	    Long scheduleId = bookingForm.getScheduleId();
 	    Integer hour = bookingForm.getHour();
 	    LocalDate date = bookingForm.getDate();
@@ -235,9 +225,9 @@ public class ScheduleService {
 		}
 
 		// Kiểm tra xem người dùng đã đặt slot này chưa
-		boolean isUserExists = scheduleBookingRepository.existsByScheduleIdAndUserIdAndHour(scheduleId, userId, hour) == 1;
+		int isUserExists = scheduleBookingRepository.existsByScheduleIdAndUserIdAndHour(scheduleId, userId, hour);
 		// Trả về lỗi nếu đã có user đặt slot này
-		if (isUserExists) {
+		if (isUserExists  == 1) {
 			return "error: You have already scheduled this time slot!";
 		}
 				
@@ -248,5 +238,22 @@ public class ScheduleService {
 		scheduleBookingRepository.insertBooking(scheduleId, userId, hour);
 		
 		return "success: Register successful!";
+	}
+	
+	// Phương thức để xóa thông tin đặt lịch
+	@Transactional
+	public String cancelSchedule(ScheduleBookingForm bookingForm, Long userId) {
+		
+	    Long scheduleId = bookingForm.getScheduleId();
+	    Integer hour = bookingForm.getHour();
+	    LocalDate date = bookingForm.getDate();
+
+		// Gọi query để xóa giờ ra khỏi table SCHEDULE
+		scheduleRepository.decrementHour(scheduleId, hour, date);
+		
+		// Gọi query để xóa thông tin người dùng đã đặt ra khỏi table SCHEDULE_BOOKING
+		scheduleBookingRepository.cancelBooking(scheduleId, userId, hour);
+		
+		return "success: Cancel slot successfully!";
 	}
 }

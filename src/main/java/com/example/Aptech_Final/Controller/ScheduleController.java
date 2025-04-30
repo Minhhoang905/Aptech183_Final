@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.Aptech_Final.Controller.DTO.SlotInfo;
@@ -36,8 +37,6 @@ public class ScheduleController {
 	private ScheduleService scheduleService;
 	@Autowired
 	private UserRepository userRepository;
-	@Autowired
-	private HomeService homeService;
 	
 	@GetMapping("")
 	public String getScheduleView(Model model, Authentication authentication) {
@@ -100,7 +99,7 @@ public class ScheduleController {
 	    }
 
 		// Tạo và gọi phương thức từ service
-	    String result = scheduleService.bookSchedule(bookingForm);
+	    String result = scheduleService.bookSchedule(bookingForm, userId);
 	    
         // Tạo if-else để chuyển về controller
 	    if (result.startsWith("success: ")) {
@@ -111,5 +110,29 @@ public class ScheduleController {
 
 		}
 		return "redirect:/ComplexGym/schedule";
+	}
+	
+	// Phương thức để hủy lịch tập trong database
+	@PostMapping("/cancel")
+	public String cancelScheduleSlot(Model model, Authentication authentication, RedirectAttributes redirectAttributes,
+					@ModelAttribute("cancelBooking") ScheduleBookingForm bookingForm) {
+	    // Thêm các thuộc tính chung vào model (ví dụ: userId, role,...)
+	    homeController.addCommonAttributes(model, authentication);
+	    model.addAttribute("cancelBooking", new ScheduleBookingForm());  
+	    
+	    // Lấy userId và role từ model
+	    Long userId = (Long) model.getAttribute("userId");
+	    
+		// Gọi phương thức từ service 
+	    String result = scheduleService.cancelSchedule(bookingForm, userId);
+	    
+        // Tạo if-else để chuyển về controller
+	    if (result.startsWith("success: ")) {
+			redirectAttributes.addFlashAttribute("successMessage", result.substring(8));
+		} else {
+			redirectAttributes.addFlashAttribute("errorMessage", "Oops, something happens. Try again or contact to admin!");
+		}
+	    
+	    return "redirect:/ComplexGym/schedule";
 	}
 }

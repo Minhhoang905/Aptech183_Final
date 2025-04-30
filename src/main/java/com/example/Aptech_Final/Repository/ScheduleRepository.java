@@ -1,9 +1,7 @@
 package com.example.Aptech_Final.Repository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import com.example.Aptech_Final.Controller.DTO.ScheduleDTO;
 import com.example.Aptech_Final.Enity.Schedule;
 
-import jakarta.transaction.Transactional;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long>{
@@ -142,7 +139,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>{
                    "HOUR_19 = CASE WHEN :hour = 19 THEN HOUR_19 - 1 ELSE HOUR_19 END, " +
                    "HOUR_20 = CASE WHEN :hour = 20 THEN HOUR_20 - 1 ELSE HOUR_20 END " +
                    "WHERE SCHEDULE_ID = :scheduleId", nativeQuery = true)
-    void decrementHour(@Param("scheduleId") Long scheduleId, @Param("hour") Integer hour);
+    void decrementHour(@Param("scheduleId") Long scheduleId, @Param("hour") Integer hour, @Param("date") LocalDate date);
 
     
 }

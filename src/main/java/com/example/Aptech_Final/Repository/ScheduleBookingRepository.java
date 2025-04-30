@@ -1,6 +1,5 @@
 package com.example.Aptech_Final.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +11,8 @@ import org.springframework.stereotype.Repository;
 
 import com.example.Aptech_Final.Controller.DTO.ScheduleBookingDTO;
 import com.example.Aptech_Final.Enity.ScheduleBooking;
+
+import jakarta.transaction.Transactional;
 
 @Repository
 public interface ScheduleBookingRepository extends JpaRepository<ScheduleBooking, Long>{
@@ -99,5 +100,12 @@ public interface ScheduleBookingRepository extends JpaRepository<ScheduleBooking
                        @Param("userId") Long userId,
                        @Param("hour") Integer hour);
 
+    // Query để xóa thông tin người dùng
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM SCHEDULE_BOOKING WHERE SCHEDULE_ID = :scheduleId AND USER_ID = :userId AND HOUR = :hour", nativeQuery = true)
+    void cancelBooking(@Param("scheduleId") Long scheduleId,
+                       @Param("userId") Long userId,
+                       @Param("hour") Integer hour);
 
 }
