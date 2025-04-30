@@ -297,8 +297,9 @@
 
                                 <!-- Khi người dùng đã đặt slot -->
                                 <div th:if="${slotInfo.bookedByCurrentUser}">
-                                    <form class="confirm-cancel" method="post" th:action="@{/ComplexGym/schedule/cancel}">
+                                    <form class="confirm-cancel" method="post" th:action="@{/ComplexGym/schedule/cancel}" th:object=${cancelBooking}>
                                         <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" />
+                                    	<input type="hidden" name="date" th:value="${#temporals.format(entry.key, 'yyyy-MM-dd')}" />
                                         <input type="hidden" name="hour" th:value="${hour}" />
                                         <button type="submit" class="btn btn-sm btn-danger mt-1">Cancel</button>                                        
                                     </form>
@@ -308,6 +309,7 @@
                                 <form class="confirm-booking" th:if="${!slotInfo.bookedByCurrentUser and slotInfo.ptCount > slotInfo.userCount}"
                                       method="post" th:action="@{/ComplexGym/schedule/book}" th:object=${scheduleBooking}>
                                     <input type="hidden" name="scheduleId" th:value="${form.scheduleId}"/>
+                                    <input type="hidden" name="date" th:value="${#temporals.format(entry.key, 'yyyy-MM-dd')}" />                                                                            
                                     <input type="hidden" name="hour" th:value="${hour}" />
                                     <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Book</button>
                                 </form>
@@ -334,7 +336,8 @@
                                 <!-- Khi người dùng đã đặt slot -->
                                 <div th:if="${slotInfo.bookedByCurrentUser}">
                                     <form class="confirm-cancel" method="post" th:action="@{/ComplexGym/schedule/cancel}">
-                                        <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" />
+                                        <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" th:object=${cancelBooking}/>
+                                    	<input type="hidden" name="date" th:value="${#temporals.format(entry.key, 'yyyy-MM-dd')}" />
                                         <input type="hidden" name="hour" th:value="${hour}" />
                                         <button type="submit" class="btn btn-sm btn-danger mt-1">Cancel</button>
                                     </form>
@@ -345,7 +348,7 @@
                                 <form class="confirm-booking" th:if="${!slotInfo.bookedByCurrentUser and slotInfo.ptCount == 0}"
                                       method="post" th:action="@{/ComplexGym/schedule/book}" th:object=${scheduleBooking}>
                                     <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" />
-										<input type="hidden" name="date" th:value="${#temporals.format(entry.key, 'yyyy-MM-dd')}" />
+									<input type="hidden" name="date" th:value="${#temporals.format(entry.key, 'yyyy-MM-dd')}" />
                                     <input type="hidden" name="hour" th:value="${hour}" />
                                     <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Book</button>
                                 </form>
