@@ -21,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.Aptech_Final.Controller.DTO.SlotInfo;
 import com.example.Aptech_Final.Enity.Users;
+import com.example.Aptech_Final.Form.ScheduleBookingForm;
 import com.example.Aptech_Final.Form.ScheduleForm;
 import com.example.Aptech_Final.Repository.UserRepository;
 import com.example.Aptech_Final.Service.HomeService;
@@ -49,7 +50,7 @@ public class ScheduleController {
 
 	    // Kiểm tra nếu userId và role không tồn tại, chuyển hướng về trang login hoặc trang khác nếu cần thiết
 	    if (userId == null || role == null) {
-	        return "redirect:/login"; // Chỉnh sửa theo đường dẫn login của bạn
+	        return "redirect:/login";
 	    }
 
 	    // Lấy lịch theo vai trò người dùng từ service
@@ -78,8 +79,37 @@ public class ScheduleController {
 	    model.addAttribute("dates", dates);
 	    // Tạo danh sách khung giờ (IntStream.rangeClosed) 5h -> 20h, rồi chuyển từ int => Integer, rồi chuyển thành List
 	    model.addAttribute("timeSlots", IntStream.rangeClosed(5, 20).boxed().toList());
-
+	    
 	    // Trả về view
 	    return "html_resources/schedule";
+	}
+	
+	// Phương thức để thực hiện đăng ký lịch tập vào database
+	@PostMapping("/book")
+	public String bookScheduleSlot(Model model,@ModelAttribute("scheduleBooking") ScheduleBookingForm bookingForm, Authentication authentication, RedirectAttributes redirectAttributes) {
+	    // Thêm các thuộc tính chung vào model (ví dụ: userId, role,...)
+	    homeController.addCommonAttributes(model, authentication);
+	    model.addAttribute("scheduleBooking", new ScheduleBookingForm());  
+
+	    // Lấy userId và role từ model
+	    Long userId = (Long) model.getAttribute("userId");
+	    String role = (String) model.getAttribute("role");
+	    // Kiểm tra nếu userId và role không tồn tại, chuyển hướng về trang login hoặc trang khác nếu cần thiết
+	    if (userId == null || role == null) {
+	        return "redirect:/login";
+	    }
+
+		// Tạo và gọi phương thức từ service
+	    String result = scheduleService.bookSchedule(bookingForm);
+	    
+        // Tạo if-else để chuyển về controller
+	    if (result.startsWith("success: ")) {
+			redirectAttributes.addFlashAttribute("successMessage", result.substring(8));
+			
+		} else {
+			redirectAttributes.addFlashAttribute("errorMessage", result.substring(6));
+
+		}
+		return "redirect:/ComplexGym/schedule";
 	}
 }

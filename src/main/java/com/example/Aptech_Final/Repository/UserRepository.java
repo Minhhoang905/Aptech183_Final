@@ -80,6 +80,10 @@ public interface UserRepository extends JpaRepository<Users, Long>{
 			+ "OR d.DISTRICT_NAME LIKE CONCAT('%', :keyword, '%') "
 			+ "OR w.WARD_NAME LIKE CONCAT('%', :keyword, '%')) AND " + "u.USER_ROLE <> 'admin'", nativeQuery = true)
 	List<UserManagementDTO> searchUsers(@Param("keyword") String keyword);
+	
+    @Query(value = "SELECT USER_ID FROM USERS WHERE USER_NAME = :username", nativeQuery = true)
+    Long findUserIdByUsername(@Param("username") String username);
+
 }
 
 

@@ -267,7 +267,7 @@
 <table class="table table-bordered text-center align-middle">
     <thead>
         <tr>
-            <th>Giờ</th>
+            <th>Hours</th>
             <th th:each="entry : ${scheduleMap}" th:text="${#temporals.format(entry.key, 'dd/MM/yyyy')}"></th>
         </tr>
     </thead>
@@ -297,19 +297,19 @@
 
                                 <!-- Khi người dùng đã đặt slot -->
                                 <div th:if="${slotInfo.bookedByCurrentUser}">
-                                    <form method="post" th:action="@{/ComplexGym/schedule/cancel}">
+                                    <form class="confirm-cancel" method="post" th:action="@{/ComplexGym/schedule/cancel}">
                                         <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" />
                                         <input type="hidden" name="hour" th:value="${hour}" />
-                                        <button type="submit" class="btn btn-sm btn-danger mt-1">Hủy</button>                                        
+                                        <button type="submit" class="btn btn-sm btn-danger mt-1">Cancel</button>                                        
                                     </form>
                                 </div>
 
                                 <!-- Khi slot chưa được đặt và còn chỗ -->
-                                <form th:if="${!slotInfo.bookedByCurrentUser and slotInfo.ptCount > slotInfo.userCount}"
-                                      method="post" th:action="@{/ComplexGym/schedule/book}">
-                                    <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" />
+                                <form class="confirm-booking" th:if="${!slotInfo.bookedByCurrentUser and slotInfo.ptCount > slotInfo.userCount}"
+                                      method="post" th:action="@{/ComplexGym/schedule/book}" th:object=${scheduleBooking}>
+                                    <input type="hidden" name="scheduleId" th:value="${form.scheduleId}"/>
                                     <input type="hidden" name="hour" th:value="${hour}" />
-                                    <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Đặt Hẹn</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Book</button>
                                 </form>
                             </div>
                         </th:block>
@@ -333,28 +333,30 @@
 
                                 <!-- Khi người dùng đã đặt slot -->
                                 <div th:if="${slotInfo.bookedByCurrentUser}">
-                                    <form method="post" th:action="@{/ComplexGym/schedule/cancel}">
+                                    <form class="confirm-cancel" method="post" th:action="@{/ComplexGym/schedule/cancel}">
                                         <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" />
                                         <input type="hidden" name="hour" th:value="${hour}" />
-                                        <button type="submit" class="btn btn-sm btn-danger mt-1">Hủy</button>
+                                        <button type="submit" class="btn btn-sm btn-danger mt-1">Cancel</button>
                                     </form>
                                     
                                 </div>
 
                                 <!-- Khi slot chưa được đặt và chưa có người đăng ký -->
-                                <form th:if="${!slotInfo.bookedByCurrentUser and slotInfo.ptCount == 0}"
-                                      method="post" th:action="@{/ComplexGym/schedule/book}">
+                                <form class="confirm-booking" th:if="${!slotInfo.bookedByCurrentUser and slotInfo.ptCount == 0}"
+                                      method="post" th:action="@{/ComplexGym/schedule/book}" th:object=${scheduleBooking}>
                                     <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" />
+										<input type="hidden" name="date" th:value="${#temporals.format(entry.key, 'yyyy-MM-dd')}" />
                                     <input type="hidden" name="hour" th:value="${hour}" />
-                                    <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Đặt Hẹn</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Book</button>
                                 </form>
 
                                 <!-- Khi slot đã có người đăng ký -->
                                 <th:block th:if="${!slotInfo.bookedByCurrentUser and slotInfo.ptCount > 0}">
-                                    <form method="post" th:action="@{/ComplexGym/schedule/book}">
+                                    <form class="confirm-booking" method="post" th:action="@{/ComplexGym/schedule/book}" th:object=${scheduleBooking}>
                                         <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" />
+                                        <input type="hidden" name="date" th:value="${#temporals.format(entry.key, 'yyyy-MM-dd')}" />                                        
                                         <input type="hidden" name="hour" th:value="${hour}" />
-                                        <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Đặt Hẹn</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Book</button>
                                     </form>
                                 </th:block>
                             </div>
@@ -377,6 +379,58 @@
 <!-- SweetAlert + Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Xử lý khi bấm "Đặt Hẹn"
+document.querySelectorAll('.confirm-booking').forEach(function(form) {
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Chặn submit mặc định
+
+        Swal.fire({
+            title: 'Are you sure you want to book this slot?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Book',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Disable nút và show spinner
+                let submitButton = form.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Doing...';
+
+                form.submit(); // Submit form
+            }
+        });
+    });
+});
+
+// Xử lý khi bấm "Hủy"
+document.querySelectorAll('.confirm-cancel').forEach(function(form) {
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Chặn submit mặc định
+
+        Swal.fire({
+            title: 'Are you sure you want to cancel this slot?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Disable nút và show spinner
+                let submitButton = form.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Doing...';
+
+                form.submit(); // Submit form
+            }
+        });
+    });
+});
+</script>
 
 </body>
 
