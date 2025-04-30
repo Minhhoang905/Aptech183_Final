@@ -11,9 +11,12 @@ import org.springframework.stereotype.Service;
 
 import com.example.Aptech_Final.Controller.DTO.ScheduleDTO;
 import com.example.Aptech_Final.Controller.DTO.SlotInfo;
+import com.example.Aptech_Final.Form.ScheduleBookingForm;
 import com.example.Aptech_Final.Form.ScheduleForm;
 import com.example.Aptech_Final.Repository.ScheduleBookingRepository;
 import com.example.Aptech_Final.Repository.ScheduleRepository;
+
+import jakarta.transaction.Transactional;
 
 
 @Service
@@ -22,7 +25,10 @@ public class ScheduleService {
 	private ScheduleRepository scheduleRepository;
 	@Autowired
 	private ScheduleBookingRepository scheduleBookingRepository;
+	@Autowired
+	private HomeService homeService;
 	
+	// Phương thức để hiển thị trên view của người dùng
 	public Map<LocalDate, List<ScheduleForm>> getScheduleByUserRole(Long userId, String role) {
 	    // B0: Lấy lịch của ngày hôm nay
 	    LocalDate startDate = LocalDate.now();
@@ -203,5 +209,44 @@ public class ScheduleService {
 
 	    // B8: Trả về map đã có dữ liệu
 	    return resultMapByList;
+	}
+	
+
+	// Phương thức để lưu thông tin đặt lịch vào trong database 
+	@Transactional
+	public String bookSchedule(ScheduleBookingForm bookingForm) {
+		
+		// Lấy thông tin user hiện tại (lấy từ homeservice, sau khi đã đăng nhập)
+		Long userId = homeService.getCurrentUserId();
+	    Long scheduleId = bookingForm.getScheduleId();
+	    Integer hour = bookingForm.getHour();
+	    LocalDate date = bookingForm.getDate();
+
+		// Tạo if-else để kiểm tra xem có sẵn scheduleId không 
+	    if (scheduleId == null) {
+			// Gọi query để kiểm tra xem có ngày đó trong DB không
+		    int dateExisted = scheduleRepository.existsByDate(date);	    
+		    if (dateExisted == 0) {
+		    	// Nếu bằng 0 thì insert ngày đó vào DB
+		        scheduleRepository.insertSchedule(date);
+		    }
+		    // Dùng query để get scheduleId mới sau khi đã insert vào database
+		    scheduleId = scheduleRepository.getScheduleIdByDate(date);
+		}
+
+		// Kiểm tra xem người dùng đã đặt slot này chưa
+		boolean isUserExists = scheduleBookingRepository.existsByScheduleIdAndUserIdAndHour(scheduleId, userId, hour) == 1;
+		// Trả về lỗi nếu đã có user đặt slot này
+		if (isUserExists) {
+			return "error: You have already scheduled this time slot!";
+		}
+				
+		// Gọi query ở ScheduleRepo để cập nhập số lượng (tăng) người dùng ở bảng SCHEDULE
+		scheduleRepository.incrementHour(scheduleId, hour);
+		
+		// Gọi query ở ScheduleBookingRepo để lưu thông tin vào bảng SCHEDULE_BOOKING
+		scheduleBookingRepository.insertBooking(scheduleId, userId, hour);
+		
+		return "success: Register successful!";
 	}
 }

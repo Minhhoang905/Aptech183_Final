@@ -1,8 +1,11 @@
 package com.example.Aptech_Final.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -73,5 +76,28 @@ public interface ScheduleBookingRepository extends JpaRepository<ScheduleBooking
     	    ) THEN 1 ELSE 0 END
     	    """, nativeQuery = true)
     	int isUserBookedForSlot(@Param("scheduleId") Long scheduleId, @Param("userId") Long userId, @Param("hour") int hour);
+    
+    // Query để lấy booking id
+    @Query(value = "SELECT BOOKING_ID FROM SCHEDULE_BOOKING " +
+            "WHERE SCHEDULE_ID = :scheduleId AND USER_ID = :userId AND HOUR = :hour", nativeQuery = true)
+    Optional<Long> findBookingIdByScheduleIdAndUserIdAndHour(@Param("scheduleId") Long scheduleId,
+                                                      @Param("userId") Long userId,
+                                                      @Param("hour") Integer hour);
+    // Query kiểm tra user đã đăng ký chưa
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END " +
+            "FROM SCHEDULE_BOOKING " +
+            "WHERE SCHEDULE_ID = :scheduleId AND USER_ID = :userId AND HOUR = :hour", nativeQuery = true)
+    Integer  existsByScheduleIdAndUserIdAndHour(@Param("scheduleId") Long scheduleId,
+                                        @Param("userId") Long userId,
+                                        @Param("hour") Integer hour);
+    
+    // Query để lưu các thông tin vào database
+    @Modifying
+    @Query(value = "INSERT INTO SCHEDULE_BOOKING (SCHEDULE_ID, USER_ID, HOUR) " +
+                   "VALUES (:scheduleId, :userId, :hour)", nativeQuery = true)
+    void insertBooking(@Param("scheduleId") Long scheduleId,
+                       @Param("userId") Long userId,
+                       @Param("hour") Integer hour);
+
 
 }

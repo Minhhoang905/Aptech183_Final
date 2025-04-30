@@ -1,11 +1,14 @@
 package com.example.Aptech_Final.Form;
 
+import java.time.LocalDate;
+
 public class ScheduleBookingForm {
 
     private Long bookingId;
     private Long scheduleId;
     private Long userId;
     private int hour;
+    private LocalDate date; 
     
     // Getter và setter
 	public Long getBookingId() {
@@ -33,12 +36,19 @@ public class ScheduleBookingForm {
 		this.hour = hour;
 	}
 	
+	public LocalDate getDate() {
+		return date;
+	}
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
 	// Constructor
-	public ScheduleBookingForm(Long bookingId, Long scheduleId, Long userId, int hour) {
+	public ScheduleBookingForm(Long bookingId, Long scheduleId, Long userId, int hour, LocalDate date) {
 		this.bookingId = bookingId;
 		this.scheduleId = scheduleId;
 		this.userId = userId;
 		this.hour = hour;
+		this.date = date;
 	}
 	
 	public ScheduleBookingForm() {
