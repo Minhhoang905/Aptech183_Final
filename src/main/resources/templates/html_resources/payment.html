@@ -8,9 +8,10 @@
     <link rel="stylesheet" th:href="@{/css_resources/home.css}">
     <!-- Import Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    
     <!-- Font Awesome & Bootstrap Icons -->
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Font Awesome & Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -327,6 +328,14 @@
 
 <body>
     <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <!-- Góc trái: Icon -->
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-dumbbell"></i>
+            </a>
+
+
     <header>
         <a href="#" class="logo">Complex<span> Gym</span></a>
         <nav class="navbar">
@@ -338,6 +347,7 @@
                         <li><a th:href="@{/ComplexGym/products/gears}">Gears</a></li>
                     </ul>
                 </li>
+                <li><a th:href="@{/ComplexGym/schedule}">SCHEDULE</a></li>
                 <li><a href="#">SCHEDULE</a></li>
                 <li><a th:href="@{/ComplexGym/cart}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> CART</a>
                 </li>
@@ -355,6 +365,13 @@
             </ul>
         </nav>
     </header>
+
+            <!-- Button toggle menu cho mobile -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
 
     <div class="container mt-5">
         <!-- Form thanh toán -->
@@ -459,7 +476,12 @@
                 <input type="radio" class="form-check-input" name="paymentMethod" th:field="*{paymentMethod}"
                     value="bank" required id="bankTransfer"> Bank Transfer
             </div>
-
+            
+            <div class="form-check">
+			    <input type="radio" class="form-check-input" name="paymentMethod" th:field="*{paymentMethod}"
+			        value="vnpay" required id="vnpay"> VNPay
+			</div>
+            			
             <!-- Thông tin chuyển khoản -->
             <div id="bankInfoContainer" class="mt-3 p-3 border rounded bg-light" style="display: none;">
                 <p class="fml_font"><strong>Bank name:</strong> SHB</p>
@@ -467,6 +489,12 @@
                 <p class="fml_font"><strong>Bank account number:</strong> 12345678</p>
                 <p class="fml_font"><strong>Account Owner:</strong> Đào Nguyễn Minh Hoàng</p>
             </div>
+            
+            
+            <!-- Note -->			
+			<h2><label for="">Note</label></h2>
+			 <textarea id="note" name="note" rows="5" th:field="*{note}" placeholder="Enter your note here..." ></textarea>			
+			
 
 
             <!-- Note -->
@@ -478,7 +506,234 @@
             <h4 class="mt-3 text-danger fw-bold">Total: <span
                     th:text="${#numbers.formatInteger(totalAmount, 3, 'COMMA')} + ' VND'"></span></h4>
 
+            <!-- Note -->
+            <h2><label for="">Note</label></h2>
+            <textarea class="fml_font" id="note" name="note" rows="5" cols="145" th:field="*{note}"
+                placeholder="Enter your note here..."></textarea>
+
+            <!-- Tổng tiền -->
+            <h4 class="mt-3 text-danger fw-bold">Total: <span
+                    th:text="${#numbers.formatInteger(totalAmount, 3, 'COMMA')} + ' VND'"></span></h4>
+			<input type="hidden" name="amount" th:value="${totalAmount}">  <!-- Truyền amount vào form -->
+			
             <button class="btn btn-secondary btn-lg mt-4" onclick="location.href='/ComplexGym/cart'">
+                    <i class="fas fa-arrow-left"></i> Back to Cart
+             </button>
+             <button type="button" class="btn btn-success btn-lg mt-4" id="paymentBtn">
+                    <i class="fas fa-check"></i> Confirm Payment
+              </button>
+       </form>
+</div>
+
+  <!-- Confirmation Pop-up -->
+  <div class="confirm-popup" id="confirmPopup">
+    <h3>Are you sure you want to buy?</h3>
+    <button id="confirmYes" class="btn btn-primary">Yes</button>
+    <button id="confirmNo" class="btn btn-secondary">No</button>
+  </div>
+
+  <!-- Overlay for pop-ups -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Success & Error Pop-ups (if needed) -->
+  <div class="popup" id="successPopup">
+    <h3 th:text="${successMessage}"></h3>
+    <button onclick="redirectToHome()">OK</button>
+  </div>
+  <div class="popup" id="errorPopup">
+    <h3 th:text="${errorMessage}"></h3>
+    <button onclick="closePopup()">OK</button>
+  </div>
+
+<!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!-- Bootstrap Script -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Xử lý sự kiện khi nhấn nút 'Confirm Payment'
+    $('#paymentBtn').on('click', function(event) {
+        // Ngừng hành động mặc định (submit form)
+        event.preventDefault();
+
+        let isValid = true;
+
+        // Xóa thông báo lỗi trước đó
+        $('.error-message').remove();
+        $('.input-error').removeClass('input-error');
+
+        // Kiểm tra các trường required
+        $('#confirmPaymentForm').find('input[required], select[required]').each(function() {
+            let $field = $(this);
+            if ($field.val().trim() === '') {
+                isValid = false;
+                $field.addClass('input-error');
+                $field.after('<span class="error-message">This field is required</span>');
+
+                // Kiểm tra các trường required
+                $('#confirmPaymentForm').find('input[required], select[required]').each(function () {
+                    let $field = $(this);
+                    if ($field.val().trim() === '') {
+                        isValid = false;
+                        $field.addClass('input-error');
+                        $field.after('<span class="error-message">This field is required</span>');
+                    }
+                });
+
+                // Kiểm tra Full Name (chỉ cho phép chữ cái tiếng Việt, Nhật, khoảng trắng)
+                let $fullName = $('#fullName');
+                let fullNameVal = $fullName.val().trim();
+                if (!/^[a-zA-Z\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF\s]+$/.test(fullNameVal) || containsEmojiOrFullSize(fullNameVal)) {
+                    isValid = false;
+                    $fullName.addClass('input-error');
+                    $fullName.after('<span class="error-message">Full Name cannot contain numbers, special characters, emoji, or full-size characters</span>');
+                }
+
+                // Kiểm tra Address (chỉ cho phép chữ cái tiếng Việt, Nhật, số, dấu chấm, dấu phẩy và khoảng trắng)
+                let $address = $('#address');
+                let addressVal = $address.val().trim();
+                if (!/^[a-zA-Z0-9\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF\s,.]+$/.test(addressVal) || containsEmojiOrFullSize(addressVal)) {
+                    isValid = false;
+                    $address.addClass('input-error');
+                    $address.after('<span class="error-message">Address cannot contain special characters (except , and .), emoji, or full-size characters</span>');
+                }
+
+                // Kiểm tra số điện thoại (chỉ cho phép số)
+                let $phone = $('#phoneNumber');
+                let phoneVal = $phone.val().trim();
+                if (!/^\d+$/.test(phoneVal)) {
+                    isValid = false;
+                    $phone.addClass('input-error');
+                    $phone.after('<span class="error-message">Only digits allowed</span>');
+                }
+
+                // Kiểm tra Email
+                let $email = $('#email');
+                let emailVal = $email.val().trim();
+                let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;  // Kiểm tra định dạng email
+                let domainRegex = /@(fpt\.com|gmail\.com|yahoo\.com|outlook\.com|icloud\.com|hotmail\.com)$/; // Chỉ chấp nhận các domain phổ biến
+
+                if (containsEmojiOrFullSize(emailVal)) {
+                    isValid = false;
+                    $email.addClass('input-error');
+                    $email.after('<span class="error-message">Email cannot contain full-size characters or emoji</span>');
+                } else if (!emailRegex.test(emailVal)) {
+                    isValid = false;
+                    $email.addClass('input-error');
+                    $email.after('<span class="error-message">Invalid email format</span>');
+                } else if (!domainRegex.test(emailVal)) {
+                    isValid = false;
+                    $email.addClass('input-error');
+                    $email.after('<span class="error-message">Email must be from Gmail, Yahoo, Outlook, iCloud, or Hotmail</span>');
+                }
+
+                // Kiểm tra nếu chưa chọn Payment Method
+                if (!$('input[name="paymentMethod"]:checked').val()) {
+                    alert("Please select your payment method.");
+                    isValid = false;
+                }
+
+                // Nếu form hợp lệ, hiển thị hộp xác nhận cập nhật
+                if (isValid) {
+                    $('#confirmPopup').show();
+                    $('#overlay').show();
+                }
+
+                // Nếu có lỗi, ngừng submit
+                if (!isValid) {
+                    event.preventDefault();
+                    alert('Please check the required fields!');
+                    return;
+                }
+            });
+
+            // Khi người dùng nhấn "Yes" trong pop-up xác nhận
+			$('#confirmYes').on('click', function () {
+			    let selectedMethod = $('input[name="paymentMethod"]:checked').val();
+			    let form = $('#confirmPaymentForm');
+			    if (selectedMethod === 'vnpay') {
+			        form.attr('action', '/ComplexGym/payment/VNPay/submitOrder');
+			    }
+			    form.submit();
+			});
+
+            // Khi người dùng nhấn "No" trong pop-up xác nhận
+            $('#confirmNo').on('click', function () {
+                $('#confirmPopup').hide();
+                $('#overlay').hide();
+            });
+
+            // Khi người dùng nhập lại đúng thì xóa viền đỏ và lỗi
+            $('input, select').on('input change', function () {
+                $(this).removeClass('input-error');
+                $(this).next('.error-message').remove();
+            });
+
+            // Load District theo Province
+            $('#provinceId').change(function () {
+                var provinceId = $(this).val();
+                $('#districtId').empty().append('<option value="">Loading...</option>');
+                $.ajax({
+                    url: '/loginAPI/getDistrictDropdown',
+                    type: 'GET',
+                    data: { provinceId: provinceId },
+                    success: function (data) {
+                        $('#districtId').empty().append('<option value="">Select district</option>');
+                        $('#wardId').empty().append('<option value="">Select ward</option>');
+                        data.forEach(function (district) {
+                            $('#districtId').append('<option value="' + district.districtId + '">' + district.districtName + '</option>');
+                        });
+                    }
+                });
+            });
+
+            // Load Ward theo District
+            $('#districtId').change(function () {
+                var districtId = $(this).val();
+                $('#wardId').empty().append('<option value="">Loading...</option>');
+                $.ajax({
+                    url: '/loginAPI/getWardDropdown',
+                    type: 'GET',
+                    data: { districtId: districtId },
+                    success: function (data) {
+                        $('#wardId').empty().append('<option value="">Select ward</option>');
+                        data.forEach(function (ward) {
+                            $('#wardId').append('<option value="' + ward.wardId + '">' + ward.wardName + '</option>');
+                        });
+                    }
+                });
+            });
+        });
+
+        // Khi chọn "Bank Transfer", hiển thị thông tin chuyển khoản
+        document.getElementById("bankTransfer").addEventListener("change", function () {
+            document.getElementById("bankInfoContainer").style.display = "block";
+        });
+
+        // Khi chọn "Cash on Delivery", ẩn thông tin chuyển khoản
+        document.querySelectorAll("input[name='paymentMethod']").forEach(function (input) {
+            input.addEventListener("change", function () {
+                if (this.value !== "bank") {
+                    document.getElementById("bankInfoContainer").style.display = "none";
+                }
+            });
+        });
+
+        // Hàm kiểm tra nếu chứa emoji hoặc ký tự full-size (hàm này cần phải có định nghĩa)
+        function containsEmojiOrFullSize(value) {
+            return /[\u200B-\u24FF\u2700-\u27BF\uD83C[\uDF00-\uDFFF]]/.test(value) || /[\uFF00-\uFFFF]/.test(value);
+        }
+
+        // Xử lý thông báo thành công/lỗi từ server
+        window.onload = function () {
+            let successMessage = "[[${successMessage}]]";
+            let errorMessage = "[[${errorMessage}]]";
+            if (successMessage && successMessage.trim() !== "null") {
+                $('#successPopup').show();
+                $('#overlay').show();
+                setTimeout(redirectToHome, 3000);
+            }
+        });
                 <i class="fas fa-arrow-left"></i> Back to Cart
             </button>
             <button type="button" class="btn btn-success btn-lg mt-4" id="paymentBtn">
@@ -533,6 +788,23 @@
                         $field.after('<span class="error-message">This field is required</span>');
                     }
                 });
+            }
+        });
+    });
+
+    // Load Ward theo District
+    $('#districtId').change(function() {
+        var districtId = $(this).val();
+        $('#wardId').empty().append('<option value="">Loading...</option>');
+        $.ajax({
+            url: '/loginAPI/getWardDropdown',
+            type: 'GET',
+            data: { districtId: districtId },
+            success: function(data) {
+                $('#wardId').empty().append('<option value="">Select ward</option>');
+                data.forEach(function(ward) {
+                    $('#wardId').append('<option value="' + ward.wardId + '">' + ward.wardName + '</option>');
+
 
                 // Kiểm tra Full Name (chỉ cho phép chữ cái tiếng Việt, Nhật, khoảng trắng)
                 let $fullName = $('#fullName');
@@ -658,6 +930,60 @@
         document.getElementById("bankTransfer").addEventListener("change", function () {
             document.getElementById("bankInfoContainer").style.display = "block";
         });
+    });
+});
+
+// Khi chọn "Bank Transfer", hiển thị thông tin chuyển khoản
+document.getElementById("bankTransfer").addEventListener("change", function () {
+    document.getElementById("bankInfoContainer").style.display = "block";
+});
+
+// Khi chọn "Cash on Delivery", ẩn thông tin chuyển khoản
+document.querySelectorAll("input[name='paymentMethod']").forEach(function (input) {
+    input.addEventListener("change", function () {
+        if (this.value !== "bank") {
+            document.getElementById("bankInfoContainer").style.display = "none";
+        // Hàm chuyển hướng về trang chủ sau khi thông báo thành công
+        function redirectToHome() {
+
+            window.location.href = "/ComplexGym/home";
+        }
+    });
+});
+
+// Hàm kiểm tra nếu chứa emoji hoặc ký tự full-size (hàm này cần phải có định nghĩa)
+function containsEmojiOrFullSize(value) {
+    return /[\u200B-\u24FF\u2700-\u27BF\uD83C[\uDF00-\uDFFF]]/.test(value) || /[\uFF00-\uFFFF]/.test(value);
+}
+
+// Xử lý thông báo thành công/lỗi từ server
+window.onload = function() {
+    let successMessage = "[[${successMessage}]]";
+    let errorMessage = "[[${errorMessage}]]";
+    if (successMessage && successMessage.trim() !== "null") {
+        $('#successPopup').show();
+        $('#overlay').show();
+        setTimeout(redirectToHome, 3000);
+    }
+    if (errorMessage && errorMessage.trim() !== "null") {
+        $('#errorPopup').show();
+        $('#overlay').show();
+    }
+};
+
+// Hàm chuyển hướng về trang chủ sau khi thông báo thành công
+function redirectToHome() {
+    window.location.href = "/ComplexGym/home";
+}
+
+// Đóng pop-up lỗi
+function closePopup() {
+    $('#errorPopup').hide();
+    $('#overlay').hide();
+}
+
+</script>
+    
 
         // Khi chọn "Cash on Delivery", ẩn thông tin chuyển khoản
         document.querySelectorAll("input[name='paymentMethod']").forEach(function (input) {

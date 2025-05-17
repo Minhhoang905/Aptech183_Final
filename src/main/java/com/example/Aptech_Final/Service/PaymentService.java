@@ -6,10 +6,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.example.Aptech_Final.Controller.DTO.OrderDetailDTO;
 import com.example.Aptech_Final.Controller.DTO.OrdersManagementDTO;
@@ -21,7 +24,9 @@ import com.example.Aptech_Final.Form.OrdersManagementForm;
 import com.example.Aptech_Final.Repository.OrdersDetailRepository;
 import com.example.Aptech_Final.Repository.OrdersManagementRepository;
 import com.example.Aptech_Final.Repository.ProductsRepository;
+import com.example.Aptech_Final.Security.VNPay.OrderCache;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 
 
@@ -138,14 +143,14 @@ public class PaymentService {
             }
         }
 
-        // Tính toán tổng tiền đơn hàng từ các sản phẩm trong giỏ hàng
+        // Tính toán tổng tiền đơn hàng từ các sản phẩm trong giỏ hàng (khởi tạo với giá tiền là 0 để tránh null)
     	BigDecimal totalAmount = BigDecimal.ZERO;
 
     	for (CartForm item : managementForm.getItems()) {
     	    BigDecimal itemTotal = item.getPrice().multiply(BigDecimal.valueOf(item.getAmount()));
     	    totalAmount = totalAmount.add(itemTotal);
     	}
-
+    	     	
     	// Gọi đối tượng từ DTO để gán thông tin vào database
     	OrdersManagement orders = new OrdersManagement();
     	

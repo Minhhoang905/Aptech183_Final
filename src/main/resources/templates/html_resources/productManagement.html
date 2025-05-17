@@ -218,6 +218,12 @@
 
 <body>
     <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <!-- Góc trái: Icon -->
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-dumbbell"></i>
+            </a>
     <header>
         <a href="#" class="logo">Complex<span> Gym</span></a>
         <nav class="navbar">
@@ -229,6 +235,7 @@
                         <li><a th:href="@{/ComplexGym/products/gears}">Gears</a></li>
                     </ul>
                 </li>
+                <li><a th:href="@{/ComplexGym/schedule}">SCHEDULE</a></li>
                 <li><a href="#">SCHEDULE</a></li>
                 <li><a th:href="@{/ComplexGym/cart}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> CART</a>
                 </li>
@@ -246,6 +253,65 @@
             </ul>
         </nav>
     </header>
+
+            <!-- Button toggle menu cho mobile -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navbar -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/ComplexGym/home}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="bookingLink" role="button">
+                            Schedule
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Products
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="productsDropdown">
+                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/supplements}">Supplement</a></li>
+                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/gears}">Gears</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/cart}">
+                            <i class="fas fa-shopping-cart"></i> Cart <span id="cart-count"></span>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Hiển thị theo trạng thái đăng nhập -->
+                <div class="ms-3">
+                    <th:block th:if="${role == 'Anonymous'}">
+                        <a class="btn btn-warning" th:href="@{/login}">Login</a>
+                    </th:block>
+                    <th:block th:if="${role != 'Anonymous'}">
+                        <div class="dropdown">
+                            <button class="btn btn-warning dropdown-toggle" type="button" id="userMenu"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user"></i> <span th:text="${username}"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/userManagement}">User Management</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/ComplexGym/products/productManagement}">Product Management</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a th:href="@{/ComplexGym/payment/ordersManagement}">Order<br>management</a></li>
+                                <li><hr class="dropdown-divider"></li>                                                                                                                                                                                                                                                                                              
+                                <li><a class="dropdown-item logout-item" th:href="@{/logout}">Logout</a></li>
+                            </ul>
+                        </div>
+                    </th:block>
+                </div>
+
 
     <div class="container">
         <h1 style="text-align: center;" class="mb-3">Product management</h1>

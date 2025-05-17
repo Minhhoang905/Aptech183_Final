@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -28,7 +29,10 @@ import com.example.Aptech_Final.Form.CartForm;
 import com.example.Aptech_Final.Form.OrdersManagementForm;
 import com.example.Aptech_Final.Repository.CartRepository;
 import com.example.Aptech_Final.Repository.UserRepository;
+import com.example.Aptech_Final.Security.VNPay.Config;
 import com.example.Aptech_Final.Service.*;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/ComplexGym/payment")
@@ -46,8 +50,9 @@ public class PaymentController {
 	private UserService userService;
 	@Autowired
 	private PaymentService paymentService;
+    @Autowired
+    private VNPAYService vnPayService;
 
-    
     // Tạo phương thức để thêm role và username vào model
     public void addCommonAttributes(Model model, Authentication authentication) {
         if (authentication != null) {
@@ -165,7 +170,8 @@ public class PaymentController {
 						@RequestParam(name = "userId", required = false) Long id,
 	                     Model model,
 	                     Authentication authentication, 
-	                     RedirectAttributes redirectAttributes) {
+	                     RedirectAttributes redirectAttributes,
+	                     HttpServletRequest request) {
 	    
 		// Gọi phương thức để lấy role và tên của người dùng vào form
         addCommonAttributes(model, authentication);
@@ -173,11 +179,30 @@ public class PaymentController {
         // Lấy userId từ model
         Long userId = (Long) model.getAttribute("userId");
         if (userId == null) {
-            return "redirect:/login"; // Nếu userId null, điều hướng về trang login
+		    // Điều hướng sang trang login
+            return "redirect:/login";
         }
         
         // Gọi phương thức prepareData() để chuẩn bị dữ liệu
         prepareData(ordersManagementForm, id, userId, model);
+        
+        // Xử lý phương thức thanh toán VNPay (Dùng UUID + Cache)
+        if ("VNPay".equalsIgnoreCase(ordersManagementForm.getPaymentMethod())) {
+            // B1: Tạo UUID
+            String uuid = java.util.UUID.randomUUID().toString();
+
+            // B2: Lưu OrdersManagementForm vào cache tạm bằng UUID
+            com.example.Aptech_Final.Security.VNPay.OrderCache.saveOrderToCache(uuid, ordersManagementForm);
+
+            // B3: Tạo URL sang đường dẫn của VNPay (từ lớp Config)
+            // Note: Vì đang dùng ngrok nên phải điều chỉnh url của ngrok
+            String urlReturn = Config.vnp_ReturnUrl; 
+            // Gọi phương thức createOrder ở vnPayService với các tham số yêu cầu
+            String vnpayUrl = vnPayService.createOrder(request, ordersManagementForm.getTotalAmount().intValue(), uuid, urlReturn);
+
+            // B4: Redirect sang VNPay
+            return "redirect:" + vnpayUrl;
+        }
 
 		// Tạo và gọi phương thức từ service
         String confirmPayment = paymentService.getOrder(ordersManagementForm, model);
@@ -188,7 +213,7 @@ public class PaymentController {
         	redirectAttributes.addFlashAttribute("successMessage", confirmPayment.substring(8));
         	// Gọi cập nhật tồn kho
         	paymentService.updateProductQuantities(ordersManagementForm.getItems());
-
+        	
         	return "redirect:/ComplexGym/payment/ordersManagement";
 		}else {
     	    // Kiểm tra nếu người dùng đã chọn Tỉnh thì load Quận/Huyện tương ứng
@@ -201,11 +226,10 @@ public class PaymentController {
     	        List<Ward> wardList = userService.getWardByDistrictId(ordersManagementForm.getDistrictId());
     	        model.addAttribute("wardList", wardList);
     	    }
-    	    // Thêm đối tượng userUpdate để binding với th:object ở form update
-    	    //model.addAttribute("checkout", ordersManagementForm);
 
         	// Thêm thông báo thất bại vào Flash Attribute để hiển thị sau khi chuyển hướng
         	redirectAttributes.addFlashAttribute("errorMessage", confirmPayment.substring(6));
+        	        	
 		    // Điều hướng sang trang thanh toán
 		    return "redirect:/ComplexGym/payment";
 

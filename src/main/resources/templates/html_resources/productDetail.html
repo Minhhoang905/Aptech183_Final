@@ -331,6 +331,11 @@
 <body>
 
     <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/ComplexGym/home}">
+                <i class="fas fa-dumbbell"></i>
+            </a>
     <header>
         <a th:href="@{/ComplexGym/home}" class="logo">Complex<span> Gym</span></a>
         <nav class="navbar">
@@ -342,6 +347,7 @@
                         <li><a th:href="@{/ComplexGym/products/gears}">Gears</a></li>
                     </ul>
                 </li>
+                <li><a th:href="@{/ComplexGym/schedule}">SCHEDULE</a></li>
                 <li><a href="#">SCHEDULE</a></li>
                 <li><a th:href="@{/ComplexGym/cart}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> CART</a>
                 </li>
@@ -359,6 +365,30 @@
             </ul>
         </nav>
     </header>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" th:href="@{/ComplexGym/home}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" id="bookingLink">Schedule</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button"
+                            data-bs-toggle="dropdown">Products</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/supplements}">Supplement</a></li>
+                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/gears}">Gears</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/ComplexGym/cart}">
+                            <i class="fas fa-shopping-cart"></i> Cart <span id="cart-count"></span>
+                        </a>
+                    </li>
+                </ul>
 
     <!-- Hiển thị thông báo từ backend -->
     <div class="pop_up">
@@ -473,10 +503,10 @@
             const addToCartBtn = document.querySelector('.btn-success');
             const buyNowBtn = document.querySelector('.btn-danger');
 
-            // ✅ Âm thanh "pop" khi thêm thành công
+            //  Âm thanh "pop" khi thêm thành công
             const successSound = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_5a5015fba7.mp3"); // sound effect miễn phí
 
-            // ✅ Kiểm tra số lượng nhập vào
+            //  Kiểm tra số lượng nhập vào
             function checkQuantity() {
                 const maxQuantity = parseInt(quantityInput.getAttribute("max"));
                 let currentValue = parseInt(quantityInput.value);
@@ -489,11 +519,11 @@
                 }
             }
 
-            // ✅ Hàm thêm vào giỏ
+            //  Hàm thêm vào giỏ
             window.addToCart = function (isBuyNow) {
                 const targetBtn = isBuyNow ? buyNowBtn : addToCartBtn;
 
-                // 👉 Đổi nút sang trạng thái loading
+                //  Đổi nút sang trạng thái loading
                 const originalText = targetBtn.innerHTML;
                 targetBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Processing...';
                 targetBtn.disabled = true;
@@ -506,13 +536,13 @@
                 }).then(response => {
                     if (response.ok) {
                         if (isBuyNow) {
-                            // 🛍️ Mua ngay → chuyển trang
+                            //  Mua ngay → chuyển trang
                             window.location.href = "/ComplexGym/payment";
                         } else {
-                            // 🔊 Phát âm thanh khi thêm thành công
+                            //  Phát âm thanh khi thêm thành công
                             successSound.play();
-
-                            // ✅ SweetAlert với lựa chọn
+                          
+                            //  SweetAlert với lựa chọn
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Added to cart!',
@@ -529,7 +559,7 @@
                             });
                         }
                     } else {
-                        // ❌ Lỗi từ server → hiệu ứng rung
+                        //  Lỗi từ server → hiệu ứng rung
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
@@ -540,7 +570,7 @@
                         });
                     }
                 }).catch(error => {
-                    // ❌ Lỗi mạng → hiệu ứng rung
+                    //  Lỗi mạng → hiệu ứng rung
                     Swal.fire({
                         icon: 'error',
                         title: 'Network error',

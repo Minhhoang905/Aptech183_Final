@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán thất bại</title>
+
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+
+<body>
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6 text-center">
+            <h2 class="mt-3">Thanh toán thất bại</h2>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const errorCode = /*[[${errorCode}]]*/ 'unknown';
+    let message = 'Đã xảy ra lỗi trong quá trình thanh toán. Vui lòng thử lại.';
+
+    // Gợi ý diễn giải cho các mã lỗi phổ biến
+    switch (errorCode) {
+        case '07':
+            message = 'Thẻ bị nghi ngờ gian lận. Vui lòng liên hệ ngân hàng.';
+            break;
+        case '09':
+            message = 'Tài khoản chưa đăng ký Internet Banking.';
+            break;
+        case '10':
+            message = 'Xác thực thông tin thẻ thất bại.';
+            break;
+        case '24':
+            message = 'Giao dịch không thành công. Hãy thử lại.';
+            break;
+        default:
+            message += ' (Mã lỗi: ' + errorCode + ')';
+    }
+
+    Swal.fire({
+        icon: 'error',
+        title: 'Thanh toán thất bại!',
+        text: message,
+        confirmButtonText: 'Quay lại thanh toán'
+    }).then(() => {
+        window.location.href = '/ComplexGym/payment';
+    });
+    /*]]>*/
+</script>
+
+</body>
+</html>
