@@ -8,6 +8,105 @@
 </head>
 
 <body>
+<<<<<<< Updated upstream
+=======
+    <header>
+        <a href="#" class="logo">Complex<span> Gym</span></a>
+        <nav class="navbar">
+            <ul>
+                <li><a th:href="@{/ComplexGym/home}">HOME</a></li>
+                <li><a href="#">PRODUCTS +</a>
+                    <ul>
+                        <li><a th:href="@{/ComplexGym/products/supplements}">Supplements</a></li>
+                        <li><a th:href="@{/ComplexGym/products/gears}">Gears</a></li>
+                    </ul>
+                </li>
+                <li><a th:href="@{/ComplexGym/schedule}">SCHEDULE</a></li>
+                <li><a th:href="@{/ComplexGym/cart}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> CART</a>
+                </li>
+                <li th:if="${role == 'Anonymous'}"><a th:href="@{/login}" type="button" class="button">LOGIN</a></li>
+                <li th:if="${role != 'Anonymous'}"><a class="welcome" href="#"><i
+                            class="fa-solid fa-circle-user"></i>WELCOME!</a>
+                    <ul>
+                        <li th:if="${role == 'ROLE_ADMIN'}"><a th:href="@{/userManagement}">User<br>management</a></li>
+                        <li th:if="${role == 'ROLE_ADMIN'}"><a
+                                th:href="@{/ComplexGym/products/productManagement}">Product<br>management</a></li>
+                        <li><a th:href="@{/ComplexGym/payment/ordersManagement}">Order<br>management</a></li>
+                        <li><a th:href="@{/logout}">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container mt-4"></div>
+    <h2 style="text-align: center;">Order Management</h2>
+    <!-- Hiển thị thông báo flash -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+<div style="overflow-x: auto;">
+    <table class="table table-bordered fml_font">
+        <thead class="fml_font">
+            <tr>
+                <!-- Mã đơn -->
+                <th>Order ID</th>
+                <!-- Ngày đặt -->
+                <th>Order Date</th>
+                <!-- Thời gian kết thúc -->
+                <th>End Time</th>
+                <!-- Trạng thái -->
+                <th>Status</th>
+                <!-- Tên người dùng -->
+                <th>User Name</th>
+                <!-- Họ tên người nhận -->
+                <th>Recipient Name</th>
+                <!-- Số điện thoại -->
+                <th>Phone Number</th>
+                <!-- Email -->
+                <th>Email</th>
+                <!-- Tên tỉnh -->
+                <th>Province</th>
+                <!-- Tên quận -->
+                <th>District</th>
+                <!-- Tên xã -->
+                <th>Ward</th>
+                <!-- Địa chỉ giao hàng -->
+                <th>Delivery Address</th>
+                <!-- Phương thức thanh toán -->
+                <th>Payment Method</th>
+                <!-- Ghi chú -->
+                <th>Notes</th>
+                <!-- Tổng tiền -->
+                <th>Total Amount</th>
+                <!-- Chi tiết đơn hàng -->
+                <th>Order Details</th>
+            </tr>
+        </thead>
+        <th:block th:each="order : ${orders}">
+            <tr class="fml_font">
+                <!-- Mã đơn -->
+                <td th:text="${order.orderId}"></td>
+                <!-- Ngày đặt -->
+                <td th:text="${#temporals.format(order.orderStartTime, 'dd/MM/yyyy HH:mm')}"></td>
+                <!-- Thời gian kết thúc -->
+                <td th:text="${#temporals.format(order.orderEndTime, 'dd/MM/yyyy HH:mm')}"></td>
+                <!-- Trạng thái đơn hàng -->
+                <td>
+                    <span th:text="${order.orderStatus}"></span>
+                    <div style="margin-top: 5px;">
+                        <form th:action="@{/ComplexGym/payment/updateOrderStatus}" method="post"
+                            class="order-status-form d-flex align-items-center gap-2 mt-1">
+                            <!-- Thêm trường ẩn để hiển thị orderId -->
+                            <input type="hidden" name="orderId" th:value="${order.orderId}" />
+                            <!-- Hiển thị trạng thái 'CANCEL' nếu orderStatus là CANCEL và ẩn dropdown -->
+                            <div th:if="${order.orderStatus == 'CANCEL'}">
+                                <span class="badge bg-danger">CANCEL</span>
+                                <!-- Nút Delete khi trạng thái là CANCEL -->
+                                <button type="button" class="btn btn-sm btn-danger confirm-delete"
+                                    th:data-order-id="${order.orderId}" th:data-order-status="${order.orderStatus}">
+                                    🗑 Delete
+                                </button>
+                            </div>
+>>>>>>> Stashed changes
 
 <div class="container mt-4">
     <!-- Navbar -->
