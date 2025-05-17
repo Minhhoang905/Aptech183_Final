@@ -4,150 +4,346 @@
 <head>
     <meta charset="UTF-8">
     <title>Register</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-body {
-	font-family: 'Poppins', sans-serif;
-	background-color: #E3F2FD;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 100vh;
-	margin: 0;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-decoration: none;
+            color: white;
+        }
 
-.register-container {
-	background-color: white;
-	padding: 25px;
-	border-radius: 12px;
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-	width: 400px;
-	box-sizing: border-box;
-	text-align: center;
-}
+        body {
+            font-family: 'Impact', Haettenschweiler, sans-serif;
+            min-height: 100vh;
+            background-color: rgb(213, 60, 17);
+        }
 
-h2 {
-	color: #333;
-	margin-bottom: 15px;
-}
+        header {
+            backdrop-filter: blur(5px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0px 3%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
 
-.form-group {
-	text-align: left;
-	margin-bottom: 12px;
-}
+        }
 
-.form-group label {
-	font-weight: bold;
-	display: block;
-	margin-bottom: 5px;
-}
+        header .logo {
+            color: white;
+            font-size: 30px;
+        }
 
-input[type="text"], input[type="password"], input[type="email"], input[type="tel"],
-	select {
-	width: 100%;
-	padding: 10px;
-	border: 1px solid #ccc;
-	border-radius: 6px;
-	box-sizing: border-box;
-	font-size: 14px;
-	transition: 0.3s;
-}
+        header .logo span {
+            color: rgb(11, 211, 85);
+        }
 
-input:focus, select:focus {
-	border-color: #007BFF;
-	outline: none;
-}
+        header .navbar ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-.input-error {
-	border: 2px solid red !important;
-}
+        header .navbar ul li {
+            position: relative;
+            float: left;
+        }
 
-.radio-container {
-	display: flex;
-	justify-content: space-around;
-	margin: 12px 0;
-}
+        header .navbar ul li a {
+            display: block;
+            padding: 20px;
+            color: white;
+            font-size: 20px;
+            transition: ease-in 0.3s;
+        }
 
-.radio-container label {
-	font-size: 16px;
-	cursor: pointer;
-}
+        header .navbar ul li .fa-circle-user {
+            font-size: 20px;
+            padding-right: 10px;
+        }
 
-.submit-button, .back-button {
-	background-color: #007BFF;
-	color: white;
-	border: none;
-	padding: 12px;
-	border-radius: 6px;
-	cursor: pointer;
-	width: 100%;
-	font-size: 16px;
-	transition: 0.3s;
-	margin-top: 10px;
-}
+        nav ul li a:hover {
+            color: rgb(11, 211, 85);
+        }
 
-.submit-button:hover {
-	background-color: #0056b3;
-}
+        header .navbar ul li ul {
+            position: absolute;
+            left: 0;
+            width: 200px;
+            display: none;
+        }
 
-.back-button {
-	background-color: #28a745;
-}
+        header .navbar ul li ul li {
+            width: 100%;
+        }
 
-.back-button:hover {
-	background-color: #218838;
-}
+        header .navbar ul li:hover>ul {
+            display: initial;
+        }
 
-/* CSS cho pop-up */
-.popup {
-	display: none;
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background: white;
-	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-	text-align: center;
-	z-index: 1000;
-}
+        header .navbar ul li .button {
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 120px;
+            padding: 7px 7px;
+            background-color: rgb(11, 211, 85);
+            transition: ease-in-out 0.3s;
+            cursor: pointer;
+            margin-left: 20px;
+        }
 
-.popup h3 {
-	margin: 0 0 10px;
-}
+        header .navbar ul li .button:hover {
+            color: white;
+        }
 
-.popup button {
-	background-color: #007BFF;
-	color: white;
-	border: none;
-	padding: 10px 20px;
-	border-radius: 5px;
-	cursor: pointer;
-}
 
-.popup button:hover {
-	background-color: #0056b3;
-}
+        .register-container {
+            padding-top: 35px;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+        }
 
-/* Overlay mờ khi hiển thị pop-up */
-.overlay {
-	display: none;
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, 0.5);
-	z-index: 999;
-}
-</style>
+        h2 {
+            color: white;
+            font-size: 50px;
+            padding-top: 35px;
+           
+        }
+
+        #registrationForm {
+            display: flex;
+            flex-direction: column;
+            padding-left: 50vh;
+            padding-right: 50vh;
+
+        }
+
+        .form {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .form div {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .form_button button {
+            margin: 20px 10px;
+            height: 40px;
+            width: 200px;
+            background-color: rgb(11, 211, 85);
+            transition: ease-in-out 0.3s;
+            border: none;
+            font-family: 'Impact', Haettenschweiler, sans-serif;
+            font-size: 20px;
+            color: rgb(0, 0, 0);
+            cursor: pointer;
+        }
+
+        .form_button button:hover {
+            color: white;
+        }
+
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 12px;
+        }
+
+
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        .input-error {
+            border: 2px solid red !important;
+        }
+
+        .radio-container {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .radio-container label {
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .radio_left {
+            padding: 10px;
+        }
+
+        .radio_right {
+            padding: 10px;
+        }
+
+
+        .submit-button,
+        .back-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .submit-button:hover {
+            background-color: #0056b3;
+        }
+
+        .back-button {
+            background-color: #28a745;
+        }
+
+        .back-button:hover {
+            background-color: #218838;
+        }
+
+        .date_input {
+            border-radius: 8px;
+            height: 40px;
+            width: 231px;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .date_input input {
+            outline: none;
+            border: none;
+        }
+
+        .form_left {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .form_left label {
+            padding-top: 10px;
+        }
+
+        .form_right {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .form_right label {
+            padding-top: 10px;
+        }
+        
+         .form_right input {
+            color: black;
+        }
+        
+        .form_left input {
+            color: black;
+        }
+        
+          .form_right select {
+            color: black;
+        }
+        
+          .form_right select option {
+            color: black;
+        }
+        
+       
+
+        /* CSS cho pop-up */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .popup h3 {
+            margin: 0 0 10px;
+        }
+
+        .popup button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Overlay mờ khi hiển thị pop-up */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+    </style>
 </head>
 
 <body>
     <!-- Navbar -->
-<<<<<<< Updated upstream
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container-fluid">
             <!-- Góc trái: Icon -->
@@ -211,11 +407,133 @@ input:focus, select:focus {
                             </ul>
                         </div>
                     </th:block>
+    <header>
+        <a href="#" class="logo">Complex<span> Gym</span></a>
+        <nav class="navbar">
+            <ul>
+                <li><a th:href="@{/ComplexGym/home}">HOME</a></li>
+                <li><a href="#">PRODUCTS +</a>
+                    <ul>
+                        <li><a th:href="@{/ComplexGym/products/supplements}">Supplements</a></li>
+                        <li><a th:href="@{/ComplexGym/products/gears}">Gears</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">SCHEDULE</a></li>
+                <li><a th:href="@{/ComplexGym/cart}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> CART</a>
+                </li>
+                <li th:if="${role == 'Anonymous'}"><a th:href="@{/login}" type="button" class="button">LOGIN</a></li>
+                <li th:if="${role != 'Anonymous'}"><a class="welcome" href="#"><i
+                            class="fa-solid fa-circle-user"></i>WELCOME!</a>
+                    <ul>
+                        <li th:if="${role == 'ROLE_ADMIN'}"><a th:href="@{/userManagement}">User<br>management</a></li>
+                        <li th:if="${role == 'ROLE_ADMIN'}"><a
+                                th:href="@{/ComplexGym/products/productManagement}">Product<br>management</a></li>
+                        <li><a th:href="@{/ComplexGym/payment/ordersManagement}">Order<br>management</a></li>
+                        <li><a th:href="@{/logout}">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="register-container">
+        <h2>Register</h2>
+        <form id="registrationForm" method="POST" th:action="@{/doRegister}" th:object="${userForm}">
+            <div class="form">
+                <div class="form_left">
+                    <label>Username</label>
+                    <input type="text" id="username" name="username" th:field="*{name}" required>
+                    <small class="error-message text-danger" th:text="${usernameError}"></small>
+                    <p class="message" th:text="${mes}" style="color: white; font-size: 12px;"></p>
+
+                    <label>Password</label>
+                    <input type="password" id="password" name="password" th:field="*{pass}" required>
+                    <small class="form-text text-muted">
+                        The password must contain at least one uppercase letter, one special character, and one number.
+                    </small>
+
+                    <span id="passwordError" style="color: white; font-size: 12px;"></span>
+
+                    <label>Full Name</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                    <span id="fullNameError" style="color: white; font-size: 12px;"></span>
+
+
+                    <label>Date of Birth</label>
+
+                    <div class="date_input">
+                        <input type="date" id="dateOfBirth" name="dateOfBirth" th:field="*{dateOfBirth}" required
+                            title="Vui lòng chọn ngày sinh" min="1900-01-01" max="2999-12-31" style="width:231px">
+                    </div>
+
+
+                    <label>Email</label>
+                    <input type="email" id="email" name="email" th:field="*{email}" required>
+                    <span id="emailError" th:text="${mes}" style="color: white; font-size: 12px;"></span>
+
+
+                    <label>Phone Number</label>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" th:field="*{phoneNumber}" required>
+                    <span id="phoneNumberError" style="color: white; font-size: 12px;"></span>
+
+                </div>
+                <div class="form_right">
+
+                    <label>Province</label>
+                    <select class="form-select" id="provinceId" name="provinceId" th:field="*{provinceId}" required>
+                        <option value="">Chọn tỉnh</option>
+                        <option th:each="province : ${provinceList}" th:value="${province.provinceId}"
+                            th:text="${province.provinceName}">
+                        </option>
+                    </select>
+
+                    <label>District</label>
+                    <select class="form-select" id="districtId" name="districtId" th:field="*{districtId}" required>
+                        <option value="">Chọn quận</option>
+                        <option th:each="district : ${districtList}" th:value="${district.districtId}"
+                            th:text="${district.districtName}">
+                        </option>
+                    </select>
+                    <label>Ward</label>
+                    <select class="form-select" id="wardId" name="wardId" th:field="*{wardId}" required>
+                        <option value="">Chọn xã</option>
+                        <option th:each="ward : ${wardList}" th:value="${ward.wardId}" th:text="${ward.wardName}">
+                        </option>
+                    </select>
+
+                    <label>Address</label>
+                    <input type="text" th:field="*{address}" placeholder="Nhập số nhà cụ thể" required>
+                    <span id="addressError" style="color: white; font-size: 12px;"></span>
+                    <br>
+                    <p class="message" th:text="${mes}"></p>
+
+                    <label>Role</label>
+                    <div class="radio-container">
+                        <label class="radio_left">
+                            <input type="radio" th:field="*{role}" value="USER" required> User
+                        </label>
+                        <label class="radio_right">
+                            <input type="radio" th:field="*{role}" value="PT" required> PT
+                        </label>
+                    </div>
+
                 </div>
             </div>
+            <div class="form_button">
+                <button class="btn btn-warning" type="submit">Submit</button>
+            </div>
+        </form>
+
+        <!-- Overlay và Pop-up -->
+        <div class="overlay" id="overlay"></div>
+
+        <!-- Pop-up Thông báo thành công -->
+        <div class="popup" id="successPopup">
+            <h3 style="color:black; font-family:tahoma" th:text="${successMessage}">></h3>
+            <!-- Người dùng có thể nhấn OK để chuyển ngay hoặc chờ timeout -->
+            <button onclick="redirectToLogin()">OK</button>
         </div>
     </nav>
-=======
     <header>
         <a href="#" class="logo">Complex<span> Gym</span></a>
         <nav class="navbar">
@@ -244,361 +562,266 @@ input:focus, select:focus {
             </ul>
         </nav>
     </header>
->>>>>>> Stashed changes
 
-    <div class="register-container">
-        <h2>Register</h2>
-<form id="registrationForm" method="POST" th:action="@{/doRegister}" th:object="${userForm}">
-    <label>Username</label>
-    <input type="text" id="username" name="username" th:field="*{name}" required>
-	<small class="error-message text-danger" th:text="${usernameError}"></small>
-	<p class="message" th:text="${mes}" style="color: red; font-size: 12px;"></p>
-	
-    <label>Password</label>
-    <input type="password" id="password" name="password" th:field="*{pass}" required>
-	<small class="form-text text-muted">
-	  Mật khẩu phải chứa ít nhất 1 chữ cái in hoa, 1 ký tự đặc biệt và 1 số.
-	</small>
-	<br>
-	<span id="passwordError" style="color: red; font-size: 12px;"></span>
-	<br>
-    <label>Full Name</label>
-    <input type="text" id="fullName" name="fullName" required>
-	<span id="fullNameError" style="color: red; font-size: 12px;"></span>
-	<br>
-    
-    <label>Date of Birth</label>
-    <br>
-    <input type="date" id="dateOfBirth" name="dateOfBirth" th:field="*{dateOfBirth}" required title="Vui lòng chọn ngày sinh"  min="1900-01-01" max="2999-12-31">
-	<br>
-	
-    <label>Email</label>
-    <input type="email" id="email" name="email" th:field="*{email}" required>
-	<span id="emailError" th:text="${mes}" style="color: red; font-size: 12px;"></span>
-	<br>
+        <!-- Pop-up Thông báo lỗi -->
+        <div class="popup" id="errorPopup">
+            <h3 style="color:black; font-family:tahoma" th:text="${errorMessage}"></h3>
+            <button onclick="closePopup()">OK</button>
+        </div>
 
-    <label>Phone Number</label>
-    <input type="tel" id="phoneNumber" name="phoneNumber" th:field="*{phoneNumber}" required >
-	<span id="phoneNumberError" style="color: red; font-size: 12px;"></span>
-	<br>
+        <!-- Script AJAX -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                // Kiểm tra lỗi nhập liệu
+                $('#registrationForm').on('submit', function (event) {
+                    let isValid = true;
 
-    <label>Role</label>
-    <div class="radio-container">
-        <label>
-            <input type="radio" th:field="*{role}" value="USER" required> User
-        </label>
-        <label>
-            <input type="radio" th:field="*{role}" value="PT" required> PT
-        </label>
-    </div>
+                    // Kiểm tra các trường bắt buộc
+                    $('input[required], select[required]').each(function () {
+                        if ($(this).val() === '') {
+                            $(this).addClass('input-error');
+                            $(this).next('.error-message').text('This field cannot be left blank.');
+                            isValid = false;
+                        } else {
+                            $(this).removeClass('input-error');
+                            $(this).next('.error-message').text('');
+                        }
+                    });
 
-    <label>Province</label>
-    <select class="form-select" id="provinceId" name="provinceId" th:field="*{provinceId}" required>
-        <option value="">Chọn tỉnh</option>
-        <option th:each="province : ${provinceList}" 
-                th:value="${province.provinceId}" 
-                th:text="${province.provinceName}">
-        </option>
-    </select>
+                    // Kiểm tra tên tài khoản
+                    const username = $('#username').val();
+                    let usernameErrors = [];
+                    if (username.length < 5) usernameErrors.push("Tên tài khoản phải chứa ít nhất 5 ký tự.");
+                    if (/[^a-zA-Z0-9]/.test(username)) usernameErrors.push("Tên tài khoản không được chứa ký tự đặc biệt.");
+                    if (/[^ -~]/.test(username)) usernameErrors.push("Chỉ được phép dùng ký tự half-size, không được dùng full-size.");
+                    if (usernameErrors.length > 0) {
+                        $('#username').addClass('input-error');
+                        $('#username').next('.error-message').html(usernameErrors.join('<br>'));
+                        isValid = false;
+                    }
 
-    <label>District</label>
-    <select class="form-select" id="districtId" name="districtId" th:field="*{districtId}" required>
-        <option value="">Chọn quận</option>
-        <option th:each="district : ${districtList}" 
-                th:value="${district.districtId}" 
-                th:text="${district.districtName}">
-        </option>
-    </select>
+                    // Kiểm tra mật khẩu
+                    const password = $('#password').val();
+                    let errors = [];
 
-    <label>Ward</label>
-    <select class="form-select" id="wardId" name="wardId" th:field="*{wardId}" required>
-        <option value="">Chọn xã</option>
-        <option th:each="ward : ${wardList}" 
-                th:value="${ward.wardId}" 
-                th:text="${ward.wardName}">
-        </option>
-    </select>
-    
-	 <label>Address</label>	
-    <input type="text" th:field="*{address}" placeholder="Nhập số nhà cụ thể" required>
-	<span id="addressError" style="color: red; font-size: 12px;"></span>
-	<br>
-	<p class="message" th:text="${mes}"></p>
-    <button class="btn btn-warning" type="submit">Register</button>
-</form>
+                    if (password.length < 8) errors.push("Mật khẩu phải chứa ít nhất 8 ký tự.");
+                    if (!/[A-Z]/.test(password)) errors.push("Phải chứa ít nhất 1 chữ cái in hoa.");
+                    if (!/[a-z]/.test(password)) errors.push("Phải chứa ít nhất 1 chữ cái thường.");
+                    if (!/[0-9]/.test(password)) errors.push("Phải chứa ít nhất 1 số.");
+                    if (!/[@$!%*?&]/.test(password)) errors.push("Phải chứa ít nhất 1 ký tự đặc biệt (@$!%*?&).");
+                    if (/[^ -~]/.test(password)) errors.push("Chỉ được phép dùng ký tự half-size, không được dùng full-size.");
 
-        <button class="back-button" onclick="location.href='/ComplexGym/home'">Back to Home</button>        
-    </div>
+                    if (errors.length > 0) {
+                        $('#password').addClass('input-error');
+                        $('#passwordError').html(errors.join('<br>'));
+                        event.preventDefault();
+                    } else {
+                        $('#password').removeClass('input-error');
+                        $('#passwordError').text('');
+                    }
 
-    <!-- Overlay và Pop-up -->
-    <div class="overlay" id="overlay"></div>
 
-    <!-- Pop-up Thông báo thành công -->
-    <div class="popup" id="successPopup">
-        <h3 th:text="${successMessage}">></h3>
-        <!-- Người dùng có thể nhấn OK để chuyển ngay hoặc chờ timeout -->
-        <button onclick="redirectToLogin()">OK</button>
-    </div>
-
-    <!-- Pop-up Thông báo lỗi -->
-    <div class="popup" id="errorPopup">
-        <h3 th:text="${errorMessage}"></h3>
-        <button onclick="closePopup()">OK</button>
-    </div>
-    
-    <!-- Script AJAX -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Kiểm tra lỗi nhập liệu
-            $('#registrationForm').on('submit', function(event) {
-                let isValid = true;
-
-                // Kiểm tra các trường bắt buộc
-                $('input[required], select[required]').each(function() {
-                    if ($(this).val() === '') {
-                        $(this).addClass('input-error');
-                        $(this).next('.error-message').text('Trường này không được để trống');
+                    // Kiểm tra FullName
+                    const fullName = $('#fullName').val();
+                    let fullNameError = [];
+                    if (/[^\u0020-\u007E\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF]/.test(fullName)) {
+                        $('#fullName').addClass('input-error');
+                        $('#fullNameError').text('Chỉ được phép dùng ký tự half-size, không được dùng full-size.');
                         isValid = false;
                     } else {
-                        $(this).removeClass('input-error');
-                        $(this).next('.error-message').text('');
+                        $('#fullName').removeClass('input-error');
+                        $('#fullNameError').text('');
+                    }
+
+                    // Kiểm tra PhoneNumber
+                    const phoneNumber = $('#phoneNumber').val();
+                    let phoneNumberError = [];
+                    if (/[^ -~]/.test(phoneNumber)) {
+                        $('#phoneNumber').addClass('input-error');
+                        $('#phoneNumberError').text('Chỉ được phép dùng ký tự half-size, không được dùng full-size.');
+                        isValid = false;
+                    } else if (!/^\d+$/.test(phoneNumber)) {
+                        $('#phoneNumber').addClass('input-error');
+                        $('#phoneNumberError').text('Số điện thoại chỉ được nhập số.');
+                        isValid = false;
+                    } else {
+                        $('#phoneNumber').removeClass('input-error');
+                        $('#phoneNumberError').text('');
+                    }
+
+                    // Kiểm tra Email
+                    const emailError = [];
+                    let $email = $('#email');
+                    let email = $email.val().trim();
+
+                    if (/[^ -~]/.test(email)) { // Kiểm tra ký tự full-size
+                        $email.addClass('input-error');
+                        emailError.push('Chỉ được phép dùng ký tự half-size, không được dùng full-size.');
+                    }
+
+                    let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;  // Kiểm tra định dạng email
+                    let domainRegex = /@(gmail\.com|yahoo\.com|outlook\.com|icloud\.com|hotmail\.com)$/; // Chỉ chấp nhận các domain phổ biến
+
+                    if (!emailRegex.test(email)) {
+                        $email.addClass('input-error');
+                        emailError.push('Email không đúng định dạng.');
+                    }
+
+                    if (!domainRegex.test(email)) {
+                        $email.addClass('input-error');
+                        emailError.push('Email phải thuộc Gmail, Yahoo, Outlook, iCloud hoặc Hotmail.');
+                    }
+
+                    // Hiển thị lỗi nếu có
+                    if (emailError.length > 0) {
+                        $('#emailError').text(emailError.join(' '));
+                        isValid = false;
+                    } else {
+                        $email.removeClass('input-error');
+                        $('#emailError').text('');
+                    }
+
+                    // Kiểm tra Address
+                    const address = $('#address').val();
+                    let addressError = [];
+                    if (/[^\u0020-\u007E\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF]/.test(address)) {
+                        $('#address').addClass('input-error');
+                        $('#addressError').text('Chỉ được phép dùng ký tự half-size, không được dùng full-size.');
+                        isValid = false;
+                    } else {
+                        $('#address').removeClass('input-error');
+                        $('#addressError').text('');
+                    }
+
+                    // Kiểm tra nếu chưa chọn tỉnh, quận hoặc xã
+                    if (!$('#provinceId').val()) {
+                        alert("Please select a province.");
+                        event.preventDefault(); // Ngừng gửi form nếu chưa chọn tỉnh
+                        return;
+                    }
+
+                    if (!$('#districtId').val()) {
+                        alert("Please select a district.");
+                        event.preventDefault(); // Ngừng gửi form nếu chưa chọn quận
+                        return;
+                    }
+
+                    if (!$('#wardId').val()) {
+                        alert("Please select a ward.");
+                        event.preventDefault(); // Ngừng gửi form nếu chưa chọn xã
+                        return;
+                    }
+                    // Nếu có lỗi, ngừng submit
+                    if (!isValid) {
+                        event.preventDefault();
+                        alert('Vui lòng kiểm tra lại các trường!');
                     }
                 });
-                
-                // Kiểm tra tên tài khoản
-                const username = $('#username').val();
-                let usernameErrors = [];
-                if (username.length < 5) usernameErrors.push("Tên tài khoản phải chứa ít nhất 5 ký tự.");
-                if (/[^a-zA-Z0-9]/.test(username)) usernameErrors.push("Tên tài khoản không được chứa ký tự đặc biệt.");
-                if (/[^ -~]/.test(username)) usernameErrors.push("Chỉ được phép dùng ký tự half-size, không được dùng full-size.");               
-                if (usernameErrors.length > 0) {
-                    $('#username').addClass('input-error');
-                    $('#username').next('.error-message').html(usernameErrors.join('<br>'));
-                    isValid = false;
-                }
 
-                // Kiểm tra mật khẩu
-                const password = $('#password').val();
-                let errors = [];
-	
-                if (password.length < 8) errors.push("Mật khẩu phải chứa ít nhất 8 ký tự.");
-                if (!/[A-Z]/.test(password)) errors.push("Phải chứa ít nhất 1 chữ cái in hoa.");
-                if (!/[a-z]/.test(password)) errors.push("Phải chứa ít nhất 1 chữ cái thường.");
-                if (!/[0-9]/.test(password)) errors.push("Phải chứa ít nhất 1 số.");
-                if (!/[@$!%*?&]/.test(password)) errors.push("Phải chứa ít nhất 1 ký tự đặc biệt (@$!%*?&).");
-                if (/[^ -~]/.test(password)) errors.push("Chỉ được phép dùng ký tự half-size, không được dùng full-size.");
-	
-                if (errors.length > 0) {
-                    $('#password').addClass('input-error');
-                    $('#passwordError').html(errors.join('<br>'));
-                    event.preventDefault();
-                } else {
-                    $('#password').removeClass('input-error');
-                    $('#passwordError').text('');
-                }
-                
 
-                // Kiểm tra FullName
-                const fullName = $('#fullName').val();
-                let fullNameError = [];
-                if (/[^\u0020-\u007E\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF]/.test(fullName)) {
-                    $('#fullName').addClass('input-error');
-                    $('#fullNameError').text('Chỉ được phép dùng ký tự half-size, không được dùng full-size.');
-                    isValid = false;
-                } else {
-                    $('#fullName').removeClass('input-error');
-                    $('#fullNameError').text('');
-                }
+                // Lấy ngày hiện tại theo định dạng yyyy-mm-dd
+                var today = new Date().toISOString().split("T")[0];
+                // Thiết lập thuộc tính max cho input (để ngăn người dùng chọn vượt quá ngày hiện tại trong date picker)
+                var dateOfBirthInput = document.getElementById("dateOfBirth");
+                dateOfBirthInput.max = today;
 
-                // Kiểm tra PhoneNumber
-                const phoneNumber = $('#phoneNumber').val();
-                let phoneNumberError = [];
-                if (/[^ -~]/.test(phoneNumber)) {
-                    $('#phoneNumber').addClass('input-error');
-                    $('#phoneNumberError').text('Chỉ được phép dùng ký tự half-size, không được dùng full-size.');
-                    isValid = false;
-                } else if (!/^\d+$/.test(phoneNumber)) {
-                    $('#phoneNumber').addClass('input-error');
-                    $('#phoneNumberError').text('Số điện thoại chỉ được nhập số.');
-                    isValid = false;
-                } else {
-                    $('#phoneNumber').removeClass('input-error');
-                    $('#phoneNumberError').text('');
-                }
 
-             // Kiểm tra Email
-                const emailError = [];
-                let $email = $('#email');
-                let email = $email.val().trim();
-
-                if (/[^ -~]/.test(email)) { // Kiểm tra ký tự full-size
-                    $email.addClass('input-error');
-                    emailError.push('Chỉ được phép dùng ký tự half-size, không được dùng full-size.');
-                }
-
-                let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;  // Kiểm tra định dạng email
-                let domainRegex = /@(gmail\.com|yahoo\.com|outlook\.com|icloud\.com|hotmail\.com)$/; // Chỉ chấp nhận các domain phổ biến
-
-                if (!emailRegex.test(email)) {
-                    $email.addClass('input-error');
-                    emailError.push('Email không đúng định dạng.');
-                } 
-
-                if (!domainRegex.test(email)) {
-                    $email.addClass('input-error');
-                    emailError.push('Email phải thuộc Gmail, Yahoo, Outlook, iCloud hoặc Hotmail.');
-                }
-
-                // Hiển thị lỗi nếu có
-                if (emailError.length > 0) {
-                    $('#emailError').text(emailError.join(' '));
-                    isValid = false;
-                } else {
-                    $email.removeClass('input-error');
-                    $('#emailError').text('');
-                }
-                
-                // Kiểm tra Address
-                const address = $('#address').val();
-                let addressError = [];
-                if (/[^\u0020-\u007E\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF]/.test(address)) {
-                    $('#address').addClass('input-error');
-                    $('#addressError').text('Chỉ được phép dùng ký tự half-size, không được dùng full-size.');
-                    isValid = false;
-                } else {
-                    $('#address').removeClass('input-error');
-                    $('#addressError').text('');
-                }
-
-                // Kiểm tra nếu chưa chọn tỉnh, quận hoặc xã
-                if (!$('#provinceId').val()) {
-                    alert("Please select a province.");
-                    event.preventDefault(); // Ngừng gửi form nếu chưa chọn tỉnh
-                    return;
-                }
-
-                if (!$('#districtId').val()) {
-                    alert("Please select a district.");
-                    event.preventDefault(); // Ngừng gửi form nếu chưa chọn quận
-                    return;
-                }
-
-                if (!$('#wardId').val()) {
-                    alert("Please select a ward.");
-                    event.preventDefault(); // Ngừng gửi form nếu chưa chọn xã
-                    return;
-                }
-                // Nếu có lỗi, ngừng submit
-                if (!isValid) {
-                	event.preventDefault();
-                    alert('Vui lòng kiểm tra lại các trường!');
-                }	
-            });
-            
-
-            // Lấy ngày hiện tại theo định dạng yyyy-mm-dd
-            var today = new Date().toISOString().split("T")[0];
-            // Thiết lập thuộc tính max cho input (để ngăn người dùng chọn vượt quá ngày hiện tại trong date picker)
-            var dateOfBirthInput = document.getElementById("dateOfBirth");
-            dateOfBirthInput.max = today;
-            
-
-            // Kiểm tra việc chọn radio button
-            $(document).ready(function() {
-                $('#registrationForm').submit(function(event) {
-                    // Kiểm tra nếu không có radio button nào được chọn
-                    if (!$('input[name="role"]:checked').val()) {
-                        alert("Please select a role.");
-                        event.preventDefault(); // Ngừng gửi form nếu chưa chọn role
-                    }
+                // Kiểm tra việc chọn radio button
+                $(document).ready(function () {
+                    $('#registrationForm').submit(function (event) {
+                        // Kiểm tra nếu không có radio button nào được chọn
+                        if (!$('input[name="role"]:checked').val()) {
+                            alert("Please select a role.");
+                            event.preventDefault(); // Ngừng gửi form nếu chưa chọn role
+                        }
+                    });
                 });
-            });
 
-            // AJAX cho tỉnh, quận, xã
-            $('#provinceId').change(function() {
-                var province_Id = $(this).val();
-                if (!province_Id) {
-                    $('#districtId').empty().append('<option value="">Chọn quận</option>');
-                    $('#wardId').empty().append('<option value="">Chọn xã</option>');
-                    return;
-                }
-
-                $('#districtId').empty().append('<option value="">Đang tải...</option>');
-                $.ajax({
-                    url: '/loginAPI/getDistrictDropdown',
-                    type: 'GET',
-                    data: { provinceId: province_Id },
-                    success: function(data) {
+                // AJAX cho tỉnh, quận, xã
+                $('#provinceId').change(function () {
+                    var province_Id = $(this).val();
+                    if (!province_Id) {
                         $('#districtId').empty().append('<option value="">Chọn quận</option>');
                         $('#wardId').empty().append('<option value="">Chọn xã</option>');
-                        data.forEach(function(district) {
-                            $('#districtId').append('<option value="' + district.districtId + '">' + district.districtName + '</option>');
+                        return;
+                    }
+
+                    $('#districtId').empty().append('<option value="">Đang tải...</option>');
+                    $.ajax({
+                        url: '/loginAPI/getDistrictDropdown',
+                        type: 'GET',
+                        data: { provinceId: province_Id },
+                        success: function (data) {
+                            $('#districtId').empty().append('<option value="">Chọn quận</option>');
+                            $('#wardId').empty().append('<option value="">Chọn xã</option>');
+                            data.forEach(function (district) {
+                                $('#districtId').append('<option value="' + district.districtId + '">' + district.districtName + '</option>');
+                            });
+                        }
+                    });
+                });
+
+                $('#districtId').change(function () {
+                    var district_Id = $(this).val();
+                    if (district_Id) {
+                        $('#wardId').empty().append('<option value="">Đang tải...</option>');
+                        $.ajax({
+                            url: '/loginAPI/getWardDropdown',
+                            type: 'GET',
+                            data: { districtId: district_Id },
+                            success: function (data) {
+                                $('#wardId').empty().append('<option value="">Chọn xã</option>');
+                                data.forEach(function (ward) {
+                                    $('#wardId').append('<option value="' + ward.wardId + '">' + ward.wardName + '</option>');
+                                });
+                            }
                         });
                     }
                 });
             });
 
-            $('#districtId').change(function() {
-                var district_Id = $(this).val();
-                if (district_Id) {
-                    $('#wardId').empty().append('<option value="">Đang tải...</option>');
-                    $.ajax({
-                        url: '/loginAPI/getWardDropdown',
-                        type: 'GET',
-                        data: { districtId: district_Id },
-                        success: function(data) {
-                            $('#wardId').empty().append('<option value="">Chọn xã</option>');
-                            data.forEach(function(ward) {
-                                $('#wardId').append('<option value="' + ward.wardId + '">' + ward.wardName + '</option>');
-                            });
-                        }
-                    });
+            // Xóa viền đỏ khi người dùng nhập lại
+            $('input, select').on('input change', function () {
+                if ($(this).hasClass('input-error')) {
+                    $(this).removeClass('input-error');
+                    $(this).next('.error-message').text('');
                 }
             });
-        });
-         
-        // Xóa viền đỏ khi người dùng nhập lại
-        $('input, select').on('input change', function() {
-            if ($(this).hasClass('input-error')) {
-                $(this).removeClass('input-error');
-                $(this).next('.error-message').text('');
+
+            // Kiểm tra flash attributes từ Thymeleaf khi load trang
+            window.onload = function () {
+                // Lấy giá trị successMessage và errorMessage được set qua Flash Attribute
+                let successMessage = "[[${successMessage}]]";
+                let errorMessage = "[[${errorMessage}]]";
+
+                // Nếu có thông báo thành công
+                if (successMessage && successMessage.trim() !== "null") {
+                    document.getElementById("successPopup").style.display = "block";
+                    document.getElementById("overlay").style.display = "block";
+                    // Có thể tự động chuyển hướng sau 5 giây
+                    setTimeout(redirectToLogin, 5000);
+                }
+
+                // Nếu có thông báo lỗi
+                if (errorMessage && errorMessage.trim() !== "null") {
+                    document.getElementById("errorPopup").style.display = "block";
+                    document.getElementById("overlay").style.display = "block";
+                }
+            };
+
+            // Hàm chuyển hướng sang trang login
+            function redirectToLogin() {
+                window.location.href = "/ComplexGym/home";
             }
-        });
 
-        // Kiểm tra flash attributes từ Thymeleaf khi load trang
-        window.onload = function () {
-            // Lấy giá trị successMessage và errorMessage được set qua Flash Attribute
-            let successMessage = "[[${successMessage}]]";
-            let errorMessage = "[[${errorMessage}]]";
-
-            // Nếu có thông báo thành công
-            if (successMessage && successMessage.trim() !== "null") {
-                document.getElementById("successPopup").style.display = "block";
-                document.getElementById("overlay").style.display = "block";
-                // Có thể tự động chuyển hướng sau 5 giây
-                setTimeout(redirectToLogin, 5000);
+            // Hàm đóng pop-up lỗi (vẫn ở trang register)
+            function closePopup() {
+                document.getElementById("errorPopup").style.display = "none";
+                document.getElementById("overlay").style.display = "none";
             }
 
-            // Nếu có thông báo lỗi
-            if (errorMessage && errorMessage.trim() !== "null") {
-                document.getElementById("errorPopup").style.display = "block";
-                document.getElementById("overlay").style.display = "block";
-            }
-        };
-
-        // Hàm chuyển hướng sang trang login
-        function redirectToLogin() {
-            window.location.href = "/ComplexGym/home";
-        }
-
-        // Hàm đóng pop-up lỗi (vẫn ở trang register)
-        function closePopup() {
-            document.getElementById("errorPopup").style.display = "none";
-            document.getElementById("overlay").style.display = "none";
-        }
-
-    </script>
+        </script>
 
 
 </body>

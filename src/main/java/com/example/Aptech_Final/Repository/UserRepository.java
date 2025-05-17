@@ -33,6 +33,10 @@ public interface UserRepository extends JpaRepository<Users, Long>{
 	// Tạo phương thức để tìm kiếm theo email
 	Users findByEmail(String email);
 	
+	// Tạo phương thức để tìm kiếm theo role
+	@Query(value = "SELECT USER_ROLE FROM dbo.USERS WHERE USER_ID = :userId", nativeQuery = true)
+	String findRoleByUserId(@Param("userId") Long userId);
+
 	// Tạo phương thức mới, dùng interface `UserManagement` để hiển thị kết quả theo custom query
 	@Query(value = "SELECT u.USER_ID AS id, u.USER_NAME AS name, u.FULL_NAME AS fullName, " +
             			"u.USER_DOB AS dateOfBirth, u.USER_EMAIL AS email, " +
@@ -76,6 +80,10 @@ public interface UserRepository extends JpaRepository<Users, Long>{
 			+ "OR d.DISTRICT_NAME LIKE CONCAT('%', :keyword, '%') "
 			+ "OR w.WARD_NAME LIKE CONCAT('%', :keyword, '%')) AND " + "u.USER_ROLE <> 'admin'", nativeQuery = true)
 	List<UserManagementDTO> searchUsers(@Param("keyword") String keyword);
+	
+    @Query(value = "SELECT USER_ID FROM USERS WHERE USER_NAME = :username", nativeQuery = true)
+    Long findUserIdByUsername(@Param("username") String username);
+
 }
 
 

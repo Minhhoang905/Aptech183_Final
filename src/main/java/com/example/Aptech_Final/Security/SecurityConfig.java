@@ -30,7 +30,8 @@ public class SecurityConfig {
 					.requestMatchers("/css_resources/**","/js_resources/**","/image_resources/**").permitAll()
                 	.requestMatchers("/images/**", "/css/**", "/js/**").permitAll() // Cho phép truy cập ảnh, CSS, JS
 					.requestMatchers("/ComplexGym/home", "/loginAPI", "/loginAPI/getDistrictDropdown", "/loginAPI/getWardDropdown").permitAll() //Không đăng nhập: Chỉ được phép xem home
-					.requestMatchers("/ComplexGym/products/**", "/ComplexGym/payment/**").permitAll()
+					.requestMatchers("/ComplexGym/products/**", "/ComplexGym/payment/**").hasAnyRole("ADMIN", "USER","PT")
+					.requestMatchers("/ComplexGym/schedule/**").hasAnyRole("ADMIN", "USER","PT")
 					.requestMatchers("/forgot-password/**","/reset-password/**").permitAll() 
 					.requestMatchers("/doLogin",  "/doChangePass", "/changePass", "/logout").permitAll() 
 					.requestMatchers("/ComplexGym/home").hasAnyRole("ADMIN", "USER","PT") // Cả user và admin thực hiện search

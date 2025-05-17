@@ -176,7 +176,7 @@ public class PaymentService {
     	// Phương thức thanh toán
     	orders.setPaymentMethod(managementForm.getPaymentMethod());
     	// Tình trạng đơn hàng
-    	orders.setOrderStatus("PENDING");
+    	orders.setOrderStatus("PROCESSING");
     	// Tổng số tiền đơn hàng
     	orders.setTotalAmount(totalAmount);
     	// Thời gian đặt hàng
