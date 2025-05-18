@@ -54,5 +54,5 @@ public class ScheduleBookingForm {
 	public ScheduleBookingForm() {
 	}
 
-
 }
+

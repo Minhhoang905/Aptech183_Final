@@ -253,10 +253,19 @@ public class PaymentService {
 			return "error: Sorry, you have canceled this order. Please create a new order.";
 		}
     	
+        // Nếu trạng thái cập nhật là CANCEL thì thực hiện cập nhật số lượng sản phẩm
+        if ("CANCEL".equals(orderStatus)) {
+            // Lấy chi tiết giỏ hàng từ ORDER_DETAIL qua orderId
+            List<CartForm> cartItems = ordersDetailRepository.getCartItemsByOrderId(orderId);
+            // Nếu đơn hàng là 'CANCEL', gọi phương thức restoreProductQuantities() để cập nhập lại số lượng tồn kho
+            restoreProductQuantities(cartItems);
+        }
+
     	// Gán trạng thái đơn hàng hiện tại vào trạng thái trong OrdersManagement
     	order.setOrderStatus(orderStatus);
     	// Cập nhật thời gian kết thúc mỗi lần đổi trạng thái
     	order.setOrderEndTime(LocalDateTime.now());
+    	
     	
     	// Lưu vào database
     	managementRepository.save(order);
@@ -269,12 +278,6 @@ public class PaymentService {
     @Transactional // Dùng @Transactional (bắt buộc) để đảm bảo tính toàn vẹn dữ liệu trong giao dịch
     public String deleteOrder (Long orderId) {
     	try {
-            // Lấy chi tiết giỏ hàng từ ORDER_DETAIL qua orderId
-            List<CartForm> cartItems = ordersDetailRepository.getCartItemsByOrderId(orderId);
-            
-            // Nếu đơn hàng là 'CANCEL', gọi phương thức restoreProductQuantities() để cập nhập lại số lượng tồn kho
-            restoreProductQuantities(cartItems);
-            
         	// Xóa chi tiết đơn hàng trước tiên
         	ordersDetailRepository.deleteByOrderId(orderId);
         	

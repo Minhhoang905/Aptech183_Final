@@ -296,7 +296,7 @@
 
         input[type='number'] {
             font-size: 20px;
-            width: 50px;
+            width: 70px;
             height: 30px;
             text-align: right;
             padding: 10px;
@@ -331,11 +331,6 @@
 <body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" th:href="@{/ComplexGym/home}">
-                <i class="fas fa-dumbbell"></i>
-            </a>
     <header>
         <a th:href="@{/ComplexGym/home}" class="logo">Complex<span> Gym</span></a>
         <nav class="navbar">
@@ -348,7 +343,6 @@
                     </ul>
                 </li>
                 <li><a th:href="@{/ComplexGym/schedule}">SCHEDULE</a></li>
-                <li><a href="#">SCHEDULE</a></li>
                 <li><a th:href="@{/ComplexGym/cart}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> CART</a>
                 </li>
                 <li th:if="${role == 'Anonymous'}"><a th:href="@{/login}" type="button" class="button">LOGIN</a></li>
@@ -365,30 +359,6 @@
             </ul>
         </nav>
     </header>
-
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link active" th:href="@{/ComplexGym/home}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="bookingLink">Schedule</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button"
-                            data-bs-toggle="dropdown">Products</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/supplements}">Supplement</a></li>
-                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/gears}">Gears</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/ComplexGym/cart}">
-                            <i class="fas fa-shopping-cart"></i> Cart <span id="cart-count"></span>
-                        </a>
-                    </li>
-                </ul>
 
     <!-- Hiển thị thông báo từ backend -->
     <div class="pop_up">
@@ -425,7 +395,6 @@
                                 <input type="number" name="quantity" id="quantity" class="form-control mb-2" value="1"
                                     min="1" th:max="${product.quantity}" oninput="checkQuantity()">
                             </div>
-                            <p class="text-danger small d-none" id="cartWarning">Not enough stock avaliable!</p>
                         </form>
 
                         <div class="button_area">
@@ -489,107 +458,113 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Script kiểm tra số lượng và xử lý "Mua ngay" -->
-    <script>
+<script>
+    // Khởi tạo CKEditor nếu cần
+    if (document.getElementById('editor')) {
+        CKEDITOR.replace('editor');
+    }
 
-        // Kiểm tra nếu phần tử có ID "editor" tồn tại, thì khởi tạo CKEditor để chỉnh sửa mô tả sản phẩm.
-        if (document.getElementById('editor')) {
-            CKEDITOR.replace('editor');
-        }
+    document.addEventListener("DOMContentLoaded", function () {
+        const quantityInput = document.getElementById("quantity");
+        const addToCartBtn = document.querySelector('.btn-success');
+        const buyNowBtn = document.querySelector('.btn-danger');
 
+        const successSound = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_5a5015fba7.mp3");
 
-        document.addEventListener("DOMContentLoaded", function () {
+        // Kiểm tra số lượng hợp lệ
+        quantityInput.addEventListener("input", () => {
+            const max = parseInt(quantityInput.getAttribute("max")) || 0;
+            let value = parseInt(quantityInput.value) || 1;
+
+            if (value > max) {
+                quantityInput.value = max;
+
+                // Hiển thị cảnh báo bằng SweetAlert
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops!',
+                    text: 'Not enough stock available!',
+                    confirmButtonColor: '#d33'
+                });
+            }
+        });
+
+        // Xử lý thêm vào giỏ hàng
+        window.addToCart = function (isBuyNow) {
+            const targetBtn = isBuyNow ? buyNowBtn : addToCartBtn;
+            const originalText = targetBtn.innerHTML;
+
             const quantityInput = document.getElementById("quantity");
-            const cartWarning = document.getElementById("cartWarning");
-            const addToCartBtn = document.querySelector('.btn-success');
-            const buyNowBtn = document.querySelector('.btn-danger');
+            const maxStock = parseInt(quantityInput.getAttribute("max")) || 0;
 
-            //  Âm thanh "pop" khi thêm thành công
-            const successSound = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_5a5015fba7.mp3"); // sound effect miễn phí
-
-            //  Kiểm tra số lượng nhập vào
-            function checkQuantity() {
-                const maxQuantity = parseInt(quantityInput.getAttribute("max"));
-                let currentValue = parseInt(quantityInput.value);
-
-                if (currentValue > maxQuantity) {
-                    cartWarning.classList.remove("d-none");
-                    quantityInput.value = maxQuantity;
-                } else {
-                    cartWarning.classList.add("d-none");
-                }
+            // Nếu hết hàng thì chặn lại và hiển thị cảnh báo
+            if (maxStock <= 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Out of stock',
+                    text: 'Sorry, this product is currently out of stock!',
+                    confirmButtonColor: '#d33'
+                });
+                return;
             }
 
-            //  Hàm thêm vào giỏ
-            window.addToCart = function (isBuyNow) {
-                const targetBtn = isBuyNow ? buyNowBtn : addToCartBtn;
+            targetBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Processing...';
+            targetBtn.disabled = true;
 
-                //  Đổi nút sang trạng thái loading
-                const originalText = targetBtn.innerHTML;
-                targetBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Processing...';
-                targetBtn.disabled = true;
+            let formData = new FormData(document.getElementById("cartForm"));
 
-                let formData = new FormData(document.getElementById("cartForm"));
-
-                fetch("/ComplexGym/cart/add", {
-                    method: "POST",
-                    body: formData,
-                }).then(response => {
-                    if (response.ok) {
-                        if (isBuyNow) {
-                            //  Mua ngay → chuyển trang
-                            window.location.href = "/ComplexGym/payment";
-                        } else {
-                            //  Phát âm thanh khi thêm thành công
-                            successSound.play();
-                          
-                            //  SweetAlert với lựa chọn
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Added to cart!',
-                                text: 'The product has been added to your cart.',
-                                showCancelButton: true,
-                                confirmButtonText: '🛒 View Cart',
-                                cancelButtonText: '🛍️ Continue Shopping',
-                                confirmButtonColor: '#198754',
-                                cancelButtonColor: '#6c757d'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    window.location.href = "/ComplexGym/cart";
-                                }
-                            });
-                        }
+            fetch("/ComplexGym/cart/add", {
+                method: "POST",
+                body: formData,
+            }).then(response => {
+                if (response.ok) {
+                    if (isBuyNow) {
+                        window.location.href = "/ComplexGym/payment";
                     } else {
-                        //  Lỗi từ server → hiệu ứng rung
+                        successSound.play();
+
                         Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Something went wrong while adding the product to cart!',
-                            customClass: {
-                                popup: 'animate__animated animate__shakeX'
+                            icon: 'success',
+                            title: 'Added to cart!',
+                            text: 'The product has been added to your cart.',
+                            showCancelButton: true,
+                            confirmButtonText: '🛒 View Cart',
+                            cancelButtonText: '🛍️ Continue Shopping',
+                            confirmButtonColor: '#198754',
+                            cancelButtonColor: '#6c757d'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = "/ComplexGym/cart";
                             }
                         });
                     }
-                }).catch(error => {
-                    //  Lỗi mạng → hiệu ứng rung
+                } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Network error',
-                        text: 'Please check your connection and try again.',
+                        title: 'Oops...',
+                        text: 'Something went wrong while adding the product to cart!',
                         customClass: {
                             popup: 'animate__animated animate__shakeX'
                         }
                     });
-                    console.error("Add to cart error:", error);
-                }).finally(() => {
-                    // 🔁 Khôi phục nút về trạng thái ban đầu
-                    targetBtn.innerHTML = originalText;
-                    targetBtn.disabled = false;
+                }
+            }).catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Network error',
+                    text: 'Please check your connection and try again.',
+                    customClass: {
+                        popup: 'animate__animated animate__shakeX'
+                    }
                 });
-            };
-
-            quantityInput.addEventListener("input", checkQuantity);
-        });
-    </script>
+                console.error("Add to cart error:", error);
+            }).finally(() => {
+                targetBtn.innerHTML = originalText;
+                targetBtn.disabled = false;
+            });
+        };
+    });
+</script>
 </body>
 
 </html>

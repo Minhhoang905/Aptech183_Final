@@ -25,7 +25,7 @@ public class Config {
 	
 
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "https://e647-113-160-225-220.ngrok-free.app/ComplexGym/payment/VNPay/vnpay-payment-return";
+    public static String vnp_ReturnUrl = "https://a701-113-189-34-249.ngrok-free.app/ComplexGym/payment/VNPay/vnpay-payment-return";
     public static String vnp_TmnCode = "51I3VMBR";
     public static String secretKey = "561TN48N4JFJYO9HSODEWOHEEF4BYFDI";	
     public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";

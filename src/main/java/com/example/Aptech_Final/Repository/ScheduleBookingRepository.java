@@ -109,3 +109,4 @@ public interface ScheduleBookingRepository extends JpaRepository<ScheduleBooking
                        @Param("hour") Integer hour);
 
 }
+
