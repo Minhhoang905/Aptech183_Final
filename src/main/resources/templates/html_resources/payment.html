@@ -5,30 +5,150 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment</title>
-	<link rel="stylesheet" th:href="@{/css_resources/home.css}">
+    <link rel="stylesheet" th:href="@{/css_resources/home.css}">
     <!-- Import Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-<<<<<<< Updated upstream
-    
+
     <!-- Font Awesome & Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-=======
-    <!-- Font Awesome & Bootstrap Icons -->
->>>>>>> Stashed changes
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-	
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+
     <style>
         /* Giao diện tổng thể */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-decoration: none;
+
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .pop_up {
+            width: 100%;
+            height: 100%;
+        }
+
         body {
-            background-color: #f8f9fa;
+            font-family: 'Impact', Haettenschweiler, sans-serif;
+            min-height: 100vh;
+
+        }
+
+        header {
+            backdrop-filter: blur(5px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0px 3%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            background-color: rgb(213, 60, 17);
+
+
+        }
+
+        header .logo {
+            color: white;
+            font-size: 30px;
+        }
+
+        header .logo span {
+            color: rgb(11, 211, 85);
+        }
+
+        header .navbar ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        header .navbar ul li {
+            position: relative;
+            float: left;
+        }
+
+        header .navbar ul li a {
+            display: block;
+            padding: 20px;
+            color: white;
+            font-size: 20px;
+            transition: ease-in 0.3s;
+        }
+
+        header .navbar ul li .fa-circle-user {
+            font-size: 20px;
+            padding-right: 10px;
+        }
+
+        nav ul li a:hover {
+            color: rgb(11, 211, 85) !important;
+        }
+
+        header .navbar ul li ul {
+            background-color: rgb(213, 60, 17);
+            position: absolute;
+            left: 0;
+            width: 200px;
+            display: none;
+        }
+
+        header .navbar ul li ul li {
+            width: 100%;
+        }
+
+        header .navbar ul li:hover>ul {
+            display: initial;
+        }
+
+        header .navbar ul li .button {
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 120px;
+            padding: 7px 7px;
+            background-color: rgb(11, 211, 85);
+            transition: ease-in-out 0.3s;
+            cursor: pointer;
+            margin-left: 20px;
+        }
+
+        header .navbar ul li .button:hover {
+            color: white !important;
+        }
+
+        a:not([href]):not([class]),
+        a:not([href]):not([class]):hover {
+            color: white;
         }
 
         .container {
-            max-width: 900px;
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            justify-content: center;
+            display: flex;
+            padding-top: 16vh;
+            background-color: white;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+
+        .fml_font {
+            font-family: 'Montserrat', Impact, sans-serif;
+            font-style: normal;
         }
 
         /* Bảng sản phẩm có thanh cuộn nếu quá dài */
@@ -62,152 +182,151 @@
         .btn-lg {
             width: 100%;
         }
+
         /* Pop-up xác nhận */
-.confirm-popup {
-	display: none;
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background: white;
-	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-	text-align: center;
-	z-index: 1000;
-	width: 300px;
-}
+        .confirm-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 1000;
+            width: 300px;
+        }
 
-.confirm-popup h3 {
-	margin: 0 0 15px;
-}
+        .confirm-popup h3 {
+            margin: 0 0 15px;
+        }
 
-.confirm-popup .btn {
-	margin: 0 5px;
-}
-/* Overlay mờ */
-.overlay {
-	display: none;
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, 0.5);
-	z-index: 999;
-}
-/* Pop-up thông báo (Success/ Error) */
-.popup {
-	display: none;
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background: white;
-	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-	text-align: center;
-	z-index: 1000;
-}
+        .confirm-popup .btn {
+            margin: 0 5px;
+        }
 
-.popup h3 {
-	margin: 0 0 10px;
-}
+        /* Overlay mờ */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
 
-.popup button {
-	background-color: #007BFF;
-	color: white;
-	border: none;
-	padding: 10px 20px;
-	border-radius: 5px;
-	cursor: pointer;
-}
+        /* Pop-up thông báo (Success/ Error) */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 1000;
+        }
 
-.popup button:hover {
-	background-color: #0056b3;
-}
-/* Định dạng cho các input bị lỗi */
-.input-error {
-	border: 2px solid red;
-	background-color: #ffe6e6;
-}
+        .popup h3 {
+            margin: 0 0 10px;
+        }
 
-.error-message {
-	color: red;
-	font-size: 14px;
-	margin-top: 5px;
-	display: block;
-}
+        .popup button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-/* Tùy chỉnh pop-up overlay */
-#overlay {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, 0.5);
-	display: none;
-	z-index: 1000;
-}
+        .popup button:hover {
+            background-color: #0056b3;
+        }
 
-/* Cửa sổ pop-up xác nhận */
-#confirmPopup, #successPopup, #errorPopup {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background: white;
-	padding: 20px;
-	border-radius: 10px;
-	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-	display: none;
-	z-index: 1001;
-	width: 300px;
-	text-align: center;
-}
+        /* Định dạng cho các input bị lỗi */
+        .input-error {
+            border: 2px solid red;
+            background-color: #ffe6e6;
+        }
 
-#confirmPopup button, #successPopup button, #errorPopup button {
-	padding: 8px 15px;
-	margin: 10px;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-}
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+        }
 
-#confirmYes {
-	background-color: #28a745;
-	color: white;
-}
+        /* Tùy chỉnh pop-up overlay */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+        }
 
-#confirmNo {
-	background-color: #dc3545;
-	color: white;
-}
+        /* Cửa sổ pop-up xác nhận */
+        #confirmPopup,
+        #successPopup,
+        #errorPopup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1001;
+            width: 300px;
+            text-align: center;
+        }
 
-#successPopup {
-	border: 2px solid green;
-}
+        #confirmPopup button,
+        #successPopup button,
+        #errorPopup button {
+            padding: 8px 15px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-#errorPopup {
-	border: 2px solid red;
-}
-        
+        #confirmYes {
+            background-color: #28a745;
+            color: white;
+        }
+
+        #confirmNo {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        #successPopup {
+            border: 2px solid green;
+        }
+
+        #errorPopup {
+            border: 2px solid red;
+        }
     </style>
-	
+
 </head>
 
 <body>
     <!-- Navbar -->
-<<<<<<< Updated upstream
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container-fluid">
-            <!-- Góc trái: Icon -->
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-dumbbell"></i>
-            </a>
-=======
     <header>
         <a href="#" class="logo">Complex<span> Gym</span></a>
         <nav class="navbar">
@@ -236,193 +355,124 @@
             </ul>
         </nav>
     </header>
->>>>>>> Stashed changes
 
-            <!-- Button toggle menu cho mobile -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <!-- Navbar -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" th:href="@{/ComplexGym/home}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="bookingLink" role="button">
-                            Schedule
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Products
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="productsDropdown">
-                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/supplements}">Supplement</a></li>
-                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/gears}">Gears</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/ComplexGym/cart}">
-                            <i class="fas fa-shopping-cart"></i> Cart
-                        </a>
-                    </li>
-                </ul>
-
-                <!-- Hiển thị theo trạng thái đăng nhập -->
-                <div class="ms-3">
-                    <th:block th:if="${role == 'Anonymous'}">
-                        <a class="btn btn-warning" th:href="@{/login}">Login</a>
-                    </th:block>
-                    <th:block th:if="${role != 'Anonymous'}">
-                        <div class="dropdown">
-                            <button class="btn btn-warning dropdown-toggle" type="button" id="userMenu"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user"></i> <span th:text="${username}"></span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/userManagement}">User Management</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/ComplexGym/products/productManagement}">Product Management</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a th:href="@{/ComplexGym/payment/ordersManagement}">Order<br>management</a></li>
-                                <li><hr class="dropdown-divider"></li>                                                                                                                                                                                                                                                                                              
-                                <li><a class="dropdown-item logout-item" th:href="@{/logout}">Logout</a></li>
-                            </ul>
-                        </div>
-                    </th:block>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-<div class="container mt-5">
+    <div class="container mt-5">
         <!-- Form thanh toán -->
-        <form id="confirmPaymentForm" method="POST" th:action="@{/ComplexGym/payment/confirmPayment}" th:object="${checkout}">
-            <h2 class="text-center mb-4">🛒 Checkout order</h2>
+        <form id="confirmPaymentForm" method="POST" th:action="@{/ComplexGym/payment/confirmPayment}"
+            th:object="${checkout}">
+            <h1 class="text-center mb-4">Checkout order</h1>
 
-    <!-- Thêm thanh cuộn nếu có quá nhiều sản phẩm -->
-    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-        <table class="table table-hover align-middle">
-            <thead class="table-dark"  style="position: sticky; top: 0; z-index: 1000;"	>
-                <tr>
-                    <th>ID</th>                	
-                    <th>📷 Image</th>
-                    <th>📦 Product name</th>
-                    <th>💰 Price</th>
-                    <th>🔢 Amount</th>
-                    <th>💵 Total</th>
-                </tr>
-            </thead>
-            <tbody>
-					<tr th:each="item, iterStat : ${cartItems}">
-						<td th:text="${item.productId}"></td>   					
-					    <td><img th:src="${item.imagePath}" class="img-thumbnail" style="width: 80px;"></td>
-					    <td th:text="${item.productName}"></td>
-					    <td th:text="${#numbers.formatInteger(item.price, 3, 'COMMA')} + ' VND'"></td>
-					    <td th:text="${item.amount}"></td>
-					    <td th:text="${#numbers.formatInteger(item.price * item.amount, 3, 'COMMA')} + ' VND'"></td>
-					
-					    <!-- Sử dụng th:name với chỉ số trong mảng -->
-					    <input type="hidden" th:name="'items[' + ${iterStat.index} + '].productId'" th:value="${item.productId}">
-					    <input type="hidden" th:name="'items[' + ${iterStat.index} + '].price'" th:value="${item.price}">
-					    <input type="hidden" th:name="'items[' + ${iterStat.index} + '].amount'" th:value="${item.amount}">
-					</tr>
-            </tbody>
-        </table>
-    </div>
-        
-                <!-- Cột 1: Thông tin khách hàng -->
-                    <h5 class="mb-3"><i class="fas fa-user"></i> Customer Info</h5>
-                     <div class="mb-3" hidden>
-				        <label for="id" hidden class="form-label">Id</label>
-				        <input type="number" id="userId" th:field="*{userId}" class="form-control" hidden>
-                    </div>                   
-                    <div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <input type="text" th:field="*{name}" class="form-control" readonly style="pointer-events: none; opacity: 0.5;">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" th:field="*{fullName}" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" th:field="*{email}" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Phone Number</label>
-                        <input type="tel" th:field="*{phoneNumber}" class="form-control" required>
-                    </div>
+            <!-- Thêm thanh cuộn nếu có quá nhiều sản phẩm -->
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark fml_font" style="position: sticky; top: 0; z-index: 0;">
+                        <tr>
+                            <th>ID</th>
+                            <th>Image</th>
+                            <th>Product name</th>
+                            <th>Price</th>
+                            <th>Amount</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="fml_font">
+                        <tr th:each="item, iterStat : ${cartItems}">
+                            <td th:text="${item.productId}"></td>
+                            <td><img th:src="${item.imagePath}" class="img-thumbnail" style="width: 80px;"></td>
+                            <td th:text="${item.productName}"></td>
+                            <td th:text="${#numbers.formatInteger(item.price, 3, 'COMMA')} + ' VND'"></td>
+                            <td th:text="${item.amount}"></td>
+                            <td th:text="${#numbers.formatInteger(item.price * item.amount, 3, 'COMMA')} + ' VND'"></td>
 
-                <!-- Cột 2: Địa chỉ giao hàng -->
-                    <h5 class="mb-3"><i class="fas fa-map-marker-alt"></i> Shipping Address</h5>
-                    <div class="mb-3">
-                        <label>Province</label>
-                        <select class="form-select" th:field="*{provinceId}" required>
-                            <option value="">Select province</option>
-                            <option th:each="province : ${provinceList}" 
-                            		th:value="${province.provinceId}"
-                                	th:text="${province.provinceName}"></option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-				        <label for="districtId" class="form-label">District</label>
-				        <select id="districtId" th:field="*{districtId}" class="form-select" required>
-				          <option value="">Select District</option>
-				          <option th:each="district : ${districtList}"
-				                  th:value="${district.districtId}" 
-				                  th:text="${district.districtName}"></option>
-				        </select>
-                    </div>
-                    <div class="mb-3">
-				        <label for="wardId" class="form-label">Ward</label>
-				        <select id="wardId" th:field="*{wardId}" class="form-select" required>
-				          <option value="">Select Ward</option>
-				          <option th:each="ward : ${wardList}"
-				                  th:value="${ward.wardId}" 
-				                  th:text="${ward.wardName}"></option>
-				        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label>Address</label>
-                        <input type="text" th:field="*{address}" class="form-control" required>
-                    </div>
-             <!-- Phương thức thanh toán -->
+                            <!-- Sử dụng th:name với chỉ số trong mảng -->
+                            <input type="hidden" th:name="'items[' + ${iterStat.index} + '].productId'"
+                                th:value="${item.productId}">
+                            <input type="hidden" th:name="'items[' + ${iterStat.index} + '].price'"
+                                th:value="${item.price}">
+                            <input type="hidden" th:name="'items[' + ${iterStat.index} + '].amount'"
+                                th:value="${item.amount}">
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cột 1: Thông tin khách hàng -->
+            <h5 class="mb-3"><i class="fas fa-user"></i> Customer Info</h5>
+            <div class="mb-3" hidden>
+                <label for="id" hidden class="form-label">Id</label>
+                <input type="number" id="userId" th:field="*{userId}" class="fml_font form-control" hidden>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" th:field="*{name}" class="fml_font form-control" readonly
+                    style="pointer-events: none; opacity: 0.5;">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input type="text" th:field="*{fullName}" class="fml_font form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" th:field="*{email}" class="fml_font form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" th:field="*{phoneNumber}" class="fml_font form-control" required>
+            </div>
+
+            <!-- Cột 2: Địa chỉ giao hàng -->
+            <h5 class="mb-3"><i class="fas fa-map-marker-alt"></i> Shipping Address</h5>
+            <div class="mb-3">
+                <label>Province</label>
+                <select class="fml_font form-select" th:field="*{provinceId}" required>
+                    <option value="">Select province</option>
+                    <option th:each="province : ${provinceList}" th:value="${province.provinceId}"
+                        th:text="${province.provinceName}"></option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="districtId" class="form-label">District</label>
+                <select id="districtId" th:field="*{districtId}" class="fml_font form-select" required>
+                    <option value="">Select District</option>
+                    <option th:each="district : ${districtList}" th:value="${district.districtId}"
+                        th:text="${district.districtName}"></option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="wardId" class="form-label">Ward</label>
+                <select id="wardId" th:field="*{wardId}" class="fml_font form-select" required>
+                    <option value="">Select Ward</option>
+                    <option th:each="ward : ${wardList}" th:value="${ward.wardId}" th:text="${ward.wardName}"></option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label>Address</label>
+                <input type="text" th:field="*{address}" class="fml_font form-control" required>
+            </div>
+            <!-- Phương thức thanh toán -->
             <h5 class="mt-3"><i class="fas fa-credit-card"></i> Payment Method</h5>
             <div class="form-check">
-                <input type="radio" class="form-check-input" name="paymentMethod" th:field="*{paymentMethod}" value="cash" required> Cash on Delivery
+                <input type="radio" class="form-check-input" name="paymentMethod" th:field="*{paymentMethod}"
+                    value="cash" required> Cash on Delivery
             </div>
             <div class="form-check">
-                <input type="radio" class="form-check-input" name="paymentMethod" th:field="*{paymentMethod}" value="bank" required id="bankTransfer"> Bank Transfer
+                <input type="radio" class="form-check-input" name="paymentMethod" th:field="*{paymentMethod}"
+                    value="bank" required id="bankTransfer"> Bank Transfer
+            </div>
+
+            <!-- Thông tin chuyển khoản -->
+            <div id="bankInfoContainer" class="mt-3 p-3 border rounded bg-light" style="display: none;">
+                <p class="fml_font"><strong>Bank name:</strong> SHB</p>
+                <p class="fml_font"><strong>Bank branch:</strong> FPT</p>
+                <p class="fml_font"><strong>Bank account number:</strong> 12345678</p>
+                <p class="fml_font"><strong>Account Owner:</strong> Đào Nguyễn Minh Hoàng</p>
             </div>
             
             <div class="form-check">
 			    <input type="radio" class="form-check-input" name="paymentMethod" th:field="*{paymentMethod}"
 			        value="vnpay" required id="vnpay"> VNPay
 			</div>
-            			
-            <!-- Thông tin chuyển khoản -->
-            <div id="bankInfoContainer" class="mt-3 p-3 border rounded bg-light" style="display: none;">
-                <p><strong>Bank name:</strong> ABC</p>
-                <p><strong>Bank branch:</strong> ABC</p>
-                <p><strong>Bank account number:</strong> ABC</p>
-                <p><strong>Account Owner:</strong> ABC</p>
-            </div>
-<<<<<<< Updated upstream
-            
-            
-            <!-- Note -->			
-			<h2><label for="">Note</label></h2>
-			 <textarea id="note" name="note" rows="5" th:field="*{note}" placeholder="Enter your note here..." ></textarea>			
-			
-            <!-- Tổng tiền -->
-            <h4 class="mt-3 text-danger fw-bold">Total: <span th:text="${#numbers.formatInteger(totalAmount, 3, 'COMMA')} + ' VND'"></span></h4>
 
-=======
 
             <!-- Note -->
             <h2><label for="">Note</label></h2>
@@ -432,64 +482,54 @@
             <!-- Tổng tiền -->
             <h4 class="mt-3 text-danger fw-bold">Total: <span
                     th:text="${#numbers.formatInteger(totalAmount, 3, 'COMMA')} + ' VND'"></span></h4>
-			<input type="hidden" name="amount" th:value="${totalAmount}">  <!-- Truyền amount vào form -->
+			<input type="hidden" name="totalAmount" th:value="${totalAmount}"> 
 			
->>>>>>> Stashed changes
             <button class="btn btn-secondary btn-lg mt-4" onclick="location.href='/ComplexGym/cart'">
-                    <i class="fas fa-arrow-left"></i> Back to Cart
-             </button>
-             <button type="button" class="btn btn-success btn-lg mt-4" id="paymentBtn">
-                    <i class="fas fa-check"></i> Confirm Payment
-              </button>
-       </form>
-</div>
+                <i class="fas fa-arrow-left"></i> Back to Cart
+            </button>
+            <button type="button" class="btn btn-success btn-lg mt-4" id="paymentBtn">
+                <i class="fas fa-check"></i> Confirm Payment
+            </button>
+        </form>
+    </div>
 
-  <!-- Confirmation Pop-up -->
-  <div class="confirm-popup" id="confirmPopup">
-    <h3>Are you sure you want to buy?</h3>
-    <button id="confirmYes" class="btn btn-primary">Yes</button>
-    <button id="confirmNo" class="btn btn-secondary">No</button>
-  </div>
+    <!-- Confirmation Pop-up -->
+    <div class="confirm-popup fml_font" id="confirmPopup">
+        <h3>Are you sure you want to buy?</h3>
+        <button id="confirmYes" class="btn btn-primary">Yes</button>
+        <button id="confirmNo" class="btn btn-secondary">No</button>
+    </div>
 
-  <!-- Overlay for pop-ups -->
-  <div class="overlay" id="overlay"></div>
+    <!-- Overlay for pop-ups -->
+    <div class="overlay" id="overlay"></div>
 
-  <!-- Success & Error Pop-ups (if needed) -->
-  <div class="popup" id="successPopup">
-    <h3 th:text="${successMessage}"></h3>
-    <button onclick="redirectToHome()">OK</button>
-  </div>
-  <div class="popup" id="errorPopup">
-    <h3 th:text="${errorMessage}"></h3>
-    <button onclick="closePopup()">OK</button>
-  </div>
+    <!-- Success & Error Pop-ups (if needed) -->
+    <div class="popup" id="successPopup">
+        <h3 th:text="${successMessage}"></h3>
+        <button onclick="redirectToHome()">OK</button>
+    </div>
+    <div class="popup" id="errorPopup">
+        <h3 th:text="${errorMessage}"></h3>
+        <button onclick="closePopup()">OK</button>
+    </div>
 
-<!-- jQuery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<!-- Bootstrap Script -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-$(document).ready(function() {
-    // Xử lý sự kiện khi nhấn nút 'Confirm Payment'
-    $('#paymentBtn').on('click', function(event) {
-        // Ngừng hành động mặc định (submit form)
-        event.preventDefault();
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Bootstrap Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Xử lý sự kiện khi nhấn nút 'Confirm Payment'
+            $('#paymentBtn').on('click', function (event) {
+                // Ngừng hành động mặc định (submit form)
+                event.preventDefault();
 
-        let isValid = true;
+                let isValid = true;
 
-        // Xóa thông báo lỗi trước đó
-        $('.error-message').remove();
-        $('.input-error').removeClass('input-error');
+                // Xóa thông báo lỗi trước đó
+                $('.error-message').remove();
+                $('.input-error').removeClass('input-error');
 
-<<<<<<< Updated upstream
-        // Kiểm tra các trường required
-        $('#confirmPaymentForm').find('input[required], select[required]').each(function() {
-            let $field = $(this);
-            if ($field.val().trim() === '') {
-                isValid = false;
-                $field.addClass('input-error');
-                $field.after('<span class="error-message">This field is required</span>');
-=======
                 // Kiểm tra các trường required
                 $('#confirmPaymentForm').find('input[required], select[required]').each(function () {
                     let $field = $(this);
@@ -568,14 +608,9 @@ $(document).ready(function() {
             });
 
             // Khi người dùng nhấn "Yes" trong pop-up xác nhận
-			$('#confirmYes').on('click', function () {
-			    let selectedMethod = $('input[name="paymentMethod"]:checked').val();
-			    let form = $('#confirmPaymentForm');
-			    if (selectedMethod === 'vnpay') {
-			        form.attr('action', '/ComplexGym/payment/VNPay/submitOrder');
-			    }
-			    form.submit();
-			});
+            $('#confirmYes').on('click', function () {
+                $('#confirmPaymentForm').submit(); // Gửi form chính xác
+            });
 
             // Khi người dùng nhấn "No" trong pop-up xác nhận
             $('#confirmNo').on('click', function () {
@@ -652,184 +687,27 @@ $(document).ready(function() {
                 $('#successPopup').show();
                 $('#overlay').show();
                 setTimeout(redirectToHome, 3000);
->>>>>>> Stashed changes
             }
-        });
-
-        // Kiểm tra Full Name (chỉ cho phép chữ cái tiếng Việt, Nhật, khoảng trắng)
-        let $fullName = $('#fullName');
-        let fullNameVal = $fullName.val().trim();
-        if (!/^[a-zA-Z\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF\s]+$/.test(fullNameVal) || containsEmojiOrFullSize(fullNameVal)) {
-            isValid = false;
-            $fullName.addClass('input-error');
-            $fullName.after('<span class="error-message">Full Name cannot contain numbers, special characters, emoji, or full-size characters</span>');
-        }
-
-        // Kiểm tra Address (chỉ cho phép chữ cái tiếng Việt, Nhật, số, dấu chấm, dấu phẩy và khoảng trắng)
-        let $address = $('#address');
-        let addressVal = $address.val().trim();
-        if (!/^[a-zA-Z0-9\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF\s,.]+$/.test(addressVal) || containsEmojiOrFullSize(addressVal)) {
-            isValid = false;
-            $address.addClass('input-error');
-            $address.after('<span class="error-message">Address cannot contain special characters (except , and .), emoji, or full-size characters</span>');
-        }
-
-        // Kiểm tra số điện thoại (chỉ cho phép số)
-        let $phone = $('#phoneNumber');
-        let phoneVal = $phone.val().trim();
-        if (!/^\d+$/.test(phoneVal)) {
-            isValid = false;
-            $phone.addClass('input-error');
-            $phone.after('<span class="error-message">Only digits allowed</span>');
-        }
-
-        // Kiểm tra Email
-        let $email = $('#email');
-        let emailVal = $email.val().trim();
-        let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;  // Kiểm tra định dạng email
-        let domainRegex = /@(fpt\.com|gmail\.com|yahoo\.com|outlook\.com|icloud\.com|hotmail\.com)$/; // Chỉ chấp nhận các domain phổ biến
-
-        if (containsEmojiOrFullSize(emailVal)) {
-            isValid = false;
-            $email.addClass('input-error');
-            $email.after('<span class="error-message">Email cannot contain full-size characters or emoji</span>');
-        } else if (!emailRegex.test(emailVal)) {
-            isValid = false;
-            $email.addClass('input-error');
-            $email.after('<span class="error-message">Invalid email format</span>');
-        } else if (!domainRegex.test(emailVal)) {
-            isValid = false;
-            $email.addClass('input-error');
-            $email.after('<span class="error-message">Email must be from Gmail, Yahoo, Outlook, iCloud, or Hotmail</span>');
-        }
-
-        // Kiểm tra nếu chưa chọn Payment Method
-        if (!$('input[name="paymentMethod"]:checked').val()) {
-            alert("Please select your payment method.");
-            isValid = false;
-        }
-
-        // Nếu form hợp lệ, hiển thị hộp xác nhận cập nhật
-        if (isValid) {
-            $('#confirmPopup').show();
-            $('#overlay').show();
-        }
-
-        // Nếu có lỗi, ngừng submit
-        if (!isValid) {
-            event.preventDefault();
-            alert('Please check the required fields!');
-            return;
-        }
-    });
-
-    // Khi người dùng nhấn "Yes" trong pop-up xác nhận
-    $('#confirmYes').on('click', function() {
-        $('#confirmPaymentForm').submit(); // Gửi form chính xác
-    });
-
-    // Khi người dùng nhấn "No" trong pop-up xác nhận
-    $('#confirmNo').on('click', function() {
-        $('#confirmPopup').hide();
-        $('#overlay').hide();
-    });
-
-    // Khi người dùng nhập lại đúng thì xóa viền đỏ và lỗi
-    $('input, select').on('input change', function() {
-        $(this).removeClass('input-error');
-        $(this).next('.error-message').remove();
-    });
-
-    // Load District theo Province
-    $('#provinceId').change(function() {
-        var provinceId = $(this).val();
-        $('#districtId').empty().append('<option value="">Loading...</option>');
-        $.ajax({
-            url: '/loginAPI/getDistrictDropdown',
-            type: 'GET',
-            data: { provinceId: provinceId },
-            success: function(data) {
-                $('#districtId').empty().append('<option value="">Select district</option>');
-                $('#wardId').empty().append('<option value="">Select ward</option>');
-                data.forEach(function(district) {
-                    $('#districtId').append('<option value="' + district.districtId + '">' + district.districtName + '</option>');
-                });
+            if (errorMessage && errorMessage.trim() !== "null") {
+                $('#errorPopup').show();
+                $('#overlay').show();
             }
-        });
-    });
+        };
 
-<<<<<<< Updated upstream
-    // Load Ward theo District
-    $('#districtId').change(function() {
-        var districtId = $(this).val();
-        $('#wardId').empty().append('<option value="">Loading...</option>');
-        $.ajax({
-            url: '/loginAPI/getWardDropdown',
-            type: 'GET',
-            data: { districtId: districtId },
-            success: function(data) {
-                $('#wardId').empty().append('<option value="">Select ward</option>');
-                data.forEach(function(ward) {
-                    $('#wardId').append('<option value="' + ward.wardId + '">' + ward.wardName + '</option>');
-                });
-            }
-        });
-    });
-});
-
-// Khi chọn "Bank Transfer", hiển thị thông tin chuyển khoản
-document.getElementById("bankTransfer").addEventListener("change", function () {
-    document.getElementById("bankInfoContainer").style.display = "block";
-});
-
-// Khi chọn "Cash on Delivery", ẩn thông tin chuyển khoản
-document.querySelectorAll("input[name='paymentMethod']").forEach(function (input) {
-    input.addEventListener("change", function () {
-        if (this.value !== "bank") {
-            document.getElementById("bankInfoContainer").style.display = "none";
-=======
         // Hàm chuyển hướng về trang chủ sau khi thông báo thành công
         function redirectToHome() {
-
             window.location.href = "/ComplexGym/home";
->>>>>>> Stashed changes
         }
-    });
-});
 
-// Hàm kiểm tra nếu chứa emoji hoặc ký tự full-size (hàm này cần phải có định nghĩa)
-function containsEmojiOrFullSize(value) {
-    return /[\u200B-\u24FF\u2700-\u27BF\uD83C[\uDF00-\uDFFF]]/.test(value) || /[\uFF00-\uFFFF]/.test(value);
-}
+        // Đóng pop-up lỗi
+        function closePopup() {
+            $('#errorPopup').hide();
+            $('#overlay').hide();
+        }
 
-// Xử lý thông báo thành công/lỗi từ server
-window.onload = function() {
-    let successMessage = "[[${successMessage}]]";
-    let errorMessage = "[[${errorMessage}]]";
-    if (successMessage && successMessage.trim() !== "null") {
-        $('#successPopup').show();
-        $('#overlay').show();
-        setTimeout(redirectToHome, 3000);
-    }
-    if (errorMessage && errorMessage.trim() !== "null") {
-        $('#errorPopup').show();
-        $('#overlay').show();
-    }
-};
+    </script>
 
-// Hàm chuyển hướng về trang chủ sau khi thông báo thành công
-function redirectToHome() {
-    window.location.href = "/ComplexGym/home";
-}
 
-// Đóng pop-up lỗi
-function closePopup() {
-    $('#errorPopup').hide();
-    $('#overlay').hide();
-}
-
-</script>
-    
 </body>
 
 </html>

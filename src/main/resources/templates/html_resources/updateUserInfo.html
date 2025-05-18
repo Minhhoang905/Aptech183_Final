@@ -1,256 +1,477 @@
 <!DOCTYPE html>
 <html xmlns="http://www.thymeleaf.org">
+
 <head>
-<meta charset="UTF-8">
-<title>Update User Information</title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">        
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
- <script th:src="@{/js/cart.js}"></script>
-	
-<style>
-body {
-	font-family: 'Poppins', sans-serif;
-	background-color: #E3F2FD;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	min-height: 100vh;
-	margin: 0;
-}
+    <meta charset="UTF-8">
+    <title>Update User Information</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <script th:src="@{/js/cart.js}"></script>
 
-.update-container {
-	background-color: white;
-	padding: 25px;
-	border-radius: 12px;
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-	width: 400px;
-	box-sizing: border-box;
-	text-align: center;
-}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-decoration: none;
+            color: white;
+        }
 
-h2 {
-	color: #333;
-	margin-bottom: 15px;
-}
+        body {
+            font-family: 'Impact', Haettenschweiler, sans-serif;
+            min-height: 100vh;
+            background-color: rgb(213, 60, 17);
+        }
 
-.form-group {
-	text-align: left;
-	margin-bottom: 12px;
-}
+        header {
+            backdrop-filter: blur(5px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0px 3%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
 
-.form-group label {
-	font-weight: bold;
-	display: block;
-	margin-bottom: 5px;
-}
+        }
 
-input[type="text"], input[type="password"], input[type="email"], input[type="tel"],
-	input[type="date"], select {
-	width: 100%;
-	padding: 10px;
-	border: 1px solid #ccc;
-	border-radius: 6px;
-	box-sizing: border-box;
-	font-size: 14px;
-	transition: border-color 0.3s;
-}
+        header .logo {
+            color: white;
+            font-size: 30px;
+        }
 
-input:focus, select:focus {
-	border-color: #007BFF;
-	outline: none;
-}
+        header .logo span {
+            color: rgb(11, 211, 85);
+        }
 
-.input-error {
-	border: 1px solid red !important;
-}
+        header .navbar ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-.error-message {
-	color: red;
-	font-size: 12px;
-	margin-top: 2px;
-	display: block;
-}
+        header .navbar ul li {
+            position: relative;
+            float: left;
+        }
 
-.radio-container {
-	display: flex;
-	justify-content: space-around;
-	margin: 12px 0;
-}
+        header .navbar ul li a {
+            display: block;
+            padding: 20px;
+            color: white;
+            font-size: 20px;
+            transition: ease-in 0.3s;
+        }
 
-.radio-container label {
-	font-size: 16px;
-	cursor: pointer;
-}
+        header .navbar ul li .fa-circle-user {
+            font-size: 20px;
+            padding-right: 10px;
+        }
 
-.submit-button, .back-button {
-	background-color: #007BFF;
-	color: white;
-	border: none;
-	padding: 12px;
-	border-radius: 6px;
-	cursor: pointer;
-	width: 100%;
-	font-size: 16px;
-	transition: background-color 0.3s;
-	margin-top: 10px;
-}
+        nav ul li a:hover {
+            color: rgb(11, 211, 85);
+        }
 
-.submit-button:hover {
-	background-color: #0056b3;
-}
+        header .navbar ul li ul {
+            position: absolute;
+            left: 0;
+            width: 200px;
+            display: none;
+        }
 
-.back-button {
-	background-color: #28a745;
-}
+        header .navbar ul li ul li {
+            width: 100%;
+        }
 
-.back-button:hover {
-	background-color: #218838;
-}
-/* Pop-up xác nhận */
-.confirm-popup {
-	display: none;
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background: white;
-	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-	text-align: center;
-	z-index: 1000;
-	width: 300px;
-}
+        header .navbar ul li:hover>ul {
+            display: initial;
+        }
 
-.confirm-popup h3 {
-	margin: 0 0 15px;
-}
+        header .navbar ul li .button {
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 120px;
+            padding: 7px 7px;
+            background-color: rgb(11, 211, 85);
+            transition: ease-in-out 0.3s;
+            cursor: pointer;
+            margin-left: 20px;
+        }
 
-.confirm-popup .btn {
-	margin: 0 5px;
-}
-/* Overlay mờ */
-.overlay {
-	display: none;
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, 0.5);
-	z-index: 999;
-}
-/* Pop-up thông báo (Success/ Error) */
-.popup {
-	display: none;
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background: white;
-	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-	text-align: center;
-	z-index: 1000;
-}
+        header .navbar ul li .button:hover {
+            color: white;
+        }
 
-.popup h3 {
-	margin: 0 0 10px;
-}
 
-.popup button {
-	background-color: #007BFF;
-	color: white;
-	border: none;
-	padding: 10px 20px;
-	border-radius: 5px;
-	cursor: pointer;
-}
+        .update-container {
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+        }
 
-.popup button:hover {
-	background-color: #0056b3;
-}
-/* Định dạng cho các input bị lỗi */
-.input-error {
-	border: 2px solid red;
-	background-color: #ffe6e6;
-}
+        h2 {
+            color: white;
+            font-size: 50px;
+            padding-top: 44px;
+        }
 
-.error-message {
-	color: red;
-	font-size: 14px;
-	margin-top: 5px;
-	display: block;
-}
+        #updateForm {
+            display: flex;
+            flex-direction: column;
+            padding-left: 50vh;
+            padding-right: 50vh;
+        }
 
-/* Tùy chỉnh pop-up overlay */
-#overlay {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, 0.5);
-	display: none;
-	z-index: 1000;
-}
+        .form {
+            display: flex;
+            flex-direction: row;
+        }
 
-/* Cửa sổ pop-up xác nhận */
-#confirmPopup, #successPopup, #errorPopup {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background: white;
-	padding: 20px;
-	border-radius: 10px;
-	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-	display: none;
-	z-index: 1001;
-	width: 300px;
-	text-align: center;
-}
+        .form div {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
 
-#confirmPopup button, #successPopup button, #errorPopup button {
-	padding: 8px 15px;
-	margin: 10px;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-}
+        .form_button button {
+            margin: 20px 10px;
+            height: 40px;
+            width: 200px;
+            background-color: rgb(11, 211, 85);
+            transition: ease-in-out 0.3s;
+            border: none;
+            font-family: 'Impact', Haettenschweiler, sans-serif;
+            font-size: 20px;
+            color: rgb(0, 0, 0);
+            cursor: pointer;
+        }
 
-#confirmYes {
-	background-color: #28a745;
-	color: white;
-}
+        .form_button button:hover {
+            color: white;
+        }
 
-#confirmNo {
-	background-color: #dc3545;
-	color: white;
-}
 
-#successPopup {
-	border: 2px solid green;
-}
+        .form-group {
+            text-align: left;
+            margin-bottom: 12px;
+        }
+        .fml_font {
+            font-family: 'Montserrat', Impact, sans-serif;
+            font-style: normal;
+        }
 
-#errorPopup {
-	border: 2px solid red;
-}
-</style>
+
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        .input-error {
+            border: 2px solid red !important;
+        }
+
+        .radio-container {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .radio-container label {
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .radio_left {
+            padding: 10px;
+        }
+
+        .radio_right {
+            padding: 10px;
+        }
+
+        .date_input {
+            border-radius: 8px;
+            border: none;
+            height: 40px;
+            width: 231px;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .date_input input {
+            outline: none;
+            border: none;
+        }
+
+        .form_left {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .form_left label {
+            padding-top: 10px;
+        }
+
+        .form_right {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .form_right label {
+            padding-top: 10px;
+        }
+        
+         .form_right input {
+            color: black;
+        }
+        
+        .form_left input {
+            color: black;
+        }
+        
+          .form_right select {
+            color: black;
+        }
+        
+          .form_right select option {
+            color: black;
+        }
+        
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        .input-error {
+            border: 1px solid red !important;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 2px;
+            display: block;
+        }
+
+        .radio-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 12px 0;
+        }
+
+        .radio-container label {
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+
+        .back-button {
+            background-color: #28a745;
+        }
+
+        .back-button:hover {
+            background-color: #218838;
+        }
+
+        /* Pop-up xác nhận */
+        .confirm-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 1000;
+            width: 300px;
+        }
+
+        .confirm-popup h3 {
+            margin: 0 0 15px;
+        }
+
+        .confirm-popup .btn {
+            margin: 0 5px;
+        }
+
+        /* Overlay mờ */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        /* Pop-up thông báo (Success/ Error) */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .popup h3 {
+            margin: 0 0 10px;
+        }
+
+        .popup button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Định dạng cho các input bị lỗi */
+        .input-error {
+            border: 2px solid red;
+            background-color: #ffe6e6;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Tùy chỉnh pop-up overlay */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+        }
+
+        /* Cửa sổ pop-up xác nhận */
+        #confirmPopup,
+        #successPopup,
+        #errorPopup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1001;
+            width: 300px;
+            text-align: center;
+        }
+
+        #confirmPopup button,
+        #successPopup button,
+        #errorPopup button {
+            padding: 8px 15px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #confirmYes {
+            background-color: #28a745;
+            color: white;
+        }
+
+        #confirmNo {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        #successPopup {
+            border: 2px solid green;
+        }
+
+        #errorPopup {
+            border: 2px solid red;
+        }
+    </style>
 </head>
+
 <body>
     <!-- Navbar -->
-<<<<<<< Updated upstream
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container-fluid">
-            <!-- Góc trái: Icon -->
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-dumbbell"></i>
-            </a>
-=======
     <header>
         <a href="#" class="logo">Complex<span> Gym</span></a>
         <nav class="navbar">
@@ -279,301 +500,249 @@ input:focus, select:focus {
             </ul>
         </nav>
     </header>
->>>>>>> Stashed changes
 
-            <!-- Button toggle menu cho mobile -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+    <div class="update-container">
+        <h2>Update user info</h2>
+        <form id="updateForm" method="POST" th:action="@{/userManagement/doUpdateUserInfo}" th:object="${userUpdate}">
+            <div class="form">
+                <div class="form_left">
 
-            <!-- Navbar -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" th:href="@{/ComplexGym/home}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="bookingLink" role="button">
-                            Schedule
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Products
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="productsDropdown">
-                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/supplements}">Supplement</a></li>
-                            <li><a class="dropdown-item" th:href="@{/ComplexGym/products/gears}">Gears</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/ComplexGym/cart}">
-                            <i class="fas fa-shopping-cart"></i> Cart <span id="cart-count"></span>
-                        </a>
-                    </li>
-                </ul>
+                    <!-- ID (read-only) -->
+                    <label for="id" class="form-label">Id</label>
+                    <input type="number" id="id" th:field="*{id}" class="form-control" readonly
+                        style="pointer-events: none; opacity: 0.5;">
 
-                <!-- Hiển thị theo trạng thái đăng nhập -->
-                <div class="ms-3">
-                    <th:block th:if="${role == 'Anonymous'}">
-                        <a class="btn btn-warning" th:href="@{/login}">Login</a>
-                    </th:block>
-                    <th:block th:if="${role != 'Anonymous'}">
-                        <div class="dropdown">
-                            <button class="btn btn-warning dropdown-toggle" type="button" id="userMenu"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user"></i> <span th:text="${username}"></span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/userManagement}">User Management</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li th:if="${role == 'ROLE_ADMIN'}"><a class="dropdown-item" th:href="@{/ComplexGym/products/productManagement}">Product Management</a></li>
-                                <li><hr class="dropdown-divider"></li> 
-                                <li><a th:href="@{/ComplexGym/payment/ordersManagement}">Order<br>management</a></li>
-                                <li><hr class="dropdown-divider"></li>                                                                                                                                                                                                                                                                                            
-                                <li><a class="dropdown-item logout-item" th:href="@{/logout}">Logout</a></li>
-                            </ul>
-                        </div>
-                    </th:block>
+                    <label>Username</label>
+                    <input type="text" id="username" name="username" th:field="*{name}" required>
+                    <small class="error-message text-danger" th:text="${usernameError}"></small>
+                    <p class="message" th:text="${mes}" style="color: white; font-size: 12px;"></p>
+
+                    <label>Password</label>
+                    <input type="password" id="password" name="password" th:field="*{pass}" required>
+                    <small class="form-text text-muted">
+                        The password must contain at least one uppercase letter, one special character, and one number.
+                    </small>
+
+                    <span id="passwordError" style="color: white; font-size: 12px;"></span>
+
+                    <label>Full Name</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                    <span id="fullNameError" style="color: white; font-size: 12px;"></span>
+
+
+                    <label>Date of Birth</label>
+
+                    <div class="date_input">
+                        <input type="date" id="dateOfBirth" name="dateOfBirth" th:field="*{dateOfBirth}" required
+                            title="Vui lòng chọn ngày sinh" min="1900-01-01" max="2999-12-31"
+                            style="border:none; width:231px">
+                    </div>
+
+
+                    <label>Email</label>
+                    <input type="email" id="email" name="email" th:field="*{email}" required>
+                    <span id="emailError" th:text="${mes}" style="color: white; font-size: 12px;"></span>
+
+
+                    <label>Phone Number</label>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" th:field="*{phoneNumber}" required>
+                    <span id="phoneNumberError" style="color: white; font-size: 12px;"></span>
+
+                </div>
+                <div class="form_right">
+
+                    <label>Province</label>
+                    <select class="form-select" id="provinceId" name="provinceId" th:field="*{provinceId}" required>
+                        <option value="">Province</option>
+                        <option th:each="province : ${provinceList}" th:value="${province.provinceId}"
+                            th:text="${province.provinceName}">
+                        </option>
+                    </select>
+
+                    <label>District</label>
+                    <select class="form-select" id="districtId" name="districtId" th:field="*{districtId}" required>
+                        <option value="">District</option>
+                        <option th:each="district : ${districtList}" th:value="${district.districtId}"
+                            th:text="${district.districtName}">
+                        </option>
+                    </select>
+                    <label>Ward</label>
+                    <select class="form-select" id="wardId" name="wardId" th:field="*{wardId}" required>
+                        <option value="">Ward</option>
+                        <option th:each="ward : ${wardList}" th:value="${ward.wardId}" th:text="${ward.wardName}">
+                        </option>
+                    </select>
+
+                    <label>Address</label>
+                    <input type="text" th:field="*{address}" placeholder="Nhập số nhà cụ thể" required>
+                    <span id="addressError" style="color: white; font-size: 12px;"></span>
+                    <br>
+                    <p class="message" th:text="${mes}"></p>
+
+                    <label>Role</label>
+                    <div class="radio-container">
+                        <label class="radio_left">
+                            <input type="radio" th:field="*{role}" value="USER" required> User
+                        </label>
+                        <label class="radio_right">
+                            <input type="radio" th:field="*{role}" value="PT" required> PT
+                        </label>
+                    </div>
+
                 </div>
             </div>
+            <div class="form_button">
+                <button type="button" id="updateBtn" class="submit-button">Update</button>
+            </div>
+
+
+        </form>
+
+        <!-- Confirmation Pop-up -->
+        <div class="fml_font confirm-popup" id="confirmPopup">
+            <h3 style="color:black">Are you sure you want to update?</h3>
+            <button id="confirmYes" class="btn btn-primary">Yes</button>
+            <button id="confirmNo" class="btn btn-secondary">No</button>
         </div>
-    </nav>
 
-  <div class="update-container">
-    <h2 class="mb-4 text-center">Update User Information</h2>
-    <form id="updateForm" method="POST" th:action="@{/userManagement/doUpdateUserInfo}" th:object="${userUpdate}">
-      <!-- ID (read-only) -->
-      <div class="mb-3 form-group">
-        <label for="id" class="form-label">Id</label>
-        <input type="number" id="id" th:field="*{id}" class="form-control" readonly style="pointer-events: none; opacity: 0.5;">
-      </div>
-      <!-- Username -->
-      <div class="mb-3 form-group">
-        <label for="name" class="form-label">Username</label>
-        <input type="text" id="name" th:field="*{name}" class="form-control" required>
-      </div>
-      <!-- Full Name -->
-      <div class="mb-3 form-group">
-        <label for="fullName" class="form-label">Full Name</label>
-        <input type="text" id="fullName" th:field="*{fullName}" class="form-control" required>
-      </div>
-      <!-- Date of Birth -->
-      <div class="mb-3 form-group">
-        <label for="dateOfBirth" class="form-label">Date of Birth</label>
-        <input type="date" id="dateOfBirth" th:field="*{dateOfBirth}" class="form-control" required min="1900-01-01" max="2999-12-31">
-      </div>
-      <!-- Email -->
-      <div class="mb-3 form-group">
-        <label for="email" class="form-label">Email</label>
-        <input type="email" id="email" th:field="*{email}" class="form-control" required>
-      </div>
-      <!-- Phone Number -->
-      <div class="mb-3 form-group">
-        <label for="phoneNumber" class="form-label">Phone Number</label>
-        <input type="tel" id="phoneNumber" th:field="*{phoneNumber}" class="form-control" required pattern="^\d+$" title="Only digits allowed">
-      </div>
-      <!-- Role (radio buttons) -->
-      <div class="mb-3 form-group">
-        <label class="form-label">Role</label>
-        <div class="radio-container">
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" th:field="*{role}" id="roleUser" value="USER" required>
-            <label class="form-check-label" for="roleUser">User</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" th:field="*{role}" id="rolePT" value="PT" required>
-            <label class="form-check-label" for="rolePT">PT</label>
-          </div>
+        <!-- Overlay for pop-ups -->
+        <div class="overlay" id="overlay"></div>
+
+        <!-- Success & Error Pop-ups (if needed) -->
+        <div class="fml_font popup" id="successPopup">
+            <h3 style="color:black" th:text="${successMessage}"></h3>
+            <button onclick="redirectToUserManagament()">OK</button>
         </div>
-      </div>
-      <!-- Province Dropdown -->
-      <div class="mb-3 form-group">
-        <label for="provinceId" class="form-label">Province</label>
-        <select id="provinceId" th:field="*{provinceId}" class="form-select" required>
-          <option value="">Select Province</option>
-          <option th:each="province : ${provinceList}"
-                  th:value="${province.provinceId}" 
-                  th:text="${province.provinceName}"></option>
-        </select>
-      </div>
-      <!-- District Dropdown -->
-      <div class="mb-3 form-group">
-        <label for="districtId" class="form-label">District</label>
-        <select id="districtId" th:field="*{districtId}" class="form-select" required>
-          <option value="">Select District</option>
-          <option th:each="district : ${districtList}"
-                  th:value="${district.districtId}" 
-                  th:text="${district.districtName}"></option>
-        </select>
-      </div>
-      <!-- Ward Dropdown -->
-      <div class="mb-3 form-group">
-        <label for="wardId" class="form-label">Ward</label>
-        <select id="wardId" th:field="*{wardId}" class="form-select" required>
-          <option value="">Select Ward</option>
-          <option th:each="ward : ${wardList}"
-                  th:value="${ward.wardId}" 
-                  th:text="${ward.wardName}"></option>
-        </select>
-      </div>
-      <!-- Detailed Address -->
-      <div class="mb-3 form-group">
-        <label for="address" class="form-label">Detailed Address</label>
-        <input type="text" id="address" th:field="*{address}" class="form-control" placeholder="Enter detailed address" required>
-      </div>
-      <!-- Submit Button (trigger confirmation) -->
-      <button type="button" id="updateBtn" class="submit-button">Update</button>
-    </form>
-    <!-- Back Button -->
-    <button class="back-button" onclick="location.href='/userManagement'">Back to User Management</button>
-  </div>
+        <div class="fml_font popup" id="errorPopup">
+            <h3 style="color:black" th:text="${errorMessage}"></h3>
+            <button onclick="closePopup()">OK</button>
+        </div>
 
-  <!-- Confirmation Pop-up -->
-  <div class="confirm-popup" id="confirmPopup">
-    <h3>Are you sure you want to update?</h3>
-    <button id="confirmYes" class="btn btn-primary">Yes</button>
-    <button id="confirmNo" class="btn btn-secondary">No</button>
-  </div>
+        <!-- jQuery & Bootstrap JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $('#updateBtn').on('click', function (event) {
+                    let isValid = true;
 
-  <!-- Overlay for pop-ups -->
-  <div class="overlay" id="overlay"></div>
+                    // Xóa thông báo lỗi trước đó
+                    $('.error-message').remove();
+                    $('.input-error').removeClass('input-error');
 
-  <!-- Success & Error Pop-ups (if needed) -->
-  <div class="popup" id="successPopup">
-    <h3 th:text="${successMessage}"></h3>
-    <button onclick="redirectToUserManagament()">OK</button>
-  </div>
-  <div class="popup" id="errorPopup">
-    <h3 th:text="${errorMessage}"></h3>
-    <button onclick="closePopup()">OK</button>
-  </div>
+                    // Kiểm tra các trường required
+                    $('#updateForm').find('input[required], select[required]').each(function () {
+                        let $field = $(this);
+                        if ($field.val().trim() === '') {
+                            isValid = false;
+                            $field.addClass('input-error');
+                            $field.after('<span class="error-message">This field is required</span>');
+                        }
+                    });
 
-  <!-- jQuery & Bootstrap JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-	$(document).ready(function() {
-	    $('#updateBtn').on('click', function(event) {
-	        let isValid = true;
+                    // Kiểm tra Full Name (chỉ cho phép chữ cái tiếng Việt, Nhật, khoảng trắng)
+                    let $fullName = $('#fullName');
+                    let fullNameVal = $fullName.val().trim();
+                    if (!/^[a-zA-Z\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF\s]+$/.test(fullNameVal) || containsEmojiOrFullSize(fullNameVal)) {
+                        isValid = false;
+                        $fullName.addClass('input-error');
+                        $fullName.after('<span class="error-message">Full Name cannot contain numbers, special characters, emoji, or full-size characters</span>');
+                    }
 
-	        // Xóa thông báo lỗi trước đó
-	        $('.error-message').remove();
-	        $('.input-error').removeClass('input-error');
+                    // Kiểm tra Address (chỉ cho phép chữ cái tiếng Việt, Nhật, số, dấu chấm, dấu phẩy và khoảng trắng)
+                    let $address = $('#address');
+                    let addressVal = $address.val().trim();
+                    if (!/^[a-zA-Z0-9\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF\s,.]+$/.test(addressVal) || containsEmojiOrFullSize(addressVal)) {
+                        isValid = false;
+                        $address.addClass('input-error');
+                        $address.after('<span class="error-message">Address cannot contain special characters (except , and .), emoji, or full-size characters</span>');
+                    }
 
-	        // Kiểm tra các trường required
-	        $('#updateForm').find('input[required], select[required]').each(function() {
-	            let $field = $(this);
-	            if ($field.val().trim() === '') {
-	                isValid = false;
-	                $field.addClass('input-error');
-	                $field.after('<span class="error-message">This field is required</span>');
-	            }
-	        });
+                    // Kiểm tra số điện thoại (chỉ cho phép số)
+                    let $phone = $('#phoneNumber');
+                    let phoneVal = $phone.val().trim();
+                    if (!/^\d+$/.test(phoneVal)) {
+                        isValid = false;
+                        $phone.addClass('input-error');
+                        $phone.after('<span class="error-message">Only digits allowed</span>');
+                    }
 
-	        // Kiểm tra Full Name (chỉ cho phép chữ cái tiếng Việt, Nhật, khoảng trắng)
-	        let $fullName = $('#fullName');
-	        let fullNameVal = $fullName.val().trim();
-	        if (!/^[a-zA-Z\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF\s]+$/.test(fullNameVal) || containsEmojiOrFullSize(fullNameVal)) {
-	            isValid = false;
-	            $fullName.addClass('input-error');
-	            $fullName.after('<span class="error-message">Full Name cannot contain numbers, special characters, emoji, or full-size characters</span>');
-	        }
+                    // Kiểm tra Email
+                    let $email = $('#email');
+                    let emailVal = $email.val().trim();
+                    let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;  // Kiểm tra định dạng email
+                    let domainRegex = /@(gmail\.com|yahoo\.com|outlook\.com|icloud\.com|hotmail\.com)$/; // Chỉ chấp nhận các domain phổ biến
 
-	        // Kiểm tra Address (chỉ cho phép chữ cái tiếng Việt, Nhật, số, dấu chấm, dấu phẩy và khoảng trắng)
-	        let $address = $('#address');
-	        let addressVal = $address.val().trim();
-	        if (!/^[a-zA-Z0-9\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF\s,.]+$/.test(addressVal) || containsEmojiOrFullSize(addressVal)) {
-	            isValid = false;
-	            $address.addClass('input-error');
-	            $address.after('<span class="error-message">Address cannot contain special characters (except , and .), emoji, or full-size characters</span>');
-	        }
+                    if (containsEmojiOrFullSize(emailVal)) {
+                        isValid = false;
+                        $email.addClass('input-error');
+                        $email.after('<span class="error-message">Email cannot contain full-size characters or emoji</span>');
+                    } else if (!emailRegex.test(emailVal)) {
+                        isValid = false;
+                        $email.addClass('input-error');
+                        $email.after('<span class="error-message">Invalid email format</span>');
+                    } else if (!domainRegex.test(emailVal)) {
+                        isValid = false;
+                        $email.addClass('input-error');
+                        $email.after('<span class="error-message">Email must be from Gmail, Yahoo, Outlook, iCloud, or Hotmail</span>');
+                    }
 
-	        // Kiểm tra số điện thoại (chỉ cho phép số)
-	        let $phone = $('#phoneNumber');
-	        let phoneVal = $phone.val().trim();
-	        if (!/^\d+$/.test(phoneVal)) {
-	            isValid = false;
-	            $phone.addClass('input-error');
-	            $phone.after('<span class="error-message">Only digits allowed</span>');
-	        }
+                    // Nếu form hợp lệ, hiển thị hộp xác nhận cập nhật
+                    if (isValid) {
+                        $('#confirmPopup').show();
+                        $('#overlay').show();
+                    }
+                });
 
-	        // Kiểm tra Email
-	        let $email = $('#email');
-	        let emailVal = $email.val().trim();
-	        let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;  // Kiểm tra định dạng email
-	        let domainRegex = /@(gmail\.com|yahoo\.com|outlook\.com|icloud\.com|hotmail\.com)$/; // Chỉ chấp nhận các domain phổ biến
+                // Xử lý nút xác nhận trong popup
+                $('#confirmYes').on('click', function () {
+                    $('#updateForm').submit(); // Gửi form sau khi xác nhận
+                });
 
-	        if (containsEmojiOrFullSize(emailVal)) {
-	            isValid = false;
-	            $email.addClass('input-error');
-	            $email.after('<span class="error-message">Email cannot contain full-size characters or emoji</span>');
-	        } else if (!emailRegex.test(emailVal)) {
-	            isValid = false;
-	            $email.addClass('input-error');
-	            $email.after('<span class="error-message">Invalid email format</span>');
-	        } else if (!domainRegex.test(emailVal)) {
-	            isValid = false;
-	            $email.addClass('input-error');
-	            $email.after('<span class="error-message">Email must be from Gmail, Yahoo, Outlook, iCloud, or Hotmail</span>');
-	        }
+                // Xử lý nút từ chối trong popup
+                $('#confirmNo').on('click', function () {
+                    $('#confirmPopup').hide();
+                    $('#overlay').hide();
+                });
 
-	        // Nếu form hợp lệ, hiển thị hộp xác nhận cập nhật
-	        if (isValid) {
-	            $('#confirmPopup').show();
-	            $('#overlay').show();
-	        }
-	    });
+                // Khi người dùng nhập lại đúng thì xóa viền đỏ và lỗi
+                $('input, select').on('input change', function () {
+                    $(this).removeClass('input-error');
+                    $(this).next('.error-message').remove();
+                });
 
-	    // Xử lý nút xác nhận trong popup
-	    $('#confirmYes').on('click', function() {
-	        $('#updateForm').submit(); // Gửi form sau khi xác nhận
-	    });
+                // Hàm kiểm tra emoji và ký tự full-size
+                function containsEmojiOrFullSize(text) {
+                    const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}]/u;
+                    const fullSizeRegex = /[\uFF00-\uFFEF]/;
+                    return emojiRegex.test(text) || fullSizeRegex.test(text);
+                }
+            });
+            // Xử lý thông báo thành công/lỗi từ server
+            window.onload = function () {
+                let successMessage = "[[${successMessage}]]";
+                let errorMessage = "[[${errorMessage}]]";
+                if (successMessage && successMessage.trim() !== "null") {
+                    $('#successPopup').show();
+                    $('#overlay').show();
+                    setTimeout(redirectToUserManagament, 3000);
+                }
+                if (errorMessage && errorMessage.trim() !== "null") {
+                    $('#errorPopup').show();
+                    $('#overlay').show();
+                }
+            };
 
-	    // Xử lý nút từ chối trong popup
-	    $('#confirmNo').on('click', function() {
-	        $('#confirmPopup').hide();
-	        $('#overlay').hide();
-	    });
+            function redirectToUserManagament() {
+                window.location.href = "/userManagement";
+            }
 
-	    // Khi người dùng nhập lại đúng thì xóa viền đỏ và lỗi
-	    $('input, select').on('input change', function() {
-	        $(this).removeClass('input-error');
-	        $(this).next('.error-message').remove();
-	    });
+            function closePopup() {
+                $('#errorPopup').hide();
+                $('#overlay').hide();
+            }
+        </script>
 
-	    // Hàm kiểm tra emoji và ký tự full-size
-	    function containsEmojiOrFullSize(text) {
-	        const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}]/u;
-	        const fullSizeRegex = /[\uFF00-\uFFEF]/;
-	        return emojiRegex.test(text) || fullSizeRegex.test(text);
-	    }
-	});
-	// Xử lý thông báo thành công/lỗi từ server
-		window.onload = function() {
-			let successMessage = "[[${successMessage}]]";
-			let errorMessage = "[[${errorMessage}]]";
-			if (successMessage && successMessage.trim() !== "null") {
-				$('#successPopup').show();
-				$('#overlay').show();
-				setTimeout(redirectToUserManagament, 3000);
-			}
-			if (errorMessage && errorMessage.trim() !== "null") {
-				$('#errorPopup').show();
-				$('#overlay').show();
-			}
-		};
-
-		function redirectToUserManagament() {
-			window.location.href = "/userManagement";
-		}
-
-		function closePopup() {
-			$('#errorPopup').hide();
-			$('#overlay').hide();
-		}
-	</script>
 </body>
+
 </html>
