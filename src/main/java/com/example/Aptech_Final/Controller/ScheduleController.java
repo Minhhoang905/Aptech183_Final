@@ -135,4 +135,6 @@ public class ScheduleController {
 	    
 	    return "redirect:/ComplexGym/schedule";
 	}
+
 }
+

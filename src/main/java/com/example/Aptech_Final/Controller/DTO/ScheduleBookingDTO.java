@@ -5,5 +5,4 @@ public interface ScheduleBookingDTO {
     Long getScheduleId();
     Long getUserId();
     int getHour();
-
 }

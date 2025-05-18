@@ -141,5 +141,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>{
                    "WHERE SCHEDULE_ID = :scheduleId", nativeQuery = true)
     void decrementHour(@Param("scheduleId") Long scheduleId, @Param("hour") Integer hour, @Param("date") LocalDate date);
 
-    
+
 }
+

@@ -6,10 +6,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import com.example.Aptech_Final.Repository.UserRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 
 @Service
 public class HomeService {
+	@Autowired
+	private UserRepository userRepository;
 	
 	//Tạo method để xác định role của người đăng nhập
 	public String getCurrentUserRole() {
@@ -37,5 +43,35 @@ public class HomeService {
         return "Anonymous"; // Trả về Anonymous nếu có lỗi
 	    
 	}
+	
+    // Lấy username hiện tại sau khi đã đăng nhập
+    public Long getCurrentUserId() {
+        // 1. Lấy Authentication object hiện tại từ Security Context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new IllegalStateException("No authenticated user found");
+        }
+
+        // 2. Lấy Principal (thông tin người dùng)
+        Object principal = authentication.getPrincipal();
+
+        // 3. Nếu Principal là UserDetails (Spring Security chuẩn)
+        if (principal instanceof UserDetails) {
+            String username = ((UserDetails) principal).getUsername();
+
+            // 4. Tìm userId từ database dựa trên username
+            Long userId = userRepository.findUserIdByUsername(username);
+
+            if (userId == null) {
+                throw new IllegalStateException("User not found in database");
+            }
+
+            return userId;
+        }
+
+        // Nếu principal không hợp lệ
+        throw new IllegalStateException("Invalid authenticated principal");
+    }
 
 }

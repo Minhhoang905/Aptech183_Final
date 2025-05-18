@@ -38,8 +38,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/ComplexGym/payment")
 public class PaymentController {
 
-
-
 	@Autowired
 	private UserRepository userRepository;
     @Autowired
@@ -56,7 +54,7 @@ public class PaymentController {
     private VNPAYService vnPayService;
 
     // Tạo phương thức để thêm role và username vào model
-    private void addCommonAttributes(Model model, Authentication authentication) {
+    public void addCommonAttributes(Model model, Authentication authentication) {
         if (authentication != null) {
             String role = homeService.getCurrentUserRole();
             String username = authentication.getName();           
