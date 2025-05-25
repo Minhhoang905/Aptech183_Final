@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.Aptech_Final.Controller.DTO.ScheduleBookingDTO;
+import com.example.Aptech_Final.Controller.DTO.ScheduleManagementDTO;
 import com.example.Aptech_Final.Enity.ScheduleBooking;
 
 import jakarta.transaction.Transactional;
@@ -107,6 +108,21 @@ public interface ScheduleBookingRepository extends JpaRepository<ScheduleBooking
     void cancelBooking(@Param("scheduleId") Long scheduleId,
                        @Param("userId") Long userId,
                        @Param("hour") Integer hour);
-
+    
+    // Query để hiển thị danh sách người dùng đã đặt lịch
+        @Query(value = """
+            SELECT 
+                s.DATE AS date,
+                b.HOUR AS hour,
+                u.FULL_NAME AS fullName,
+                u.USER_ROLE AS userRole,
+                u.USER_PHONE_NUMBER AS userPhoneNumber
+            FROM SCHEDULE_BOOKING b
+            JOIN SCHEDULE s ON b.SCHEDULE_ID = s.SCHEDULE_ID
+            JOIN USERS u ON b.USER_ID = u.USER_ID
+            WHERE u.USER_ROLE != 'ADMIN'
+            """, nativeQuery = true)
+        List<ScheduleManagementDTO> getAllScheduleUserBookings();
+    
 }
 

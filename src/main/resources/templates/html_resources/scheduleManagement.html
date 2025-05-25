@@ -209,12 +209,21 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 999;
         }
+        
+        .filter-input {
+            width: 100%;
+            padding: 6px;
+            box-sizing: border-box;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }        
     </style>
 </head>
 
 <body>
     <!-- Navbar -->
-
     <header>
         <a th:href="@{/ComplexGym/home}" class="logo">Complex<span> Gym</span></a>
         <nav class="navbar">
@@ -237,7 +246,7 @@
                         <li th:if="${role == 'ROLE_ADMIN'}"><a
                                 th:href="@{/ComplexGym/products/productManagement}">Product<br>management</a></li>
                         <li><a th:href="@{/ComplexGym/payment/ordersManagement}">Order<br>management</a></li>
-                        <li th:if="${role == 'ROLE_ADMIN'}"><a th:href="@{/ComplexGym/schedule/scheduleManagement}">Schedule<br>management</a></li>                                                                                               
+                        <li th:if="${role == 'ROLE_ADMIN'}"><a th:href="@{/ComplexGym/schedule/scheduleManagement}">Schedule<br>management</a></li>                                                
                         <li><a th:href="@{/logout}">Logout</a></li>
                     </ul>
                 </li>
@@ -246,108 +255,69 @@
     </header>
 
     <div class="container">
-        <h1 style="text-align: center;" class="mb-3">User management</h1>
-        <div class="d-flex justify-content-between mb-1">
-            <div th:if="${role != null and role.contains('ADMIN')}">
-                <button class="btn btn-outline-info" onclick="location.href='/register'">Insert user</button>
-            </div>
-        </div>
-        <!-- Tạo table tìm kiếm users-->
-        <section class="mb-4">
-            <form method="POST" th:action="@{/searchUserInformation}" th:object="${userManagementObject}">
-                <div class="mb-3">
-                    <label for="keyword" class="form-label fw-bold"></label>
-                    <input type="text" class="fml_font form-control form-control-lg" name="keyword" id="keyword"
-                        placeholder="Input ID, name, email or phone number ...">
-                </div>
-                <div class="text-center">
-                    <button class="btn btn-primary btn-lg px-5" type="submit">Search</button>
-                </div>
-            </form>
-        </section>
+        <h1 style="text-align: center;" class="mb-3">Schedule management</h1>
         <h3 class="mt-4">Result</h3>
-        <!-- Tạo table hiển thị kết quả -->
-        <section>
-            <table border="1" class="table table-bordered">
+
+        <div class="table-container">
+            <table class="table table-bordered">
                 <thead class="fml_font table-dark text-center">
                     <tr>
-                        <th>ID</th>
-                        <th>User name</th>
-                        <th>Full name</th>
-                        <th>Date of Birth</th>
-                        <th>Email</th>
-                        <th>Phone number</th>
-                        <th>Province</th>
-                        <th>District</th>
-                        <th>Ward</th>
-                        <th>Detailed Address</th>
-                        <th>Role</th>
-                        <th th:if="${role != null and role.contains('ADMIN')}">Action</th>
+                        <th>
+                            Date<br>
+                            <input type="text" class="filter-input" placeholder="dd/MM/yyyy" onkeyup="filterTable(0, this.value)">
+                        </th>
+                        <th>
+                            Hour<br>
+                            <input type="text" class="filter-input" placeholder="Hour" onkeyup="filterTable(1, this.value)">
+                        </th>
+                        <th>
+                            User Name<br>
+                            <input type="text" class="filter-input" placeholder="User Name" onkeyup="filterTable(2, this.value)">
+                        </th>
+                        <th>
+                            Role<br>
+                            <input type="text" class="filter-input" placeholder="Role" onkeyup="filterTable(3, this.value)">
+                        </th>
+                        <th>
+                            Phone Number<br>
+                            <input type="text" class="filter-input" placeholder="Phone Number" onkeyup="filterTable(4, this.value)">
+                        </th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr class="fml_font" th:each="item : ${usersResults}">
-                        <td th:text="${item.id}"></td>
-                        <td th:text="${item.name}"></td>
-                        <td th:text="${item.fullName}"></td>
-                        <td th:text="${item.formattedDateOfBirth}"></td>
-                        <td th:text="${item.email}"></td>
-                        <td th:text="${item.phoneNumber}"></td>
-                        <td th:text="${item.provinceName}"></td>
-                        <td th:text="${item.districtName}"></td>
-                        <td th:text="${item.wardName}"></td>
-                        <td th:text="${item.address}"></td>
-                        <td th:text="${item.role}"></td>
-                        <td th:if="${role != null and role.contains('ADMIN')}">
-                            <div class="d-flex justify-content-center gap-2">
-                                <a th:href="@{/userManagement/updateUser(id=${item.id})}"
-                                    class="btn btn-dark btn-sm py-1">Edit</a>
-                                <!-- Giữ nguyên th:href cho Delete -->
-                                <a th:href="@{/userManagement/doDeleteUser(id=${item.id})}"
-                                    class="btn btn-danger btn-sm py-1 delete-button">Delete</a>
-                            </div>
-                        </td>
-                    </tr>
+                <tbody id="bookingTableBody">
+		            <tr class="fml_font"
+		                th:each="item : ${usersBooking}">
+		                <td th:text="${#temporals.format(item.date, 'dd/MM/yyyy')}"></td>
+		                <td th:text="${item.hour}"></td>
+		                <td th:text="${item.fullName}"></td>
+						<td th:text="${item.userRole}"
+						    th:classappend="${item.userRole == 'PT'} ? ' text-primary' : (item.userRole == 'USER' ? ' text-danger' : '')">
+						</td>
+		                <td th:text="${item.userPhoneNumber}"></td>
+		            </tr>
                 </tbody>
             </table>
-        </section>
+        </div>
     </div>
-
-
-    <!-- HTML cho Pop-up xác nhận xóa và Overlay -->
-    <div class="fml_font confirm-popup" id="confirmDeletePopup">
-        <h3>Are you sure you want to delete this user?</h3>
-        <button id="confirmDeleteYes" class="btn btn-danger">Yes, Delete</button>
-        <button id="confirmDeleteNo" class="btn btn-secondary">Cancel</button>
-    </div>
-    <div class="overlay" id="overlay"></div>
 
     <!-- jQuery & Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        $(document).ready(function () {
-            // Khi nhấn nút Delete, chặn hành động mặc định và hiển thị pop-up xác nhận
-            $('.delete-button').on('click', function (e) {
-                e.preventDefault();
-                var deleteUrl = $(this).attr('href'); // Lấy URL xóa từ th:href
-                $('#confirmDeletePopup').data('deleteUrl', deleteUrl);
-                $('#overlay').show();
-                $('#confirmDeletePopup').show();
-            });
+        function filterTable(columnIndex, filterValue) {
+            filterValue = filterValue.toLowerCase();
+            const table = document.querySelector("#bookingTableBody");
+            const rows = table.getElementsByTagName("tr");
 
-            // Nếu người dùng nhấn "Yes", chuyển hướng tới URL xóa
-            $('#confirmDeleteYes').on('click', function () {
-                var url = $('#confirmDeletePopup').data('deleteUrl');
-                window.location.href = url;
-            });
-
-            // Nếu người dùng nhấn "Cancel", ẩn pop-up và overlay
-            $('#confirmDeleteNo').on('click', function () {
-                $('#confirmDeletePopup').hide();
-                $('#overlay').hide();
-            });
-        });
+            for (let row of rows) {
+                const cell = row.getElementsByTagName("td")[columnIndex];
+                if (cell) {
+                    const text = cell.textContent || cell.innerText;
+                    row.style.display = text.toLowerCase().includes(filterValue) ? "" : "none";
+                }
+            }
+        }
     </script>
 </body>
 
