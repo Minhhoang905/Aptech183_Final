@@ -125,3 +125,4 @@ public interface ScheduleBookingRepository extends JpaRepository<ScheduleBooking
         List<ScheduleManagementDTO> getAllScheduleUserBookings();
     
 }
+

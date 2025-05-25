@@ -26,7 +26,7 @@ public class ScheduleService {
 	private ScheduleRepository scheduleRepository;
 	@Autowired
 	private ScheduleBookingRepository scheduleBookingRepository;
-	
+
 	// Phương thức để hiển thị trên view của người dùng
 	public Map<LocalDate, List<ScheduleForm>> getScheduleByUserRole(Long userId, String role) {
 	    // B0: Lấy lịch của ngày hôm nay
@@ -263,3 +263,4 @@ public class ScheduleService {
 		return scheduleBookingRepository.getAllScheduleUserBookings();
 	}
 }
+

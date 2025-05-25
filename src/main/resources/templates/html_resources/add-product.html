@@ -1,15 +1,165 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns="http://www.thymeleaf.org">
+<html lang="en" xmlns="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add product</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">       
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script th:src="@{/js/cart.js}"></script>    
+    <script th:src="@{/js/cart.js}"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-decoration: none;
+
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .pop_up {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Impact', Haettenschweiler, sans-serif;
+            min-height: 100vh;
+
+        }
+
+        header {
+            backdrop-filter: blur(5px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0px 3%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            background-color: rgb(213, 60, 17);
+
+
+        }
+
+        header .logo {
+            color: white;
+            font-size: 30px;
+        }
+
+        header .logo span {
+            color: rgb(11, 211, 85);
+        }
+
+        header .navbar ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        header .navbar ul li {
+            position: relative;
+            float: left;
+        }
+
+        header .navbar ul li a {
+            display: block;
+            padding: 20px;
+            color: white;
+            font-size: 20px;
+            transition: ease-in 0.3s;
+        }
+
+        header .navbar ul li .fa-circle-user {
+            font-size: 20px;
+            padding-right: 10px;
+        }
+
+        nav ul li a:hover {
+            color: rgb(11, 211, 85) !important;
+        }
+
+        header .navbar ul li ul {
+            background-color: rgb(213, 60, 17);
+            position: absolute;
+            left: 0;
+            width: 200px;
+            display: none;
+        }
+
+        header .navbar ul li ul li {
+            width: 100%;
+        }
+
+        header .navbar ul li:hover>ul {
+            display: initial;
+        }
+
+        header .navbar ul li .button {
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 120px;
+            padding: 7px 7px;
+            background-color: rgb(11, 211, 85);
+            transition: ease-in-out 0.3s;
+            cursor: pointer;
+            margin-left: 20px;
+        }
+
+        header .navbar ul li .button:hover {
+            color: white !important;
+        }
+
+        a:not([href]):not([class]),
+        a:not([href]):not([class]):hover {
+            color: white;
+        }
+
+        .container {
+            justify-content: center;
+            display: flex;
+            padding-top: 16vh;
+            background-color: white;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+
+        .fml_font {
+            font-family: 'Montserrat', Impact, sans-serif;
+            font-style: normal;
+        }
+
+        .button_save {
+            margin: 20px 10px;
+            height: 40px;
+            width: 200px;
+            background-color: rgb(11, 211, 85);
+            transition: ease-in-out 0.3s;
+            border: none;
+            font-family: 'Impact', Haettenschweiler, sans-serif;
+            font-size: 20px;
+            color: rgb(0, 0, 0);
+            cursor: pointer;
+        }
+
+        .button_save:hover {
+            color: white;
+        }
+    </style>
 </head>
 
 <body>
@@ -32,6 +182,7 @@
                     </ul>
                 </li>
                 <li><a th:href="@{/ComplexGym/schedule}">SCHEDULE</a></li>
+                <li><a href="#">SCHEDULE</a></li>
                 <li><a th:href="@{/ComplexGym/cart}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> CART</a>
                 </li>
                 <li th:if="${role == 'Anonymous'}"><a th:href="@{/login}" type="button" class="button">LOGIN</a></li>
@@ -108,78 +259,77 @@
                     </th:block>
                 </div>
             </div>
-        </div>
-    </nav>
 
-	<div class="container mt-4">
-		<h2>Add new product</h2>
-		<!-- Hiển thị thông báo lỗi -->
-		<div th:if="${errorMessage}" class="alert alert-danger">
-			<span th:text="${errorMessage}"></span>
-		</div>
-		<!-- Hiển thị thông báo thành công -->
-		<div th:if="${successMessage}" class="alert alert-success">
-			<span th:text="${successMessage}"></span>
-		</div>
-		
-		<form th:action="@{/ComplexGym/products/saveProduct}" th:object="${productForm}" enctype="multipart/form-data" method="post">
+
+    <div class="container mt-4">
+        <h2 style="text-align: center;">Add new product</h2>
+        <!-- Hiển thị thông báo lỗi -->
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <span th:text="${errorMessage}"></span>
+        </div>
+        <!-- Hiển thị thông báo thành công -->
+        <div th:if="${successMessage}" class="alert alert-success">
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <form th:action="@{/ComplexGym/products/saveProduct}" th:object="${productForm}" enctype="multipart/form-data"
+            method="post">
             <div class="mb-3">
                 <label class="form-label">Product name</label>
                 <input type="text" class="form-control" name="productName" required>
             </div>
-			<div class="mb-3">
-				<label class="form-label">Price</label> 
-				<input type="number" class="form-control" min="1000" name="price" required>
-			</div>
-			<div class="mb-3">
-				<label class="form-label">Type</label>
-				<select  id="type" name="type">
-					<option value="supplements" th:selected="*{type == 'supplements'}">Supplements</option>
-					<option value="gears" th:selected="*{type == 'gears'}">Gears</option>
-				</select>
-			</div>
-			<div class="mb-3">
-				<label class="form-label">Quantity</label>
-				<input type="number" name="quantity" placeholder="Quantity" min="1" required>
-			</div>
-			
-			<label for="imagePath">Select a file:</label>
-			<input type="file" id="imagePath" name="imagePath">
-			
-			<br>
-			<!-- Input số lượng -->
-			<button type="submit">Save</button>
-		</form>
-		<button class="back-button" onclick="location.href='/ComplexGym/home'">Back to Home</button>  
-	</div>
-	
-	<script>
-	    // Lấy type từ URL và đặt vào dropdown
-	    const urlParams = new URLSearchParams(window.location.search);
-	    const type = urlParams.get('type');
-	    if (type) {
-	        document.getElementById("type").value = type;
-	    }
-	    
-	    document.getElementById("imagePath").addEventListener("change", function() {
-	        const file = this.files[0];
-	        if (file.size > 10 * 1024 * 1024) {  // 10MB
-	            alert("File quá lớn! Vui lòng chọn file nhỏ hơn 10MB.");
-	            this.value = ""; // Xóa file đã chọn
-	        }
-	    });
+            <div class="mb-3">
+                <label class="form-label">Price</label>
+                <input type="number" class="form-control" min="1000" name="price" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Type</label>
+                <select id="type" name="type">
+                    <option value="supplements" th:selected="*{type == 'supplements'}">Supplements</option>
+                    <option value="gears" th:selected="*{type == 'gears'}">Gears</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Quantity</label>
+                <input type="number" name="quantity" placeholder="Quantity" min="1" required>
+            </div>
 
-	    // Lấy thông báo từ Thymeleaf
-	    let successMessage = "[[${successMessage}]]";
-	
-	    if (successMessage && successMessage !== "null") {
-	        let selectedType = document.getElementById("productType").value;
-	        let redirectUrl = "/ComplexGym/products?type=" + selectedType;
-	
-	        alert(successMessage);
-	        window.location.href = redirectUrl; // Chuyển hướng đến trang sản phẩm
-	    }
-	</script>
+            <label for="imagePath">Select a file:</label>
+            <input style="font-family:'Tahoma'" type="file" id="imagePath" name="imagePath">
+
+            <br>
+            <!-- Input số lượng -->
+            <button class="button_save" type="submit">Save</button>
+        </form>
+    </div>
+
+    <script>
+        // Lấy type từ URL và đặt vào dropdown
+        const urlParams = new URLSearchParams(window.location.search);
+        const type = urlParams.get('type');
+        if (type) {
+            document.getElementById("type").value = type;
+        }
+
+        document.getElementById("imagePath").addEventListener("change", function () {
+            const file = this.files[0];
+            if (file.size > 10 * 1024 * 1024) {  // 10MB
+                alert("File too big! Please choose file have size less than 10MB.");
+                this.value = ""; // Xóa file đã chọn
+            }
+        });
+
+        // Lấy thông báo từ Thymeleaf
+        let successMessage = "[[${successMessage}]]";
+
+        if (successMessage && successMessage !== "null") {
+            let selectedType = document.getElementById("productType").value;
+            let redirectUrl = "/ComplexGym/products?type=" + selectedType;
+
+            alert(successMessage);
+            window.location.href = redirectUrl; // Chuyển hướng đến trang sản phẩm
+        }
+    </script>
 </body>
 
 </html>

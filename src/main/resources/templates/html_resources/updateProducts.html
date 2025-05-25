@@ -305,6 +305,7 @@
 
 <body>
     <!-- Navbar -->
+
     <header>
         <a th:href="@{/ComplexGym/home}" class="logo">Complex<span> Gym</span></a>
         <nav class="navbar">
@@ -317,6 +318,7 @@
                     </ul>
                 </li>
                 <li><a th:href="@{/ComplexGym/schedule}">SCHEDULE</a></li>
+                <li><a href="#">SCHEDULE</a></li>
                 <li><a th:href="@{/ComplexGym/cart}"><i class="fa fa-shopping-cart" aria-hidden="true"></i> CART</a>
                 </li>
                 <li th:if="${role == 'Anonymous'}"><a th:href="@{/login}" type="button" class="button">LOGIN</a></li>
