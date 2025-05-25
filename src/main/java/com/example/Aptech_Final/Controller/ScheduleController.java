@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.Aptech_Final.Controller.DTO.ScheduleManagementDTO;
 import com.example.Aptech_Final.Controller.DTO.SlotInfo;
 import com.example.Aptech_Final.Enity.Users;
 import com.example.Aptech_Final.Form.ScheduleBookingForm;
@@ -135,4 +136,18 @@ public class ScheduleController {
 	    
 	    return "redirect:/ComplexGym/schedule";
 	}
+	
+	// Phương thức để hiển thị toàn bộ thông tin người dùng đặt lịch
+	@GetMapping("/scheduleManagement")
+	public String getAllUserBooking (Model model, Authentication authentication) {
+	    // Thêm các thuộc tính chung vào model (ví dụ: userId, role,...)
+	    homeController.addCommonAttributes(model, authentication);
+	    
+	    // Gọi phương thức từ service để hiển thị thông tin user đặt lịch
+	    List<ScheduleManagementDTO> usersBooking = scheduleService.getAllUserBookings();
+	    model.addAttribute("usersBooking", usersBooking);
+	    
+	    return "html_resources/scheduleManagement";
+	}
+
 }

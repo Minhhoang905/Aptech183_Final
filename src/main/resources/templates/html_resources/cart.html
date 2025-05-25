@@ -142,7 +142,7 @@
 <body>
     <!-- Navbar -->
     <header>
-        <a href="#" class="logo">Complex<span> Gym</span></a>
+        <a th:href="@{/ComplexGym/home}" class="logo">Complex<span> Gym</span></a>
         <nav class="navbar">
             <ul>
                 <li><a th:href="@{/ComplexGym/home}">HOME</a></li>
@@ -163,6 +163,7 @@
                         <li th:if="${role == 'ROLE_ADMIN'}"><a
                                 th:href="@{/ComplexGym/products/productManagement}">Product<br>management</a></li>
                         <li><a th:href="@{/ComplexGym/payment/ordersManagement}">Order<br>management</a></li>
+                        <li th:if="${role == 'ROLE_ADMIN'}"><a th:href="@{/ComplexGym/schedule/scheduleManagement}">Schedule<br>management</a></li>                                                                       
                         <li><a th:href="@{/logout}">Logout</a></li>
                     </ul>
                 </li>

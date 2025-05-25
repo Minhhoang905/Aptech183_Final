@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.Aptech_Final.Controller.DTO.ScheduleDTO;
+import com.example.Aptech_Final.Controller.DTO.ScheduleManagementDTO;
 import com.example.Aptech_Final.Controller.DTO.SlotInfo;
 import com.example.Aptech_Final.Form.ScheduleBookingForm;
 import com.example.Aptech_Final.Form.ScheduleForm;
@@ -255,5 +256,10 @@ public class ScheduleService {
 		scheduleBookingRepository.cancelBooking(scheduleId, userId, hour);
 		
 		return "success: Cancel slot successfully!";
+	}
+	
+	// Phương thức để hiển thị toàn bộ người dùng đang đặt lịch
+	public List<ScheduleManagementDTO> getAllUserBookings() {
+		return scheduleBookingRepository.getAllScheduleUserBookings();
 	}
 }
