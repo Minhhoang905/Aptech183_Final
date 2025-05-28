@@ -409,34 +409,34 @@
                                 </div>
 
                                 <!-- Khi người dùng đã đặt slot -->
-                                <div th:if="${slotInfo.bookedByCurrentUser}">
-                                    <form class="confirm-cancel" method="post" th:action="@{/ComplexGym/schedule/cancel}">
-                                        <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" th:object=${cancelBooking}/>
-                                    	<input type="hidden" name="date" th:value="${#temporals.format(entry.key, 'yyyy-MM-dd')}" />
-                                        <input type="hidden" name="hour" th:value="${hour}" />
-                                        <button type="submit" class="btn btn-sm btn-danger mt-1">Cancel</button>
-                                    </form>
-                                    
-                                </div>
+								<div th:if="${slotInfo.bookedByCurrentUser and !#strings.contains(role, 'ROLE_ADMIN')}">
+								    <form class="confirm-cancel" method="post" th:action="@{/ComplexGym/schedule/cancel}">
+								        <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" th:object=${cancelBooking}/>
+								        <input type="hidden" name="date" th:value="${#temporals.format(entry.key, 'yyyy-MM-dd')}" />
+								        <input type="hidden" name="hour" th:value="${hour}" />
+								        <button type="submit" class="btn btn-sm btn-danger mt-1">Cancel</button>
+								    </form>
+								</div>
 
                                 <!-- Khi slot chưa được đặt và chưa có người đăng ký -->
-                                <form class="confirm-booking" th:if="${!slotInfo.bookedByCurrentUser and slotInfo.ptCount == 0}"
-                                      method="post" th:action="@{/ComplexGym/schedule/book}" th:object=${scheduleBooking}>
-                                    <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" />
-									<input type="hidden" name="date" th:value="${#temporals.format(entry.key, 'yyyy-MM-dd')}" />
-                                    <input type="hidden" name="hour" th:value="${hour}" />
-                                    <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Book</button>
-                                </form>
+								<form class="confirm-booking" 
+								      th:if="${!slotInfo.bookedByCurrentUser and slotInfo.ptCount == 0 and !#strings.contains(role, 'ROLE_ADMIN')}"
+								      method="post" th:action="@{/ComplexGym/schedule/book}" th:object=${scheduleBooking}>
+								    <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" />
+								    <input type="hidden" name="date" th:value="${#temporals.format(entry.key, 'yyyy-MM-dd')}" />
+								    <input type="hidden" name="hour" th:value="${hour}" />
+								    <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Book</button>
+								</form>
 
                                 <!-- Khi slot đã có người đăng ký -->
-                                <th:block th:if="${!slotInfo.bookedByCurrentUser and slotInfo.ptCount > 0}">
-                                    <form class="confirm-booking" method="post" th:action="@{/ComplexGym/schedule/book}" th:object=${scheduleBooking}>
-                                        <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" />
-                                        <input type="hidden" name="date" th:value="${#temporals.format(entry.key, 'yyyy-MM-dd')}" />                                        
-                                        <input type="hidden" name="hour" th:value="${hour}" />
-                                        <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Book</button>
-                                    </form>
-                                </th:block>
+								<th:block th:if="${!slotInfo.bookedByCurrentUser and slotInfo.ptCount > 0 and !#strings.contains(role, 'ROLE_ADMIN')}">
+								    <form class="confirm-booking" method="post" th:action="@{/ComplexGym/schedule/book}" th:object=${scheduleBooking}>
+								        <input type="hidden" name="scheduleId" th:value="${form.scheduleId}" />
+								        <input type="hidden" name="date" th:value="${#temporals.format(entry.key, 'yyyy-MM-dd')}" />
+								        <input type="hidden" name="hour" th:value="${hour}" />
+								        <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Book</button>
+								    </form>
+								</th:block>
                             </div>
                         </th:block>
 

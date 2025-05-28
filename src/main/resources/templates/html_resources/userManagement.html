@@ -173,42 +173,11 @@
         .logout-button:hover {
             background-color: #d32f2f;
         }
+        
+		.filtered-out, .page-hidden {
+		    display: none !important;
+		}
 
-        /* Pop-up xác nhận */
-        .confirm-popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            z-index: 1000;
-            width: 300px;
-        }
-
-        .confirm-popup h3 {
-            margin-bottom: 15px;
-        }
-
-        .confirm-popup .btn {
-            margin: 0 5px;
-        }
-
-        /* Overlay mờ */
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
     </style>
 </head>
 
@@ -245,109 +214,219 @@
     </header>
 
     <div class="container">
+        <!-- Hiển thị thông báo lỗi -->
+		<section>
+			<div th:if="${errorMessage}" class="alert alert-danger">
+				<span th:text="${errorMessage}"></span>
+			</div>
+			<!-- Hiển thị thông báo thành công -->
+			<div th:if="${successMessage}" class="alert alert-success">
+				<span th:text="${successMessage}"></span>
+			</div>
+		</section>
+    
         <h1 style="text-align: center;" class="mb-3">User management</h1>
         <div class="d-flex justify-content-between mb-1">
             <div th:if="${role != null and role.contains('ADMIN')}">
-                <button class="btn btn-outline-info" onclick="location.href='/register'">Insert user</button>
+                <button class="btn btn-outline-info" onclick="location.href='/register'">➕ Insert user</button>
             </div>
         </div>
-        <!-- Tạo table tìm kiếm users-->
-        <section class="mb-4">
-            <form method="POST" th:action="@{/searchUserInformation}" th:object="${userManagementObject}">
-                <div class="mb-3">
-                    <label for="keyword" class="form-label fw-bold"></label>
-                    <input type="text" class="fml_font form-control form-control-lg" name="keyword" id="keyword"
-                        placeholder="Input ID, name, email or phone number ...">
-                </div>
-                <div class="text-center">
-                    <button class="btn btn-primary btn-lg px-5" type="submit">Search</button>
-                </div>
-            </form>
-        </section>
-        <h3 class="mt-4">Result</h3>
+        
         <!-- Tạo table hiển thị kết quả -->
-        <section>
-            <table border="1" class="table table-bordered">
-                <thead class="fml_font table-dark text-center">
-                    <tr>
-                        <th>ID</th>
-                        <th>User name</th>
-                        <th>Full name</th>
-                        <th>Date of Birth</th>
-                        <th>Email</th>
-                        <th>Phone number</th>
-                        <th>Province</th>
-                        <th>District</th>
-                        <th>Ward</th>
-                        <th>Detailed Address</th>
-                        <th>Role</th>
-                        <th th:if="${role != null and role.contains('ADMIN')}">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="fml_font" th:each="item : ${usersResults}">
-                        <td th:text="${item.id}"></td>
-                        <td th:text="${item.name}"></td>
-                        <td th:text="${item.fullName}"></td>
-                        <td th:text="${item.formattedDateOfBirth}"></td>
-                        <td th:text="${item.email}"></td>
-                        <td th:text="${item.phoneNumber}"></td>
-                        <td th:text="${item.provinceName}"></td>
-                        <td th:text="${item.districtName}"></td>
-                        <td th:text="${item.wardName}"></td>
-                        <td th:text="${item.address}"></td>
-                        <td th:text="${item.role}"></td>
-                        <td th:if="${role != null and role.contains('ADMIN')}">
-                            <div class="d-flex justify-content-center gap-2">
-                                <a th:href="@{/userManagement/updateUser(id=${item.id})}"
-                                    class="btn btn-dark btn-sm py-1">Edit</a>
-                                <!-- Giữ nguyên th:href cho Delete -->
-                                <a th:href="@{/userManagement/doDeleteUser(id=${item.id})}"
-                                    class="btn btn-danger btn-sm py-1 delete-button">Delete</a>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <section class="fml_font mt-3">
+	        <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+	           <table border="1" class="table table-bordered">
+	                <thead class="table-dark text-center">
+	                    <tr>
+					        <th>
+					            ID<br>
+					            <input type="text" class="filter-input" placeholder="ID" 
+					            		oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+					             		onkeyup="filterTable(0, this.value)">
+					        </th>
+					        <th>
+					            User Name<br>
+					            <input type="text" class="filter-input" placeholder="User Name" onkeyup="filterTable(1, this.value)">
+					        </th>
+					        <th>
+					            Full Name<br>
+					            <input type="text" class="filter-input" placeholder="Full Name" onkeyup="filterTable(2, this.value)">
+					        </th>
+					        <th>
+					            Date of Birth<br>
+								<input type="text" class="filter-input" placeholder="D.O.B"
+								       oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+								       onkeyup="filterTable(3, this.value)">
+					        </th>
+					        <th>
+					            Email<br>
+					            <input type="text" class="filter-input" placeholder="Email" onkeyup="filterTable(4, this.value)">
+					        </th>
+					        <th>
+					            Phone number<br>
+								<input type="text" class="filter-input" placeholder="Phone number"
+								       oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+								       onkeyup="filterTable(5, this.value)">
+					        </th>
+					        <th>
+					            Province<br>
+					            <input type="text" class="filter-input" placeholder="Province" onkeyup="filterTable(6, this.value)">
+					        </th>
+					        <th>
+					            District<br>
+					            <input type="text" class="filter-input" placeholder="District" onkeyup="filterTable(7, this.value)">
+					        </th>
+					        <th>
+					            Ward<br>
+					            <input type="text" class="filter-input" placeholder="Ward" onkeyup="filterTable(8, this.value)">
+					        </th>
+					        <th>
+					            Detailed Address<br>
+					            <input type="text" class="filter-input" placeholder="Detailed Address" onkeyup="filterTable(9, this.value)">
+					        </th>
+					        <th>
+					            Role<br>
+					            <input type="text" class="filter-input" placeholder="Role" onkeyup="filterTable(10, this.value)">
+					        </th>
+	                        <th th:if="${role != null and role.contains('ADMIN')}">Action</th>
+	                    </tr>
+	                </thead>
+	                <tbody id="bookingTableBody">
+	                    <tr class="fml_font" th:each="item : ${usersResults}">
+	                        <td th:text="${item.id}"></td>
+	                        <td th:text="${item.name}"></td>
+	                        <td th:text="${item.fullName}"></td>
+	                        <td th:text="${item.formattedDateOfBirth}"></td>
+	                        <td th:text="${item.email}"></td>
+	                        <td th:text="${item.phoneNumber}"></td>
+	                        <td th:text="${item.provinceName}"></td>
+	                        <td th:text="${item.districtName}"></td>
+	                        <td th:text="${item.wardName}"></td>
+	                        <td th:text="${item.address}"></td>
+	                        <td th:text="${item.role}"></td>
+	                        <td th:if="${role != null and role.contains('ADMIN')}">
+	                            <div class="d-flex justify-content-center gap-2">
+	                                <a th:href="@{/userManagement/updateUser(id=${item.id})}"
+	                                    class="btn btn-dark btn-sm py-1">Edit</a>
+	                                <!-- Giữ nguyên th:href cho Delete -->
+	                                <a th:href="@{/userManagement/doDeleteUser(id=${item.id})}"
+	                                    class="btn btn-danger btn-sm py-1 delete-button">Delete</a>
+	                            </div>
+	                        </td>
+	                    </tr>
+	                </tbody>
+            	</table>	        
+	        </div>        
+           <div id="pagination-controls" class="mt-3 d-flex justify-content-center gap-1"></div>                        
         </section>
     </div>
-
-
-    <!-- HTML cho Pop-up xác nhận xóa và Overlay -->
-    <div class="fml_font confirm-popup" id="confirmDeletePopup">
-        <h3>Are you sure you want to delete this user?</h3>
-        <button id="confirmDeleteYes" class="btn btn-danger">Yes, Delete</button>
-        <button id="confirmDeleteNo" class="btn btn-secondary">Cancel</button>
-    </div>
-    <div class="overlay" id="overlay"></div>
 
     <!-- jQuery & Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Khi nhấn nút Delete, chặn hành động mặc định và hiển thị pop-up xác nhận
-            $('.delete-button').on('click', function (e) {
-                e.preventDefault();
-                var deleteUrl = $(this).attr('href'); // Lấy URL xóa từ th:href
-                $('#confirmDeletePopup').data('deleteUrl', deleteUrl);
-                $('#overlay').show();
-                $('#confirmDeletePopup').show();
-            });
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>       
+	<script>
 
-            // Nếu người dùng nhấn "Yes", chuyển hướng tới URL xóa
-            $('#confirmDeleteYes').on('click', function () {
-                var url = $('#confirmDeletePopup').data('deleteUrl');
-                window.location.href = url;
-            });
+	    $(document).ready(function () {
+	        // Xử lý khi click nút Delete với SweetAlert
+	        $('.delete-button').on('click', function (e) {
+	            e.preventDefault();
+	            const deleteUrl = $(this).attr('href');
+	
+	            Swal.fire({
+	                title: 'Are you sure?',
+	                text: "Do you really want to delete this user?",
+	                icon: 'warning',
+	                showCancelButton: true,
+	                confirmButtonColor: '#d33',
+	                cancelButtonColor: '#3085d6',
+	                confirmButtonText: 'Yes, delete it!'
+	            }).then((result) => {
+	                if (result.isConfirmed) {
+	                    window.location.href = deleteUrl;
+	                }
+	            });
+	        });
+	
+	        // Gọi phân trang lần đầu khi load trang
+	        showPage(0);
+	    });
+	
+	    // Số dòng hiển thị mỗi trang
+	    const rowsPerPage = 10;
+	    let currentPage = 0;
+	
+	    // Lấy các dòng không bị lọc ẩn (filtered-out)
+	    function getVisibleRows() {
+	        const rows = Array.from(document.querySelectorAll("#bookingTableBody tr"));
+	        console.log(document.querySelectorAll("#bookingTableBody tr").length);
 
-            // Nếu người dùng nhấn "Cancel", ẩn pop-up và overlay
-            $('#confirmDeleteNo').on('click', function () {
-                $('#confirmDeletePopup').hide();
-                $('#overlay').hide();
-            });
-        });
-    </script>
+	        return rows.filter(row => !row.classList.contains("filtered-out"));
+	    }
+	
+	    // Hiển thị trang cụ thể
+	    function showPage(page) {
+	        const visibleRows = getVisibleRows();
+	        const start = page * rowsPerPage;
+	        const end = start + rowsPerPage;
+	
+	        visibleRows.forEach((row, i) => {
+	            row.classList.toggle("page-hidden", !(i >= start && i < end));
+	        });
+	
+	        updatePagination(visibleRows.length, page);
+	    }
+	
+	    // Cập nhật nút phân trang
+	    function updatePagination(totalVisible, activePage) {
+	        const totalPages = Math.ceil(totalVisible / rowsPerPage);
+	        const pagination = document.getElementById("pagination-controls");
+	        pagination.innerHTML = "";
+	
+	        if (totalPages <= 1) return;
+	
+	        for (let i = 0; i < totalPages; i++) {
+	            const btn = document.createElement("button");
+	            btn.textContent = i + 1;
+	            btn.className = "btn btn-sm mx-1 " + (i === activePage ? "btn-primary" : "btn-outline-primary");
+	            btn.onclick = () => {
+	                currentPage = i;
+	                showPage(currentPage);
+	            };
+	            pagination.appendChild(btn);
+	        }
+	    }
+	
+	    // Hàm lọc theo từng cột
+	    function filterTable(columnIndex, filterValue) {
+	        // Nếu là cột Price thì chỉ giữ lại chữ số
+	        const isPriceColumn = columnIndex === 2;
+	        filterValue = filterValue.toLowerCase();
+	        if (isPriceColumn) {
+	            filterValue = filterValue.replace(/\D/g, '');
+	        }
+	
+	        const rows = document.querySelectorAll("#bookingTableBody tr");
+	
+	        rows.forEach(row => {
+	            const cell = row.getElementsByTagName("td")[columnIndex];
+	            if (cell) {
+	                let cellValue = cell.textContent.toLowerCase();
+	                if (isPriceColumn) {
+	                    // Loại bỏ dấu chấm/thành phần không phải số (vd: 1.950.000 → 1950000)
+	                    cellValue = cellValue.replace(/\D/g, '');
+	                }
+	                const matched = cellValue.includes(filterValue);
+	                row.classList.toggle("filtered-out", !matched);
+	            }
+	        });
+	
+	        // Reset về trang đầu sau khi lọc
+	        currentPage = 0;
+	        showPage(currentPage);
+	    }
+
+	</script>
 </body>
 
 </html>

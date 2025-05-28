@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -14,6 +16,7 @@ import org.springframework.ui.Model;
 import com.example.Aptech_Final.Controller.DTO.UserManagementDTO;
 import com.example.Aptech_Final.Controller.DTO.UsersDTO;
 import com.example.Aptech_Final.Enity.District;
+import com.example.Aptech_Final.Enity.Products;
 import com.example.Aptech_Final.Enity.Users;
 import com.example.Aptech_Final.Enity.Ward;
 import com.example.Aptech_Final.Form.UserForm;
@@ -221,41 +224,6 @@ public class UserService{
 		return usersDTO;
 	}
 	
-    // Phương thức sử dụng hàm escape ký tự đặc biệt trong chuỗi tìm kiếm
-    private String escapeSpecialChars(String input) {
-        if (input == null) return null;
-        // Thứ tự quan trọng: escape "\" trước, sau đó "%" và "_"
-        return input.replace("\\", "\\\\")
-                    .replace("%", "\\%")
-                    .replace("_", "\\_");
-    }
-
-    // Phương thức tìm kiếm user theo keyword (xử lý cả trường hợp ký tự đặc biệt và chuỗi rỗng)
-    public List<UserManagementDTO> searchUsers(String keyword) {
-    	// Trả về trường hợp là null và chuỗi rồng
-        if (keyword == null || keyword.trim().isEmpty()) {
-        	// Nếu không nhập gì, có thể gọi repository để trả về toàn bộ user
-            return userRepository.searchUsers(keyword);
-        }
-        // Escape ký tự đặc biệt để đảm bảo tìm kiếm chính xác
-        String escapedKeyword = escapeSpecialChars(keyword.trim());
-        return userRepository.searchUsers(escapedKeyword);
-    }
-
-	// Phương thức trả về khi nhấn button `search` ở trang userManagement
-    // (sử dụng kết quả từ phương thức searchUsers đã được xử lý)
-	public UsersDTO getUsersDTOByKeyword(String keyword) {
-		
-	    // Gọi phương thức `searchUsers` để tìm kiếm theo ký tự đặc biệt
-	    List<UserManagementDTO> userManagementDTOs = searchUsers(keyword);
-	    
-	    // Tạo đối tượng UsersDTO
-	    UsersDTO usersDTO = new UsersDTO();
-		// Gán danh sách userManagementDTOs vào danh sách UserManagementDTO ở lớp UsersDTO
-	    usersDTO.setUserManagementDTO(userManagementDTOs);
-	    
-	    return usersDTO;
-	}
 	
 	// Phương thức tìm kiếm thông tin bằng id
 	public Optional<Users> findUserById(Long id) {
@@ -318,10 +286,28 @@ public class UserService{
 		return "success: User information updated successfully!";
 		}				
 	
-	
 	// Phương thức xóa thông tin với id
-	public void deleteInfoById (Long id) {
-		userRepository.deleteById(id);
+	public String deleteInfoById (Long id) {
+		// Tìm sản phẩm bằng ID
+		Users users = userRepository.findById(id).orElse(null);
+		// Lấy tên sản phẩm
+		String usersName = users.getName();
+
+		try {
+			// Gọi repo để xóa sản phẩm bằng id
+			userRepository.deleteById(id);
+		} catch (DataIntegrityViolationException dive) {
+			// Xử lý lỗi liên quan đến ràng buộc DB (VD: khóa ngoại)
+			return "error: Cannot delete this user because this account in use in another place.";
+		} catch (EmptyResultDataAccessException noEntity) {
+			// Xử lý khi không tìm thấy sản phẩm cần xóa
+			return "error: Users not found or already deleted.";
+		} catch (Exception e) {
+			// Lỗi không xác định khác
+			return "error: An unexpected error occurred while deleting this user.";
+		}
+		
+		return "success: Users (" + usersName + ") has been deleted.";
 	}
 
 }

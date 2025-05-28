@@ -25,19 +25,7 @@ public interface ProductsRepository extends JpaRepository<Products, Long> {
 	
 	// Tìm kiếm đối tượng theo id
 	Products findById(long id);
-	
-	// Phương thức tìm kiếm sản phẩm
-	@Query(value = """
-	        SELECT PRODUCT_ID AS id, PRODUCT_NAME AS productName, PRICE, TYPE, QUANTITY, IMAGE_PATH FROM PRODUCT 
-	        WHERE PRODUCT_ID LIKE %:keyword% 
-	           OR PRODUCT_NAME LIKE %:keyword% 
-	           OR TYPE LIKE %:keyword% 
-	           OR CAST(PRICE AS NVARCHAR) LIKE %:keyword% 
-	           OR CAST(QUANTITY AS NVARCHAR) LIKE %:keyword% 
-	           OR IMAGE_PATH LIKE %:keyword%
-	        """, nativeQuery = true)
-	List<ProductManagementDTO> searchProductsByKeyword(@Param("keyword") String keyword);
-	
+		
     // Lấy số lượng tồn kho hiện tại bằng native query
     @Query(value = "SELECT QUANTITY FROM PRODUCT WHERE PRODUCT_ID = :productId", nativeQuery = true)
     int getCurrentQuantity(@Param("productId") Long productId);

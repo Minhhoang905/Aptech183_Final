@@ -142,6 +142,9 @@
             font-family: 'Montserrat', Impact, sans-serif;
             font-style: normal;
         }
+        .filtered-out, .page-hidden {
+		    display: none !important;
+		}        
     </style>
 </head>
 
@@ -175,235 +178,363 @@
             </ul>
         </nav>
     </header>
-    <div class="container mt-4"></div>
+    
+    <div class="container">    
     <h2 style="text-align: center;">Order Management</h2>
     <!-- Hiển thị thông báo flash -->
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
     <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-<div style="overflow-x: auto;">
-    <table class="table table-bordered fml_font">
-        <thead class="fml_font">
-            <tr>
-                <!-- Mã đơn -->
-                <th>Order ID</th>
-                <!-- Ngày đặt -->
-                <th>Order Date</th>
-                <!-- Thời gian kết thúc -->
-                <th>End Time</th>
-                <!-- Trạng thái -->
-                <th>Status</th>
-                <!-- Tên người dùng -->
-                <th>User Name</th>
-                <!-- Họ tên người nhận -->
-                <th>Recipient Name</th>
-                <!-- Số điện thoại -->
-                <th>Phone Number</th>
-                <!-- Email -->
-                <th>Email</th>
-                <!-- Tên tỉnh -->
-                <th>Province</th>
-                <!-- Tên quận -->
-                <th>District</th>
-                <!-- Tên xã -->
-                <th>Ward</th>
-                <!-- Địa chỉ giao hàng -->
-                <th>Delivery Address</th>
-                <!-- Phương thức thanh toán -->
-                <th>Payment Method</th>
-                <!-- Ghi chú -->
-                <th>Notes</th>
-                <!-- Tổng tiền -->
-                <th>Total Amount</th>
-                <!-- Chi tiết đơn hàng -->
-                <th>Order Details</th>
-            </tr>
-        </thead>
-        <th:block th:each="order : ${orders}">
-            <tr class="fml_font">
-                <!-- Mã đơn -->
-                <td th:text="${order.orderId}"></td>
-                <!-- Ngày đặt -->
-                <td th:text="${#temporals.format(order.orderStartTime, 'dd/MM/yyyy HH:mm')}"></td>
-                <!-- Thời gian kết thúc -->
-                <td th:text="${#temporals.format(order.orderEndTime, 'dd/MM/yyyy HH:mm')}"></td>
-                <!-- Trạng thái đơn hàng -->
-                <td>
-                    <span th:text="${order.orderStatus}"></span>
-                    <div style="margin-top: 5px;">
-                        <form th:action="@{/ComplexGym/payment/updateOrderStatus}" method="post"
-                            class="order-status-form d-flex align-items-center gap-2 mt-1">
-                            <!-- Thêm trường ẩn để hiển thị orderId -->
-                            <input type="hidden" name="orderId" th:value="${order.orderId}" />
-                            <!-- Hiển thị trạng thái 'CANCEL' nếu orderStatus là CANCEL và ẩn dropdown -->
-                            <div th:if="${order.orderStatus == 'CANCEL'}">
-                                <span class="badge bg-danger">CANCEL</span>
-                                <!-- Nút Delete khi trạng thái là CANCEL -->
-                                <button type="button" class="btn btn-sm btn-danger confirm-delete"
-                                    th:data-order-id="${order.orderId}" th:data-order-status="${order.orderStatus}">
-                                    🗑 Delete
-                                </button>
-                            </div>
-
-                            <!-- Hiển thị dropdown nếu trạng thái không phải 'CANCEL' -->
-                            <div th:if="${order.orderStatus != 'CANCEL'}">
-                                <select name="orderStatus" class="form-select form-select-sm" required>
-                                    <option value="PENDING" th:selected="${order.orderStatus == 'PENDING'}">Pending
-                                    </option>
-                                    <option value="CANCEL" th:selected="${order.orderStatus == 'CANCEL'}">Cancel
-                                    </option>
-
-                                    <option th:if="${role == 'ROLE_ADMIN'}" value="PROCESSING"
-                                        th:selected="${order.orderStatus == 'PROCESSING'}">Processing</option>
-                                    <option th:if="${role == 'ROLE_ADMIN'}" value="SHIPPED"
-                                        th:selected="${order.orderStatus == 'SHIPPED'}">Shipped</option>
-                                    <option th:if="${role == 'ROLE_ADMIN'}" value="DELIVERED"
-                                        th:selected="${order.orderStatus == 'DELIVERED'}">Delivered</option>
-                                    <option th:if="${role == 'ROLE_ADMIN'}" value="RETURNED"
-                                        th:selected="${order.orderStatus == 'RETURNED'}">Returned</option>
-                                </select>
-                                <!-- Nút Save khi trạng thái != CANCEL -->
-                                <button type="submit" class="btn btn-sm btn-success confirm-save">✔ Save</button>
-                            </div>
-                        </form>
-                    </div>
-                </td>
-                <!-- Tên tài khoản của người dùng -->
-                <td th:text="${order.name}"></td>
-                <!-- Họ tên đầy đủ -->
-                <td th:text="${order.fullName}"></td>
-                <!-- Số điện thoại -->
-                <td th:text="${order.phoneNumber}"></td>
-                <!-- Email -->
-                <td th:text="${order.email}"></td>
-                <!-- Tên tỉnh -->
-                <td th:text="${order.provinceName}"></td>
-                <!-- Tên quận  -->
-                <td th:text="${order.districtName}"></td>
-                <!-- Tên huyện -->
-                <td th:text="${order.wardName}"></td>
-                <!-- Số nhà -->
-                <td th:text="${order.address}"></td>
-                <!-- Phương thức thanh toán -->
-                <td th:text="${order.paymentMethod}"></td>
-                <!-- Ghi chú -->
-                <td th:text="${order.note}"></td>
-                <!-- Tổng tiền -->
-                <td th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
-                <!-- Chi tiết đơn hàng -->
-                <td>
-                    <button class="btn btn-primary btn-sm" data-bs-toggle="collapse"
-                        th:data-bs-target="'#details-' + ${order.orderId}">
-                        🔍 View
-                    </button>
-                </td>
-            </tr>
-
-            <tr class="fml_font">
-                <td colspan="17" class="p-0 border-0">
-                    <div th:id="'details-' + ${order.orderId}" class="collapse">
-                        <div class="p-3 bg-light">
-                            <h6>📝 Order Detail</h6>
-                            <table class="table table-sm table-striped mb-0">
-                                <thead class="table-secondary">
-                                    <tr>
-                                        <th>Order detail Id</th>
-                                        <th>Product name</th>
-                                        <th>Quantity</th>
-                                        <th>Price</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <th:block th:each="detail : ${allOrderDetail}">
-                                        <tr th:if="${detail.orderId == order.orderId}">
-                                            <!-- Id chi tiết đơn hàng -->
-                                            <td th:text="${detail.ordersDetailId}"></td>
-                                            <!-- Tên sản phẩm -->
-                                            <td th:text="${detail.productName}"></td>
-                                            <!-- Số lượng -->
-                                            <td th:text="${detail.amount}"></td>
-                                            <!-- Giá tiền sản phẩm -->
-                                            <td
-                                                th:text="${#numbers.formatDecimal(detail.unitPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'">
-                                            </td>
-                                            <!-- Tổng số tiền sản phẩm -->
-                                            <td
-                                                th:text="${#numbers.formatDecimal(detail.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'">
-                                            </td>
-                                        </tr>
-                                    </th:block>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </th:block>
-    </table>
-
-</div>
+    
+     <section class="fml_font mt-3">
+     	<div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+	    <table border="1" class="table table-bordered">
+	        <thead class="fml_font table-dark text-center">
+	            <tr>
+			        <!-- Mã đơn -->
+			        <th>
+			            Order ID<br>
+			            <input type="text" class="filter-input" placeholder="Order ID"
+			                   oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+			                   onkeyup="filterTable(0, this.value)">
+			        </th>
+			        <!-- Ngày đặt -->
+			        <th>
+			            Order Date<br>
+			            <input type="text" class="filter-input" placeholder="Order Date" onkeyup="filterTable(1, this.value)">
+			        </th>
+			        <!-- Thời gian kết thúc -->
+			        <th>
+			            End Time<br>
+			            <input type="text" class="filter-input" placeholder="End Time" onkeyup="filterTable(2, this.value)">
+			        </th>
+			        <!-- Trạng thái -->
+			        <th>
+			            Status<br>
+			            <input type="text" class="filter-input" placeholder="Status" onkeyup="filterTable(3, this.value)">
+			        </th>
+			        <!-- Tên người dùng -->
+			        <th>
+			            User Name<br>
+			            <input type="text" class="filter-input" placeholder="User Name" onkeyup="filterTable(4, this.value)">
+			        </th>
+			        <!-- Họ tên người nhận -->
+			        <th>
+			            Recipient Name<br>
+			            <input type="text" class="filter-input" placeholder="Recipient Name" onkeyup="filterTable(5, this.value)">
+			        </th>
+			        <!-- Số điện thoại -->
+			        <th>
+			            Phone Number<br>
+			            <input type="text" class="filter-input" placeholder="Phone Number"
+			                   oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+			                   onkeyup="filterTable(6, this.value)">
+			        </th>
+			        <!-- Email -->
+			        <th>
+			            Email<br>
+			            <input type="text" class="filter-input" placeholder="Email" onkeyup="filterTable(7, this.value)">
+			        </th>
+			        <!-- Tên tỉnh -->
+			        <th>
+			            Province<br>
+			            <input type="text" class="filter-input" placeholder="Province" onkeyup="filterTable(8, this.value)">
+			        </th>
+			        <!-- Tên quận -->
+			        <th>
+			            District<br>
+			            <input type="text" class="filter-input" placeholder="District" onkeyup="filterTable(9, this.value)">
+			        </th>
+			        <!-- Tên xã -->
+			        <th>
+			            Ward<br>
+			            <input type="text" class="filter-input" placeholder="Ward" onkeyup="filterTable(10, this.value)">
+			        </th>
+			        <!-- Địa chỉ giao hàng -->
+			        <th>
+			            Delivery Address<br>
+			            <input type="text" class="filter-input" placeholder="Delivery Address" onkeyup="filterTable(11, this.value)">
+			        </th>
+			        <!-- Phương thức thanh toán -->
+			        <th>
+			            Payment Method<br>
+			            <input type="text" class="filter-input" placeholder="Payment Method" onkeyup="filterTable(12, this.value)">
+			        </th>
+			        <!-- Ghi chú -->
+			        <th>
+			            Notes<br>
+			            <input type="text" class="filter-input" placeholder="Notes" onkeyup="filterTable(13, this.value)">
+			        </th>
+			        <!-- Tổng tiền -->
+			        <th>
+			            Total Amount<br>
+			            <input type="text" class="filter-input" placeholder="Total Amount"
+			                   oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+			                   onkeyup="filterTable(14, this.value)">
+			        </th>
+	                <!-- Chi tiết đơn hàng -->
+	                <th>Order Details</th>
+	            </tr>
+	        </thead>
+	        <tbody id="bookingTableBody">
+	        	<th:block th:each="order : ${orders}">
+	            <tr class="fml_font">
+	                <!-- Mã đơn -->
+	                <td th:text="${order.orderId}"></td>
+	                <!-- Ngày đặt -->
+	                <td th:text="${#temporals.format(order.orderStartTime, 'dd/MM/yyyy HH:mm')}"></td>
+	                <!-- Thời gian kết thúc -->
+	                <td th:text="${#temporals.format(order.orderEndTime, 'dd/MM/yyyy HH:mm')}"></td>
+	                <!-- Trạng thái đơn hàng -->
+	                <td>
+	                    <span th:text="${order.orderStatus}"></span>
+	                    <div style="margin-top: 5px;">
+	                        <form th:action="@{/ComplexGym/payment/updateOrderStatus}" method="post"
+	                            class="order-status-form d-flex align-items-center gap-2 mt-1">
+	                            <!-- Thêm trường ẩn để hiển thị orderId -->
+	                            <input type="hidden" name="orderId" th:value="${order.orderId}" />
+	                            <!-- Hiển thị trạng thái 'CANCEL' nếu orderStatus là CANCEL và ẩn dropdown -->
+	                            <div th:if="${order.orderStatus == 'CANCEL'}">
+	                                <span class="badge bg-danger">CANCEL</span>
+	                                <!-- Nút Delete khi trạng thái là CANCEL -->
+	                                <button type="button" class="btn btn-sm btn-danger confirm-delete"
+	                                    th:data-order-id="${order.orderId}" th:data-order-status="${order.orderStatus}">
+	                                    🗑 Delete
+	                                </button>
+	                            </div>
+	
+	                            <!-- Hiển thị dropdown nếu trạng thái không phải 'CANCEL' -->
+	                            <div th:if="${order.orderStatus != 'CANCEL'}">
+	                                <select name="orderStatus" class="form-select form-select-sm" required>
+	                                    <option value="PENDING" th:selected="${order.orderStatus == 'PENDING'}">Pending
+	                                    </option>
+	                                    <option value="CANCEL" th:selected="${order.orderStatus == 'CANCEL'}">Cancel
+	                                    </option>
+	
+	                                    <option th:if="${role == 'ROLE_ADMIN'}" value="PROCESSING"
+	                                        th:selected="${order.orderStatus == 'PROCESSING'}">Processing</option>
+	                                    <option th:if="${role == 'ROLE_ADMIN'}" value="SHIPPED"
+	                                        th:selected="${order.orderStatus == 'SHIPPED'}">Shipped</option>
+	                                    <option th:if="${role == 'ROLE_ADMIN'}" value="DELIVERED"
+	                                        th:selected="${order.orderStatus == 'DELIVERED'}">Delivered</option>
+	                                    <option th:if="${role == 'ROLE_ADMIN'}" value="RETURNED"
+	                                        th:selected="${order.orderStatus == 'RETURNED'}">Returned</option>
+	                                </select>
+	                                <!-- Nút Save khi trạng thái != CANCEL -->
+	                                <button type="submit" class="btn btn-sm btn-success confirm-save">✔ Save</button>
+	                            </div>
+	                        </form>
+	                    </div>
+	                </td>
+	                <!-- Tên tài khoản của người dùng -->
+	                <td th:text="${order.name}"></td>
+	                <!-- Họ tên đầy đủ -->
+	                <td th:text="${order.fullName}"></td>
+	                <!-- Số điện thoại -->
+	                <td th:text="${order.phoneNumber}"></td>
+	                <!-- Email -->
+	                <td th:text="${order.email}"></td>
+	                <!-- Tên tỉnh -->
+	                <td th:text="${order.provinceName}"></td>
+	                <!-- Tên quận  -->
+	                <td th:text="${order.districtName}"></td>
+	                <!-- Tên huyện -->
+	                <td th:text="${order.wardName}"></td>
+	                <!-- Số nhà -->
+	                <td th:text="${order.address}"></td>
+	                <!-- Phương thức thanh toán -->
+	                <td th:text="${order.paymentMethod}"></td>
+	                <!-- Ghi chú -->
+	                <td th:text="${order.note}"></td>
+	                <!-- Tổng tiền -->
+	                <td th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'POINT', 0, 'POINT')} + ' VND'"></td>
+	                <!-- Chi tiết đơn hàng -->
+	                <td>
+	                    <button class="btn btn-primary btn-sm" data-bs-toggle="collapse"
+	                        th:data-bs-target="'#details-' + ${order.orderId}">
+	                        🔍 View
+	                    </button>
+	                </td>
+	            </tr>
+	
+	            <tr class="fml_font">
+	                <td colspan="17" class="p-0 border-0">
+	                    <div th:id="'details-' + ${order.orderId}" class="collapse">
+	                        <div class="p-3 bg-light">
+	                            <h6>📝 Order Detail</h6>
+	                            <table class="table table-sm table-striped mb-0">
+	                                <thead class="table-secondary">
+	                                    <tr>
+	                                        <th>Order detail Id</th>
+	                                        <th>Product name</th>
+	                                        <th>Quantity</th>
+	                                        <th>Price</th>
+	                                        <th>Total</th>
+	                                    </tr>
+	                                </thead>
+	                                <tbody>
+	                                    <th:block th:each="detail : ${allOrderDetail}">
+	                                        <tr th:if="${detail.orderId == order.orderId}">
+	                                            <!-- Id chi tiết đơn hàng -->
+	                                            <td th:text="${detail.ordersDetailId}"></td>
+	                                            <!-- Tên sản phẩm -->
+	                                            <td th:text="${detail.productName}"></td>
+	                                            <!-- Số lượng -->
+	                                            <td th:text="${detail.amount}"></td>
+	                                            <!-- Giá tiền sản phẩm -->
+	                                            <td
+	                                                th:text="${#numbers.formatDecimal(detail.unitPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'">
+	                                            </td>
+	                                            <!-- Tổng số tiền sản phẩm -->
+	                                            <td
+	                                                th:text="${#numbers.formatDecimal(detail.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'">
+	                                            </td>
+	                                        </tr>
+	                                    </th:block>
+	                                </tbody>
+	                            </table>
+	                        </div>
+	                    </div>
+	                </td>
+	            </tr>
+	        </th:block>	        	
+	       </tbody>	        
+	    </table>
+	</div>
+	 <div id="pagination-controls" class="mt-3 d-flex justify-content-center gap-1"></div>                                   		     
+    </section>
+ </div>
 
     <!-- Bootstrap Script -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <!-- SweetAlert Script -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Bước 1: Thêm sự kiện click cho tất cả các nút có class 'confirm-delete'
-            document.querySelectorAll('.confirm-delete').forEach(button => {
-                button.addEventListener('click', function () {
-                    // Bước 2: Lấy orderId và orderStatus từ các thuộc tính data của nút
-                    const orderId = button.getAttribute('data-order-id');
-                    const orderStatus = button.getAttribute('data-order-status');
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-                    // Bước 3: Hiển thị SweetAlert để xác nhận việc xóa đơn hàng
-                    Swal.fire({
-                        title: 'Are you sure to delete it?',
-                        text: "This will permanently delete the order!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#aaa',
-                        confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Bước 4: Tìm form chứa nút delete
-                            const form = button.closest('form');
-                            // Bước 5: Cập nhật action của form với URL chứa tham số orderId và orderStatus
-                            form.action = '/ComplexGym/payment/deleteOrder?orderId=' + encodeURIComponent(orderId) + '&orderStatus=' + encodeURIComponent(orderStatus);
-                            console.log(form.action);  // Kiểm tra URL được tạo ra
-                            form.submit();  // Gửi form sau khi xác nhận
-                        }
-                    });
-                });
-            });
+<script>
+$(document).ready(function () {
+    showPage(0);
+});
+</script>
+    
+<script>
+$(document).ready(function () {
+    showPage(0); // Hiển thị trang đầu tiên khi load
+});
 
-            // Bước 6: Thêm sự kiện submit cho tất cả các form có class 'order-status-form'
-            document.querySelectorAll('.order-status-form').forEach(form => {
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault(); // Ngừng việc submit form mặc định
+const rowsPerPage = 25;
+let currentPage = 0;
 
-                    const button = e.submitter; // Lấy nút được nhấn (button nhấn để submit)
-                    if (button.classList.contains('confirm-save')) {
-                        // Bước 7: Nếu là nút Save, hiển thị SweetAlert để xác nhận
-                        Swal.fire({
-                            title: 'Confirm status change?',
-                            text: "Do you want to update the order status?",
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Yes, update it!'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                form.submit();  // Gửi form sau khi xác nhận
-                            }
-                        });
-                    }
-                });
+// Lấy các dòng không bị lọc ẩn (filtered-out)
+function getVisibleRows() {
+    const rows = Array.from(document.querySelectorAll("#bookingTableBody tr"));
+    return rows.filter(row => !row.classList.contains("filtered-out") && row.querySelectorAll("td").length > 1);
+}
+
+function showPage(page) {
+    const visibleRows = getVisibleRows();
+    const start = page * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    visibleRows.forEach((row, index) => {
+        const isHidden = index < start || index >= end;
+        row.classList.toggle("page-hidden", isHidden);
+
+        const detailRow = row.nextElementSibling;
+        if (detailRow && detailRow.querySelectorAll("td").length === 1) {
+            detailRow.classList.toggle("page-hidden", isHidden);
+        }
+    });
+
+    updatePaginationControls(visibleRows.length, page);
+}
+
+function updatePaginationControls(totalRows, currentPage) {
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    const paginationContainer = document.getElementById("pagination-controls");
+    paginationContainer.innerHTML = "";
+
+    if (totalPages <= 1) return;
+
+    for (let i = 0; i < totalPages; i++) {
+        const button = document.createElement("button");
+        button.textContent = i + 1;
+        button.className = "btn btn-sm mx-1 " + (i === currentPage ? "btn-primary" : "btn-outline-primary");
+        button.addEventListener("click", () => {
+            showPage(i);
+        });
+        paginationContainer.appendChild(button);
+    }
+}
+
+// Lọc theo từng cột, dùng cho tất cả các cột bao gồm "Total Amount"
+function filterTable(columnIndex, filterValue) {
+    const isTotalAmountColumn = columnIndex === 14; // giả sử cột "Total Amount" là cột thứ 14
+
+    filterValue = filterValue.toLowerCase();
+    if (isTotalAmountColumn) {
+        filterValue = filterValue.replace(/\D/g, '');
+    }
+
+    const rows = document.querySelectorAll("#bookingTableBody tr");
+    rows.forEach(row => {
+        const cell = row.getElementsByTagName("td")[columnIndex];
+        if (!cell) return;
+
+        let cellValue = cell.textContent.toLowerCase();
+        if (isTotalAmountColumn) {
+            cellValue = cellValue.replace(/\D/g, '');
+        }
+
+        const isMatch = cellValue.includes(filterValue);
+        row.classList.toggle("filtered-out", !isMatch);
+    });
+
+    currentPage = 0;
+    showPage(currentPage);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Bước 1: Thêm sự kiện click cho tất cả các nút có class 'confirm-delete'
+    document.querySelectorAll('.confirm-delete').forEach(button => {
+        button.addEventListener('click', function () {
+            // Bước 2: Lấy orderId và orderStatus từ các thuộc tính data của nút
+            const orderId = button.getAttribute('data-order-id');
+            const orderStatus = button.getAttribute('data-order-status');
+
+            // Bước 3: Hiển thị SweetAlert để xác nhận việc xóa đơn hàng
+            Swal.fire({
+                title: 'Are you sure to delete it?',
+                text: "This will permanently delete the order!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#aaa',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Bước 4: Tìm form chứa nút delete
+                    const form = button.closest('form');
+                    // Bước 5: Cập nhật action của form với URL chứa tham số orderId và orderStatus
+                    form.action = '/ComplexGym/payment/deleteOrder?orderId=' + encodeURIComponent(orderId) + '&orderStatus=' + encodeURIComponent(orderStatus);
+                    console.log(form.action);  // Kiểm tra URL được tạo ra
+                    form.submit();  // Gửi form sau khi xác nhận
+                }
             });
         });
-    </script>
+    });
+
+    // Bước 6: Thêm sự kiện submit cho tất cả các form có class 'order-status-form'
+    document.querySelectorAll('.order-status-form').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault(); // Ngừng việc submit form mặc định
+
+            // Có thể thêm xử lý kiểm tra hoặc hiển thị SweetAlert nếu cần
+            // Nếu không cần, ta gửi form thủ công ngay:
+            form.submit();
+        });
+    });
+});
+</script>
 </body>
 
 </html>

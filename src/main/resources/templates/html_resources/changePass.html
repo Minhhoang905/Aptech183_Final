@@ -296,78 +296,101 @@
     </div>
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script>
-        function togglePassword(inputId, toggleButton) {
-            const passwordInput = document.getElementById(inputId);
-            const isPasswordVisible = passwordInput.type === 'password';
-            passwordInput.type = isPasswordVisible ? 'text' : 'password';
-            toggleButton.textContent = isPasswordVisible ? '👁️' : '🙈'; // Đổi icon
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function togglePassword(inputId, toggleButton) {
+        const passwordInput = document.getElementById(inputId);
+        const isPasswordVisible = passwordInput.type === 'password';
+        passwordInput.type = isPasswordVisible ? 'text' : 'password';
+        toggleButton.textContent = isPasswordVisible ? '👁️' : '🙈'; // Đổi icon
+    }
+
+    // Hàm validate mật khẩu, trả về true/false
+    function validatePassword() {
+        const newPassword = document.getElementById("newPass");
+        const message = document.querySelector(".message");
+        const passwordValue = newPassword.value;
+
+        let errorMsg = "";
+
+        if (passwordValue.length < 8 || passwordValue.length > 20) {
+            errorMsg = "Password must be between 8 and 20 characters";
+        } else if (!/[A-Z]/.test(passwordValue)) {
+            errorMsg = "Password must contain at least one uppercase letter";
+        } else if (!/[^a-zA-Z0-9]/.test(passwordValue)) {
+            errorMsg = "Password must contain at least one special character";
         }
 
-        // Hiển thị red border khi nhập sai
-        function validatePassword(event) {
-            const newPassword = document.getElementById("newPass");
-            const message = document.querySelector(".message"); // Lấy phần tử hiển thị thông báo lỗi
-            const passwordValue = newPassword.value;
+        if (errorMsg !== "") {
+            newPassword.style.border = "2px solid red";
+            message.textContent = errorMsg;
+            return false;
+        } else {
+            newPassword.style.border = "";
+            message.textContent = "";
+            return true;
+        }
+    }
 
-            let errorMsg = "";
+    document.getElementById("passwordForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Ngăn submit mặc định
 
-            if (passwordValue.length < 8 || passwordValue.length > 20) {
-                errorMsg = "Password must be between 8 and 20 characters";
-            } else if (!/[A-Z]/.test(passwordValue)) {
-                errorMsg = "Password must contain at least one uppercase letter";
-            } else if (!/[^a-zA-Z0-9]/.test(passwordValue)) {
-                errorMsg = "Password must contain at least one special character";
-            }
-
-            if (errorMsg !== "") {
-                newPassword.style.border = "2px solid red";
-                message.textContent = errorMsg; // Hiển thị thông báo lỗi trong thẻ có class "message"
-                event.preventDefault(); // Ngăn chặn gửi form nếu có lỗi
-                return false;
-            } else {
-                newPassword.style.border = "";
-                message.textContent = ""; // Xóa thông báo lỗi nếu hợp lệ
-                return true;
-            }
+        if (!validatePassword()) {
+            // Nếu lỗi validate thì dừng luôn, không hỏi confirm
+            return;
         }
 
-        document.getElementById("passwordForm").addEventListener("submit", validatePassword);
-
-        // Kiểm tra flash attributes từ Thymeleaf khi load trang
-        window.onload = function () {
-            // Lấy giá trị successMessage và errorMessage được set qua Flash Attribute
-            let successMessage = "[[${successMessage}]]";
-            let errorMessage = "[[${errorMessage}]]";
-
-            // Nếu có thông báo thành công
-            if (successMessage && successMessage.trim() !== "null") {
-                document.getElementById("successPopup").style.display = "block";
-                document.getElementById("overlay").style.display = "block";
-                // Có thể tự động chuyển hướng sau 5 giây
-                setTimeout(redirectToLogin, 5000);
+        // Nếu validate OK thì hỏi confirm bằng SweetAlert
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to change your password?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, change it!',
+            cancelButtonText: 'Cancel',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Nếu user xác nhận thì submit form
+                event.target.submit();
             }
+        });
+    });
 
-            // Nếu có thông báo lỗi
-            if (errorMessage && errorMessage.trim() !== "null") {
-                document.getElementById("errorPopup").style.display = "block";
-                document.getElementById("overlay").style.display = "block";
-            }
-        };
+    // Kiểm tra flash attributes Thymeleaf khi load trang
+    window.onload = function () {
+        let successMessage = "[[${successMessage}]]";
+        let errorMessage = "[[${errorMessage}]]";
 
-        // Hàm chuyển hướng sang trang login
-        function redirectToLogin() {
-            window.location.href = "/ComplexGym/home";
+        if (successMessage && successMessage.trim() !== "null" && successMessage.trim() !== "") {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: successMessage,
+                confirmButtonText: 'OK',
+                timer: 5000,
+                timerProgressBar: true,
+            }).then(() => {
+                redirectToLogin();
+            });
+            // Tự động redirect sau 5 giây nếu user không bấm OK
+            setTimeout(redirectToLogin, 5000);
         }
 
-        // Hàm đóng pop-up lỗi (vẫn ở trang register)
-        function closePopup() {
-            document.getElementById("errorPopup").style.display = "none";
-            document.getElementById("overlay").style.display = "none";
+        if (errorMessage && errorMessage.trim() !== "null" && errorMessage.trim() !== "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: errorMessage,
+                confirmButtonText: 'OK',
+            });
         }
+    };
 
-    </script>
+    function redirectToLogin() {
+        window.location.href = "/ComplexGym/home";
+    }
+</script>
 </body>
 
 </html>

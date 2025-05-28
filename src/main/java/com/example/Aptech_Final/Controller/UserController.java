@@ -70,6 +70,11 @@ public class UserController {
 	// Phương thức để hiển thị page register.html
 	@GetMapping("/register")
 	public String register(ModelMap model) {
+		// Gọi phương thức xác định vai trò của user (là admin) từ @Service
+		String role = homeService.getCurrentUserRole();
+		// Thêm thông tin về role vào form ở html
+		model.addAttribute("role", role);
+
 		// Tạo đối tượng ở lớp DropDownDTP
 		UsersDTO dropdownDTO = userService.getDropDown();
 		// Thêm danh sách các tỉnh (lấy từ DropdownDTO) vào model
@@ -131,6 +136,11 @@ public class UserController {
 	// Phương thức để hiển thị changePass.html
 	@GetMapping("/changePass")
 	public String changePass(ModelMap model) {
+		// Gọi phương thức xác định vai trò của user (là admin) từ @Service
+		String role = homeService.getCurrentUserRole();
+		// Thêm thông tin về role vào form ở html
+		model.addAttribute("role", role);
+
 		return "html_resources/changePass";
 	}
 	
@@ -186,24 +196,6 @@ public class UserController {
 		
 		// Trả về tên file template Thymeleaf trong back-end (userManagement.html)		
 		return "html_resources/userManagement";
-	}
-	
-	// Phương thức để tìm kiếm thông tin ở đường dẫn `userManagement`
-	@PostMapping(path = "/searchUserInformation")
-	public String postUserManagement (@ModelAttribute("userManagementObject") Users users, @RequestParam(value = "keyword", required = false) String keyword, Model model) {
-		
-        // Gọi service để lấy UsersDTO dựa trên keyword
-        UsersDTO usersDTO = userService.getUsersDTOByKeyword(keyword);
-		// Gọi phương thức xác định vai trò của user (là admin) từ @Service
-		String role = homeService.getCurrentUserRole();
-		// Thêm thông tin về role vào form ở html
-		model.addAttribute("role", role);
-		// Thêm đối tượng rỗng để binding với th:object ở form
-		model.addAttribute("userManagementObject", new Users());
-        // Đưa danh sách kết quả (List<UserManagementDTO>) vào model
-        model.addAttribute("usersResults", usersDTO.getUserManagementDTO());
-		
-	    return "html_resources/userManagement"; 
 	}
 	
 	// Phương thức xử lý yêu cầu GET cho đường dẫn "/userManagement/update"
@@ -276,14 +268,23 @@ public class UserController {
 	
 	// Phương thức xóa thông tin người dùng bằng id
 	@GetMapping(path = "/userManagement/doDeleteUser")
-	public String deleteInfoById(@RequestParam(value = "id") Long id, Model model) {
+	public String deleteInfoById(@RequestParam(value = "id") Long id, Model model, RedirectAttributes redirectAttributes) {
 		// Gọi phương thức xác định vai trò của user (là admin) từ @Service
 		String role = homeService.getCurrentUserRole();
 		// Thêm thông tin về role vào form ở html
 		model.addAttribute("role", role);		
-		// Xóa thông tin cần xóa bằng method ở service 
-		userService.deleteInfoById(id);
 		
+		// Xóa thông tin cần xóa bằng method ở service 
+		String result = userService.deleteInfoById(id);
+		
+		if(result.startsWith("error: ")) {
+        	// Thêm thông báo vào Flash Attribute để hiển thị sau khi chuyển hướng
+        	redirectAttributes.addFlashAttribute("errorMessage", result.substring(6));
+		}else {
+        	// Thêm thông báo vào Flash Attribute để hiển thị sau khi chuyển hướng
+        	redirectAttributes.addFlashAttribute("successMessage", result.substring(8));			
+		}
+
 		// Trả về html `userManagement`
 		return "redirect:/userManagement";
 	}

@@ -3,6 +3,8 @@ package com.example.Aptech_Final.Controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -76,7 +78,7 @@ public class ProductsController {
 		// Đối tượng rỗng để binding với th:object ở form
 		model.addAttribute("productForm", new ProductsForm());
 	
-        return "html_resources/add-product";
+        return "html_resources/addProduct";
     }
     
     // Phương thức để lưu sản phẩm vào db
@@ -92,7 +94,7 @@ public class ProductsController {
 		
     	String result = productsService.saveProduct(productsForm, imageFile);
         
-        // Nếu có lỗi, redirect về trang add-product với thông báo lỗi
+        // Nếu có lỗi, redirect về trang addProduct với thông báo lỗi
         if (result.startsWith("error: ")) {
         	redirectAttributes.addFlashAttribute("errorMessage", result.substring(6));
             return "redirect:/ComplexGym/products/addProduct";
@@ -119,25 +121,7 @@ public class ProductsController {
 		// Trả về tên file template Thymeleaf trong back-end (productManagement.html)			
     	return "html_resources/productManagement";
     }
-      
-	// Phương thức để tìm kiếm thông tin ở đường dẫn `productManagement`
-    @PostMapping("/searchProductInformation")
-    public String searchProducts(@ModelAttribute("productManagementObject") Products products, @RequestParam(value = "keyword", required = false) String keyword, Model model) {
-        // Gọi service để lấy productDTO dựa trên keyword
-    	ProductDTO productDTO = productsService.getProductsDTOByKeyword(keyword);
-    	// Gọi phương thức xác định vai trò của user từ @Service
-    	String role = homeService.getCurrentUserRole();
-		// Thêm thông tin về role vào form ở html
-		model.addAttribute("role", role);
-		// Thêm đối tượng rỗng để binding với th:object ở form
-    	model.addAttribute("productManagementObject", new Products());
-        // Đưa danh sách kết quả (List<productManagementDTO>) vào model
-    	model.addAttribute("productResults", productDTO.getProductManagementDTOs());
-    	
-		// Trả về tên file template Thymeleaf trong back-end (productManagement.html)			
-    	return "html_resources/productManagement";
-    }
-    
+          
 	// Phương thức xử lý yêu cầu GET cho đường dẫn "/products/updateProduct"
     @GetMapping("/updateProduct")
     public String getUpdateProducts(Model model, @RequestParam("id") Long id) {
@@ -163,7 +147,7 @@ public class ProductsController {
 
     	// Đối tượng rỗng để binding với th:object ở form
 		model.addAttribute("productForm", new ProductsForm());
-		
+
     	String result = productsService.doUpdateProducts(productsForm, imageFile);
         
         // Nếu có lỗi, redirect về trang add-product với thông báo lỗi
@@ -174,7 +158,7 @@ public class ProductsController {
         	//Giữ nguyên đối tượng để Thymeleaf có thể hiển thị lại giá trị đã nhập
         	model.addAttribute("productManagementObject", new Products());
         	
-            return "redirect:/ComplexGym/products/updateProducts?id=" + productsForm.getId();
+            return "redirect:/ComplexGym/products/updateProduct?id=" + productsForm.getId();
         }else {
             // Nếu thành công, redirect về trang danh sách sản phẩm theo loại
             redirectAttributes.addFlashAttribute("successMessage", result.substring(8));
@@ -184,16 +168,27 @@ public class ProductsController {
     
 	// Phương thức xóa thông tin người dùng bằng id
 	@GetMapping("/deleteProduct")
-	public String deleteInfoById(@RequestParam(value = "id") Long id, Model model) {
+	public String deleteInfoById(@RequestParam(value = "id") Long id, Model model, RedirectAttributes redirectAttributes) {
 		// Gọi phương thức xác định vai trò của user (là admin) từ @Service
 		String role = homeService.getCurrentUserRole();
 		// Thêm thông tin về role vào form ở html
 		model.addAttribute("role", role);		
+		
+		
 		// Xóa thông tin cần xóa bằng method ở service 
-		productsService.deleteInfoById(id);
+		String result =	productsService.deleteInfoById(id);		
+		
+		if(result.startsWith("error: ")) {
+        	// Thêm thông báo vào Flash Attribute để hiển thị sau khi chuyển hướng
+        	redirectAttributes.addFlashAttribute("errorMessage", result.substring(6));
+		}else {
+        	// Thêm thông báo vào Flash Attribute để hiển thị sau khi chuyển hướng
+        	redirectAttributes.addFlashAttribute("successMessage", result.substring(8));			
+		}
 		
 		// Trả về html `userManagement`
 		return "redirect:/ComplexGym/products/productManagement";
+
 	}
 	
 	// Phương thức để đi vào trang chi tiết sản phẩm

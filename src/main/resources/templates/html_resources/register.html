@@ -419,7 +419,7 @@
 
                     <label>Province</label>
                     <select class="form-select" id="provinceId" name="provinceId" th:field="*{provinceId}" required>
-                        <option value="">Chọn tỉnh</option>
+                        <option value="">Select Province</option>
                         <option th:each="province : ${provinceList}" th:value="${province.provinceId}"
                             th:text="${province.provinceName}">
                         </option>
@@ -427,14 +427,14 @@
 
                     <label>District</label>
                     <select class="form-select" id="districtId" name="districtId" th:field="*{districtId}" required>
-                        <option value="">Chọn quận</option>
+                        <option value="">Select District</option>
                         <option th:each="district : ${districtList}" th:value="${district.districtId}"
                             th:text="${district.districtName}">
                         </option>
                     </select>
                     <label>Ward</label>
                     <select class="form-select" id="wardId" name="wardId" th:field="*{wardId}" required>
-                        <option value="">Chọn xã</option>
+                        <option value="">Select Ward</option>
                         <option th:each="ward : ${wardList}" th:value="${ward.wardId}" th:text="${ward.wardName}">
                         </option>
                     </select>
@@ -461,7 +461,7 @@
                 <button class="btn btn-warning" type="submit">Submit</button>
             </div>
         </form>
-
+ 	</div>
         <!-- Overlay và Pop-up -->
         <div class="overlay" id="overlay"></div>
 
@@ -480,259 +480,246 @@
 
         <!-- Script AJAX -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script>
-            $(document).ready(function () {
-                // Kiểm tra lỗi nhập liệu
-                $('#registrationForm').on('submit', function (event) {
-                    let isValid = true;
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>       
+<script>
+    $(document).ready(function () {
+        $('#registrationForm').on('submit', function (event) {
+            event.preventDefault();  // chặn submit mặc định trước
 
-                    // Kiểm tra các trường bắt buộc
-                    $('input[required], select[required]').each(function () {
-                        if ($(this).val() === '') {
-                            $(this).addClass('input-error');
-                            $(this).next('.error-message').text('This field cannot be left blank.');
-                            isValid = false;
-                        } else {
-                            $(this).removeClass('input-error');
-                            $(this).next('.error-message').text('');
-                        }
-                    });
-
-                    // Kiểm tra tên tài khoản
-                    const username = $('#username').val();
-                    let usernameErrors = [];
-                    if (username.length < 5) usernameErrors.push("Tên tài khoản phải chứa ít nhất 5 ký tự.");
-                    if (/[^a-zA-Z0-9]/.test(username)) usernameErrors.push("Tên tài khoản không được chứa ký tự đặc biệt.");
-                    if (/[^ -~]/.test(username)) usernameErrors.push("Chỉ được phép dùng ký tự half-size, không được dùng full-size.");
-                    if (usernameErrors.length > 0) {
-                        $('#username').addClass('input-error');
-                        $('#username').next('.error-message').html(usernameErrors.join('<br>'));
-                        isValid = false;
+            Swal.fire({
+                title: 'Confirm Registration',
+                text: "Are you sure you want to register?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Nếu user đồng ý, chạy validate rồi submit nếu hợp lệ
+                    if (validateForm()) {
+                        // Bỏ chặn submit và submit form
+                        event.currentTarget.submit();
                     }
-
-                    // Kiểm tra mật khẩu
-                    const password = $('#password').val();
-                    let errors = [];
-
-                    if (password.length < 8) errors.push("Mật khẩu phải chứa ít nhất 8 ký tự.");
-                    if (!/[A-Z]/.test(password)) errors.push("Phải chứa ít nhất 1 chữ cái in hoa.");
-                    if (!/[a-z]/.test(password)) errors.push("Phải chứa ít nhất 1 chữ cái thường.");
-                    if (!/[0-9]/.test(password)) errors.push("Phải chứa ít nhất 1 số.");
-                    if (!/[@$!%*?&]/.test(password)) errors.push("Phải chứa ít nhất 1 ký tự đặc biệt (@$!%*?&).");
-                    if (/[^ -~]/.test(password)) errors.push("Chỉ được phép dùng ký tự half-size, không được dùng full-size.");
-
-                    if (errors.length > 0) {
-                        $('#password').addClass('input-error');
-                        $('#passwordError').html(errors.join('<br>'));
-                        event.preventDefault();
-                    } else {
-                        $('#password').removeClass('input-error');
-                        $('#passwordError').text('');
-                    }
-
-
-                    // Kiểm tra FullName
-                    const fullName = $('#fullName').val();
-                    let fullNameError = [];
-                    if (/[^\u0020-\u007E\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF]/.test(fullName)) {
-                        $('#fullName').addClass('input-error');
-                        $('#fullNameError').text('Chỉ được phép dùng ký tự half-size, không được dùng full-size.');
-                        isValid = false;
-                    } else {
-                        $('#fullName').removeClass('input-error');
-                        $('#fullNameError').text('');
-                    }
-
-                    // Kiểm tra PhoneNumber
-                    const phoneNumber = $('#phoneNumber').val();
-                    let phoneNumberError = [];
-                    if (/[^ -~]/.test(phoneNumber)) {
-                        $('#phoneNumber').addClass('input-error');
-                        $('#phoneNumberError').text('Chỉ được phép dùng ký tự half-size, không được dùng full-size.');
-                        isValid = false;
-                    } else if (!/^\d+$/.test(phoneNumber)) {
-                        $('#phoneNumber').addClass('input-error');
-                        $('#phoneNumberError').text('Số điện thoại chỉ được nhập số.');
-                        isValid = false;
-                    } else {
-                        $('#phoneNumber').removeClass('input-error');
-                        $('#phoneNumberError').text('');
-                    }
-
-                    // Kiểm tra Email
-                    const emailError = [];
-                    let $email = $('#email');
-                    let email = $email.val().trim();
-
-                    if (/[^ -~]/.test(email)) { // Kiểm tra ký tự full-size
-                        $email.addClass('input-error');
-                        emailError.push('Chỉ được phép dùng ký tự half-size, không được dùng full-size.');
-                    }
-
-                    let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;  // Kiểm tra định dạng email
-                    let domainRegex = /@(gmail\.com|yahoo\.com|outlook\.com|icloud\.com|hotmail\.com)$/; // Chỉ chấp nhận các domain phổ biến
-
-                    if (!emailRegex.test(email)) {
-                        $email.addClass('input-error');
-                        emailError.push('Email không đúng định dạng.');
-                    }
-
-                    if (!domainRegex.test(email)) {
-                        $email.addClass('input-error');
-                        emailError.push('Email phải thuộc Gmail, Yahoo, Outlook, iCloud hoặc Hotmail.');
-                    }
-
-                    // Hiển thị lỗi nếu có
-                    if (emailError.length > 0) {
-                        $('#emailError').text(emailError.join(' '));
-                        isValid = false;
-                    } else {
-                        $email.removeClass('input-error');
-                        $('#emailError').text('');
-                    }
-
-                    // Kiểm tra Address
-                    const address = $('#address').val();
-                    let addressError = [];
-                    if (/[^\u0020-\u007E\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF]/.test(address)) {
-                        $('#address').addClass('input-error');
-                        $('#addressError').text('Chỉ được phép dùng ký tự half-size, không được dùng full-size.');
-                        isValid = false;
-                    } else {
-                        $('#address').removeClass('input-error');
-                        $('#addressError').text('');
-                    }
-
-                    // Kiểm tra nếu chưa chọn tỉnh, quận hoặc xã
-                    if (!$('#provinceId').val()) {
-                        alert("Please select a province.");
-                        event.preventDefault(); // Ngừng gửi form nếu chưa chọn tỉnh
-                        return;
-                    }
-
-                    if (!$('#districtId').val()) {
-                        alert("Please select a district.");
-                        event.preventDefault(); // Ngừng gửi form nếu chưa chọn quận
-                        return;
-                    }
-
-                    if (!$('#wardId').val()) {
-                        alert("Please select a ward.");
-                        event.preventDefault(); // Ngừng gửi form nếu chưa chọn xã
-                        return;
-                    }
-                    // Nếu có lỗi, ngừng submit
-                    if (!isValid) {
-                        event.preventDefault();
-                        alert('Vui lòng kiểm tra lại các trường!');
-                    }
-                });
-
-
-                // Lấy ngày hiện tại theo định dạng yyyy-mm-dd
-                var today = new Date().toISOString().split("T")[0];
-                // Thiết lập thuộc tính max cho input (để ngăn người dùng chọn vượt quá ngày hiện tại trong date picker)
-                var dateOfBirthInput = document.getElementById("dateOfBirth");
-                dateOfBirthInput.max = today;
-
-
-                // Kiểm tra việc chọn radio button
-                $(document).ready(function () {
-                    $('#registrationForm').submit(function (event) {
-                        // Kiểm tra nếu không có radio button nào được chọn
-                        if (!$('input[name="role"]:checked').val()) {
-                            alert("Please select a role.");
-                            event.preventDefault(); // Ngừng gửi form nếu chưa chọn role
-                        }
-                    });
-                });
-
-                // AJAX cho tỉnh, quận, xã
-                $('#provinceId').change(function () {
-                    var province_Id = $(this).val();
-                    if (!province_Id) {
-                        $('#districtId').empty().append('<option value="">Chọn quận</option>');
-                        $('#wardId').empty().append('<option value="">Chọn xã</option>');
-                        return;
-                    }
-
-                    $('#districtId').empty().append('<option value="">Đang tải...</option>');
-                    $.ajax({
-                        url: '/loginAPI/getDistrictDropdown',
-                        type: 'GET',
-                        data: { provinceId: province_Id },
-                        success: function (data) {
-                            $('#districtId').empty().append('<option value="">Chọn quận</option>');
-                            $('#wardId').empty().append('<option value="">Chọn xã</option>');
-                            data.forEach(function (district) {
-                                $('#districtId').append('<option value="' + district.districtId + '">' + district.districtName + '</option>');
-                            });
-                        }
-                    });
-                });
-
-                $('#districtId').change(function () {
-                    var district_Id = $(this).val();
-                    if (district_Id) {
-                        $('#wardId').empty().append('<option value="">Đang tải...</option>');
-                        $.ajax({
-                            url: '/loginAPI/getWardDropdown',
-                            type: 'GET',
-                            data: { districtId: district_Id },
-                            success: function (data) {
-                                $('#wardId').empty().append('<option value="">Chọn xã</option>');
-                                data.forEach(function (ward) {
-                                    $('#wardId').append('<option value="' + ward.wardId + '">' + ward.wardName + '</option>');
-                                });
-                            }
-                        });
-                    }
-                });
+                } 
+                // Nếu hủy thì không làm gì cả
             });
+        });
 
-            // Xóa viền đỏ khi người dùng nhập lại
-            $('input, select').on('input change', function () {
-                if ($(this).hasClass('input-error')) {
+        function validateForm() {
+            let isValid = true;
+
+            $('input[required], select[required]').each(function () {
+                if ($(this).val() === '') {
+                    $(this).addClass('input-error');
+                    $(this).next('.error-message').text('This field cannot be left blank.');
+                    isValid = false;
+                } else {
                     $(this).removeClass('input-error');
                     $(this).next('.error-message').text('');
                 }
             });
 
-            // Kiểm tra flash attributes từ Thymeleaf khi load trang
-            window.onload = function () {
-                // Lấy giá trị successMessage và errorMessage được set qua Flash Attribute
-                let successMessage = "[[${successMessage}]]";
-                let errorMessage = "[[${errorMessage}]]";
-
-                // Nếu có thông báo thành công
-                if (successMessage && successMessage.trim() !== "null") {
-                    document.getElementById("successPopup").style.display = "block";
-                    document.getElementById("overlay").style.display = "block";
-                    // Có thể tự động chuyển hướng sau 5 giây
-                    setTimeout(redirectToLogin, 5000);
-                }
-
-                // Nếu có thông báo lỗi
-                if (errorMessage && errorMessage.trim() !== "null") {
-                    document.getElementById("errorPopup").style.display = "block";
-                    document.getElementById("overlay").style.display = "block";
-                }
-            };
-
-            // Hàm chuyển hướng sang trang login
-            function redirectToLogin() {
-                window.location.href = "/ComplexGym/home";
+            const username = $('#username').val();
+            let usernameErrors = [];
+            if (username.length < 5) usernameErrors.push("Account names require a minimum of 5 characters.");
+            if (/[^a-zA-Z0-9]/.test(username)) usernameErrors.push("Account names must not include special characters.");
+            if (/[^ -~]/.test(username)) usernameErrors.push("Only half-width characters are allowed; full-width characters are not!");
+            if (usernameErrors.length > 0) {
+                $('#username').addClass('input-error');
+                $('#username').next('.error-message').html(usernameErrors.join('<br>'));
+                isValid = false;
+            } else {
+                $('#username').removeClass('input-error');
+                $('#username').next('.error-message').text('');
             }
 
-            // Hàm đóng pop-up lỗi (vẫn ở trang register)
-            function closePopup() {
-                document.getElementById("errorPopup").style.display = "none";
-                document.getElementById("overlay").style.display = "none";
+            const password = $('#password').val();
+            let passwordErrors = [];
+            if (password.length < 8) passwordErrors.push("The password must contain at least 8 characters.");
+            if (!/[A-Z]/.test(password)) passwordErrors.push("Must include at least 1 uppercase letter.");
+            if (!/[a-z]/.test(password)) passwordErrors.push("Requires at least 1 lowercase character.");
+            if (!/[0-9]/.test(password)) passwordErrors.push("Requires at least 1 numeral.");
+            if (!/[@$!%*?&]/.test(password)) passwordErrors.push("Must include at least 1 special character (@$!%*?&).");
+            if (/[^ -~]/.test(password)) passwordErrors.push("Only half-width characters are allowed; full-width characters are not!");
+            if (passwordErrors.length > 0) {
+                $('#password').addClass('input-error');
+                $('#passwordError').html(passwordErrors.join('<br>'));
+                isValid = false;
+            } else {
+                $('#password').removeClass('input-error');
+                $('#passwordError').text('');
             }
 
-        </script>
+            const fullName = $('#fullName').val();
+            if (/[^\u0020-\u007E\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF]/.test(fullName)) {
+                $('#fullName').addClass('input-error');
+                $('#fullNameError').text('Only half-width characters are allowed; full-width characters are not!');
+                isValid = false;
+            } else {
+                $('#fullName').removeClass('input-error');
+                $('#fullNameError').text('');
+            }
 
+            const phoneNumber = $('#phoneNumber').val();
+            if (/[^ -~]/.test(phoneNumber)) {
+                $('#phoneNumber').addClass('input-error');
+                $('#phoneNumberError').text('Only half-width characters are allowed; full-width characters are not!');
+                isValid = false;
+            } else if (!/^\d+$/.test(phoneNumber)) {
+                $('#phoneNumber').addClass('input-error');
+                $('#phoneNumberError').text('Only numbers are allowed for the phone number.');
+                isValid = false;
+            } else {
+                $('#phoneNumber').removeClass('input-error');
+                $('#phoneNumberError').text('');
+            }
 
+            const $email = $('#email');
+            const email = $email.val().trim();
+            let emailError = [];
+
+            if (/[^ -~]/.test(email)) {
+                $email.addClass('input-error');
+                emailError.push('Only half-width characters are allowed; full-width characters are not!');
+            }
+
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            const domainRegex = /@(gmail\.com|yahoo\.com|outlook\.com|icloud\.com|hotmail\.com)$/;
+
+            if (!emailRegex.test(email)) {
+                $email.addClass('input-error');
+                emailError.push('Invalid email format.');
+            }
+            if (!domainRegex.test(email)) {
+                $email.addClass('input-error');
+                emailError.push('The email must be from Gmail, Yahoo, Outlook, iCloud, or Hotmail.');
+            }
+
+            if (emailError.length > 0) {
+                $('#emailError').text(emailError.join(' '));
+                isValid = false;
+            } else {
+                $email.removeClass('input-error');
+                $('#emailError').text('');
+            }
+
+            const address = $('#address').val();
+            if (/[^\u0020-\u007E\u00C0-\u1EF9\u3040-\u30FF\u4E00-\u9FAF]/.test(address)) {
+                $('#address').addClass('input-error');
+                $('#addressError').text('Only half-width characters are allowed; full-width characters are not!');
+                isValid = false;
+            } else {
+                $('#address').removeClass('input-error');
+                $('#addressError').text('');
+            }
+
+            if (!$('#provinceId').val()) {
+                Swal.fire('Missing Information', 'Please select a province.', 'warning');
+                isValid = false;
+            }
+
+            if (!$('#districtId').val()) {
+                Swal.fire('Missing Information', 'Please select a district.', 'warning');
+                isValid = false;
+            }
+
+            if (!$('#wardId').val()) {
+                Swal.fire('Missing Information', 'Please select a ward.', 'warning');
+                isValid = false;
+            }
+
+            if (!$('input[name="role"]:checked').val()) {
+                Swal.fire('Missing Role', 'Please select a role.', 'warning');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                Swal.fire('Validation Error', 'Please check the fields again!', 'error');
+            }
+
+            return isValid;
+        }
+
+        $('input, select').on('input change', function () {
+            if ($(this).hasClass('input-error')) {
+                $(this).removeClass('input-error');
+                $(this).next('.error-message').text('');
+            }
+        });
+
+        let today = new Date().toISOString().split("T")[0];
+        document.getElementById("dateOfBirth").max = today;
+
+        $('#provinceId').change(function () {
+            let provinceId = $(this).val();
+            $('#districtId').empty().append('<option value="">Loading...</option>');
+            $('#wardId').empty().append('<option value="">Select Ward</option>');
+
+            if (!provinceId) {
+                $('#districtId').empty().append('<option value="">Select District</option>');
+                return;
+            }
+
+            $.ajax({
+                url: '/loginAPI/getDistrictDropdown',
+                type: 'GET',
+                data: { provinceId: provinceId },
+                success: function (data) {
+                    $('#districtId').empty().append('<option value="">Select District</option>');
+                    data.forEach(function (district) {
+                        $('#districtId').append('<option value="' + district.districtId + '">' + district.districtName + '</option>');
+                    });
+                }
+            });
+        });
+
+        $('#districtId').change(function () {
+            let districtId = $(this).val();
+            if (!districtId) return;
+
+            $('#wardId').empty().append('<option value="">Loading...</option>');
+            $.ajax({
+                url: '/loginAPI/getWardDropdown',
+                type: 'GET',
+                data: { districtId: districtId },
+                success: function (data) {
+                    $('#wardId').empty().append('<option value="">Select Ward</option>');
+                    data.forEach(function (ward) {
+                        $('#wardId').append('<option value="' + ward.wardId + '">' + ward.wardName + '</option>');
+                    });
+                }
+            });
+        });
+
+        // ===== Hiển thị popup nếu có thông báo từ backend =====
+        let successMessage = "[[${successMessage}]]";
+        let errorMessage = "[[${errorMessage}]]";
+
+        if (successMessage && successMessage.trim() !== "null") {
+            Swal.fire({
+                icon: 'success',
+                title: 'Registration Successful!',
+                text: successMessage,
+                timer: 5000,
+                timerProgressBar: true,
+                didClose: redirectToLogin
+            });
+        }
+
+        if (errorMessage && errorMessage.trim() !== "null") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Registration Failed!',
+                text: errorMessage,
+                confirmButtonText: 'Close'
+            });
+        }
+    });
+
+    function redirectToLogin() {
+        window.location.href = "/ComplexGym/home";
+    }
+</script>
 </body>
 
 </html>

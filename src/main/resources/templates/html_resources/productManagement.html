@@ -177,42 +177,11 @@
         .logout-button:hover {
             background-color: #d32f2f;
         }
-
-        /* Pop-up xác nhận */
-        .confirm-popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            z-index: 1000;
-            width: 300px;
-        }
-
-        .confirm-popup h3 {
-            margin-bottom: 15px;
-        }
-
-        .confirm-popup .btn {
-            margin: 0 5px;
-        }
-
-        /* Overlay mờ */
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
+		
+		.filtered-out, .page-hidden {
+		    display: none !important;
+		}
+		
     </style>
 </head>
 
@@ -249,7 +218,18 @@
     </header>
 
     <div class="container">
-        <h1 style="text-align: center;" class="mb-3">Product management</h1>
+       	<!-- Hiển thị thông báo -->
+		<section>
+			<div th:if="${errorMessage}" class="alert alert-danger">
+				<span th:text="${errorMessage}"></span>
+			</div>
+			<!-- Hiển thị thông báo thành công -->
+			<div th:if="${successMessage}" class="alert alert-success">
+				<span th:text="${successMessage}"></span>
+			</div>
+		</section>
+
+		<h1 style="text-align: center;" class="mb-3">Product management</h1>
         <div class="d-flex justify-content-between mb-1">
             <div th:if="${role != null and role.contains('ADMIN')}">
                 <button class=" fml_font btn btn-outline-info"
@@ -257,40 +237,49 @@
                     product</button>
             </div>
         </div>
-        <!-- Tạo table tìm kiếm product-->
-        <section class="fml_font mb-4">
-            <form method="POST" th:action="@{/ComplexGym/products/searchProductInformation}"
-                th:object="${productManagementObject}">
-                <div class="mb-3">
-                    <label for="keyword" class="form-label fw-bold">Search</label>
-                    <input type="text" class="form-control form-control-lg" name="keyword" id="keyword"
-                        placeholder="Input ID, product name,...">
-                </div>
-                <div class="text-center">
-                    <button class="btn btn-primary btn-lg px-5" type="submit">Search</button>
-                </div>
-            </form>
-        </section>
-        <h3 class="fml_font mt-4">Result</h3>
+                     
         <!-- Tạo table hiển thị kết quả -->
-        <section class="fml_font">
-            <table border="1" class="table table-bordered">
-                <thead class="table-dark text-center">
-                    <tr>
-                        <th>ID</th>
-                        <th>Product name</th>
-                        <th>Price</th>
-                        <th>Type</th>
-                        <th>Quantity</th>
-                        <th>Image Path</th>
-                        <th th:if="${role != null and role.contains('ADMIN')}">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
+        <section class="fml_font mt-3">
+           <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                <table border="1" class="table table-bordered">
+				<thead class="table-dark text-center">
+				    <tr>
+				        <th>
+				            ID<br>
+				            <input type="text" class="filter-input" placeholder="ID" 
+				            		oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+				             		onkeyup="filterTable(0, this.value)">
+				        </th>
+				        <th>
+				            Product name<br>
+				            <input type="text" class="filter-input" placeholder="Product name" onkeyup="filterTable(1, this.value)">
+				        </th>
+				        <th>
+				            Price (VND)<br>
+							<input type="text" class="filter-input" placeholder="Price"
+							       oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+							       onkeyup="filterTable(2, this.value)">
+				        </th>
+				        <th>
+				            Type<br>
+				            <input type="text" class="filter-input" placeholder="Type" onkeyup="filterTable(3, this.value)">
+				        </th>
+				        <th>
+				            Quantity<br>
+				            <input type="text" class="filter-input" placeholder="Quantity" onkeyup="filterTable(4, this.value)">
+				        </th>
+				        <th>
+				            Image Path<br>
+				            <input type="text" class="filter-input" placeholder="Image Path" onkeyup="filterTable(5, this.value)">
+				        </th>
+				        <th th:if="${role != null and role.contains('ADMIN')}"> Action</th>
+				    </tr>
+				</thead>
+                <tbody id="bookingTableBody">
                     <tr th:each="item : ${productResults}">
                         <td th:text="${item.id}"></td>
                         <td th:text="${item.productName}"></td>
-                        <td th:text="${item.price}"></td>
+                        <td th:text="${#numbers.formatInteger(item.price, 3, 'POINT')}"></td>
                         <td th:text="${item.type}"></td>
                         <td th:text="${item.quantity}"></td>
                         <td th:text="${item.imagePath}"></td>
@@ -306,45 +295,113 @@
                     </tr>
                 </tbody>
             </table>
+        	</div>        	
         </section>
+          <div id="pagination-controls" class="mt-3 d-flex justify-content-center gap-1"></div>                            	        
     </div>
-
-
-    <!-- HTML cho Pop-up xác nhận xóa và Overlay -->
-    <div class="fml_font confirm-popup" id="confirmDeletePopup">
-        <h3>Are you sure you want to delete this product?</h3>
-        <button id="confirmDeleteYes" class="btn btn-danger">Yes, Delete</button>
-        <button id="confirmDeleteNo" class="btn btn-secondary">Cancel</button>
-    </div>
-    <div class="overlay" id="overlay"></div>
 
     <!-- jQuery & Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Khi nhấn nút Delete, chặn hành động mặc định và hiển thị pop-up xác nhận
-            $('.delete-button').on('click', function (e) {
-                e.preventDefault();
-                var deleteUrl = $(this).attr('href'); // Lấy URL xóa từ th:href
-                $('#confirmDeletePopup').data('deleteUrl', deleteUrl);
-                $('#overlay').show();
-                $('#confirmDeletePopup').show();
-            });
-
-            // Nếu người dùng nhấn "Yes", chuyển hướng tới URL xóa
-            $('#confirmDeleteYes').on('click', function () {
-                var url = $('#confirmDeletePopup').data('deleteUrl');
-                window.location.href = url;
-            });
-
-            // Nếu người dùng nhấn "Cancel", ẩn pop-up và overlay
-            $('#confirmDeleteNo').on('click', function () {
-                $('#confirmDeletePopup').hide();
-                $('#overlay').hide();
-            });
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>   
+	<script>
+	    $(document).ready(function () {
+	        // Xử lý khi click nút Delete với SweetAlert
+	        $('.delete-button').on('click', function (e) {
+	            e.preventDefault();
+	            const deleteUrl = $(this).attr('href');
+	
+	            Swal.fire({
+	                title: 'Are you sure?',
+	                text: "Do you really want to delete this product?",
+	                icon: 'warning',
+	                showCancelButton: true,
+	                confirmButtonColor: '#d33',
+	                cancelButtonColor: '#3085d6',
+	                confirmButtonText: 'Yes, delete it!'
+	            }).then((result) => {
+	                if (result.isConfirmed) {
+	                    window.location.href = deleteUrl;
+	                }
+	            });
+	        });
+	
+	        // Gọi phân trang lần đầu khi load trang
+	        showPage(0);
+	    });
+	
+	    // Số dòng hiển thị mỗi trang
+	    const rowsPerPage = 10;
+	    let currentPage = 0;
+	
+	    // Lấy các dòng không bị lọc ẩn (filtered-out)
+	    function getVisibleRows() {
+	        const rows = Array.from(document.querySelectorAll("#bookingTableBody tr"));
+	        return rows.filter(row => !row.classList.contains("filtered-out"));
+	    }
+	
+	    // Hiển thị trang cụ thể
+	    function showPage(page) {
+	        const visibleRows = getVisibleRows();
+	        const start = page * rowsPerPage;
+	        const end = start + rowsPerPage;
+	
+	        visibleRows.forEach((row, i) => {
+	            row.classList.toggle("page-hidden", !(i >= start && i < end));
+	        });
+	
+	        updatePagination(visibleRows.length, page);
+	    }
+	
+	    // Cập nhật nút phân trang
+	    function updatePagination(totalVisible, activePage) {
+	        const totalPages = Math.ceil(totalVisible / rowsPerPage);
+	        const pagination = document.getElementById("pagination-controls");
+	        pagination.innerHTML = "";
+	
+	        if (totalPages <= 1) return;
+	
+	        for (let i = 0; i < totalPages; i++) {
+	            const btn = document.createElement("button");
+	            btn.textContent = i + 1;
+	            btn.className = "btn btn-sm mx-1 " + (i === activePage ? "btn-primary" : "btn-outline-primary");
+	            btn.onclick = () => {
+	                currentPage = i;
+	                showPage(currentPage);
+	            };
+	            pagination.appendChild(btn);
+	        }
+	    }
+	
+	    // Hàm lọc theo từng cột
+	    function filterTable(columnIndex, filterValue) {
+	        // Nếu là cột Price thì chỉ giữ lại chữ số
+	        const isPriceColumn = columnIndex === 2;
+	        filterValue = filterValue.toLowerCase();
+	        if (isPriceColumn) {
+	            filterValue = filterValue.replace(/\D/g, '');
+	        }
+	
+	        const rows = document.querySelectorAll("#bookingTableBody tr");
+	
+	        rows.forEach(row => {
+	            const cell = row.getElementsByTagName("td")[columnIndex];
+	            if (cell) {
+	                let cellValue = cell.textContent.toLowerCase();
+	                if (isPriceColumn) {
+	                    // Loại bỏ dấu chấm/thành phần không phải số (vd: 1.950.000 → 1950000)
+	                    cellValue = cellValue.replace(/\D/g, '');
+	                }
+	                const matched = cellValue.includes(filterValue);
+	                row.classList.toggle("filtered-out", !matched);
+	            }
+	        });
+	
+	        // Reset về trang đầu sau khi lọc
+	        currentPage = 0;
+	        showPage(currentPage);
+	    }
+	</script>
 </body>
 
 </html>

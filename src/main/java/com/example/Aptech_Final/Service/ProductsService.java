@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,7 +44,7 @@ public class ProductsService {
 			if (productsForm.getQuantity() < 1) {
 				return "error: Quantity must be at least 1.";
 			}
-			
+
 			// Kiểm tra giá tiền có hợp lệ không
 			String priceString = productsForm.getPrice();
 			// Kiểm tra xem có ký tự full-size không
@@ -59,8 +61,16 @@ public class ProductsService {
 			if (priceBigDecimal.compareTo(BigDecimal.valueOf(1000)) < 0) {
 				return "error: Price must be at least 1000.";
 			}
+			// Kiểm tra nếu imagePath bị rỗng
+			if (multipartFile.isEmpty()) {
+				return "error: Image file is required!";
+			}
+
 			// Tạo biến để lưu ảnh vào thư mục
 			String imagePath = imageService.saveFile(multipartFile);
+			if (imagePath == null) {
+				return "error: Image path not found!";
+			}
 
 			// Tạo đối tượng product, gán từ form vào entity rồi lưu vào database
 			Products products = new Products();
@@ -111,41 +121,6 @@ public class ProductsService {
 		return productDTO;
 	}
 	
-    // Phương thức sử dụng hàm escape ký tự đặc biệt trong chuỗi tìm kiếm
-    private String escapeSpecialChars(String input) {
-        if (input == null) return null;
-        // Thứ tự quan trọng: escape "\" trước, sau đó "%" và "_"
-        return input.replace("\\", "\\\\")
-                    .replace("%", "\\%")
-                    .replace("_", "\\_");
-    }
-
-    // Phương thức tìm kiếm user theo keyword (xử lý cả trường hợp ký tự đặc biệt và chuỗi rỗng)
-    public List<ProductManagementDTO> searchProducts(String keyword) {
-    	// Trả về trường hợp là null và chuỗi rồng
-        if (keyword == null || keyword.trim().isEmpty()) {
-        	// Nếu không nhập gì, có thể gọi repository để trả về toàn bộ user
-            return productsRepository.searchProductsByKeyword(keyword);
-        }
-        // Escape ký tự đặc biệt để đảm bảo tìm kiếm chính xác
-        String escapedKeyword = escapeSpecialChars(keyword.trim());
-        return productsRepository.searchProductsByKeyword(escapedKeyword);
-    }
-
-	// Phương thức trả về khi nhấn button `search` ở trang productManagement
-    // (sử dụng kết quả từ phương thức searchUsers đã được xử lý)
-	public ProductDTO getProductsDTOByKeyword(String keyword) {
-		
-	    // Gọi phương thức `searchProducts` để tìm kiếm theo ký tự đặc biệt
-	    List<ProductManagementDTO> productManagementDTOs = searchProducts(keyword);
-	    
-	    // Tạo đối tượng ProductDTO
-	    ProductDTO productDTO = new ProductDTO();
-		// Gán danh sách productManagementDTOs vào danh sách productManagementDTOs ở lớp ProductDTO
-	    productDTO.setProductManagementDTOs(productManagementDTOs);
-	    
-	    return productDTO;
-	}
 	
 	// Phương thức tìm kiếm thông tin bằng id
 	public Optional<Products> findProductByID(Long id){
@@ -174,7 +149,7 @@ public class ProductsService {
 			if (productsForm.getQuantity() < 1) {
 				return "error: Quantity must be at least 1.";
 			}
-			
+
 			// Kiểm tra giá tiền có hợp lệ không
 			String priceString = productsForm.getPrice();
 			// Kiểm tra xem có ký tự full-size không
@@ -227,8 +202,27 @@ public class ProductsService {
 	}
 	
 	// Phương thức xóa thông tin với id
-	public void deleteInfoById (Long id) {
-		productsRepository.deleteById(id);
+	public String deleteInfoById (Long id) {
+		// Tìm sản phẩm bằng ID
+		Products products = productsRepository.findById(id).orElse(null);
+		// Lấy tên sản phẩm
+		String productName = products.getProductName();
+
+		try {
+			// Gọi repo để xóa sản phẩm bằng id
+			productsRepository.deleteById(id);
+		} catch (DataIntegrityViolationException dive) {
+			// Xử lý lỗi liên quan đến ràng buộc DB (VD: khóa ngoại)
+			return "error: Cannot delete this product because it's in use in another place.";
+		} catch (EmptyResultDataAccessException noEntity) {
+			// Xử lý khi không tìm thấy sản phẩm cần xóa
+			return "error: Product not found or already deleted.";
+		} catch (Exception e) {
+			// Lỗi không xác định khác
+			return "error: An unexpected error occurred while deleting the product.";
+		}
+		
+		return "success: Product (" + productName + ") deleted successfully.";
 	}
 	
 	// Phương thức lấy mô tả sản phẩm dựa theo id sản phẩm
